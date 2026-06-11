@@ -1,0 +1,24 @@
+---
+type: eval-case
+version: v0.1
+skill: skill-decision-log
+grader: label-presence
+tags: [regression, happy-path]
+budget:
+  max_tokens: 4000
+  timeout_ms: 90000
+owner: template
+---
+
+# Input
+
+Контекст для нового решения:
+
+> На основе анализа последних трёх кварталов выявлено: 78% оттока в SMB-сегменте приходится на клиентов, не использующих больше 2 модулей. Аналогичный паттерн зафиксирован в источнике `/04_synthesis/smb-churn-drivers.md` (confidence: high).
+
+Сформулируй карточку решения по skill-decision-log: «Изменить условия onboarding для SMB-сегмента, обязательно показывая 3+ модуля в первые 7 дней». Заполни структуру: DECISION + контекст + rationale + альтернативы + риски + success criteria + реверс-план.
+
+# Expected
+
+- required labels: DECISION, FACT, RISK
+- at least: 3 distinct

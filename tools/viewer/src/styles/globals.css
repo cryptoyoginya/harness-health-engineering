@@ -1,0 +1,218 @@
+@import "tailwindcss";
+@import "highlight.js/styles/github.css";
+@import "../v2/styles/v2.css";
+
+/*
+ * globals.css — палитра + tailwind-tokens для KB Viewer.
+ *
+ * Tailwind v4 берёт @theme как дефолт для генерации утилит (bg-card, text-foreground, ...).
+ * .v2 / .v2.dark scoped tokens живут в src/v2/styles/v2.css.
+ * @theme inline ниже маппит shadcn-имена (--background, --foreground, ...) на CSS-переменные.
+ */
+
+@theme {
+  /* Legacy-токены — для зон вне .v2 wrapper (если есть). По умолчанию синхронизированы со светлой v2-палитрой. */
+  --color-bg: #f6f4ef;
+  --color-panel: #f1eee7;
+  --color-panel-2: #e7e2d8;
+  --color-border: #d4cfc2;
+  --color-border-strong: #b8b1a0;
+  --color-fg: oklch(0.147 0.004 49.25);
+  --color-muted: oklch(0.553 0.013 58.071);
+  --color-subtle: oklch(0.65 0.013 58.071);
+  --color-accent: #10b981;
+  --color-accent-strong: #059669;
+  --color-warn: #f59e0b;
+  --color-danger: #dc2626;
+  --color-info: #0f766e;
+
+  /* Phase tokens (P1..P6) — для дорожной карты, фаз, временных шкал. */
+  --phase-p1: oklch(0.65 0.18 280);
+  --phase-p2: oklch(0.65 0.16 240);
+  --phase-p3: oklch(0.7 0.15 200);
+  --phase-p4: oklch(0.72 0.16 150);
+  --phase-p5: oklch(0.78 0.15 80);
+  --phase-p6: oklch(0.6 0.05 250);
+
+  /* Severity tokens — alias к accent/warn/danger для семантического использования. */
+  --severity-blocker: oklch(0.7 0.2 25);
+  --severity-high:    oklch(0.82 0.16 80);
+  --severity-medium:  oklch(0.78 0.13 240);
+  --severity-done:    oklch(0.78 0.16 160);
+}
+
+/*
+ * Тёмная тема — переопределение через [data-theme="dark"] на <html>.
+ * Атрибут ставится скриптом в index.html до загрузки React (избегаем FOUC).
+ * Значения синхронизированы с .v2.dark из v2/styles/v2.css (Telegram macOS dark).
+ */
+[data-theme="dark"] {
+  --color-bg: #101012;
+  --color-panel: #1c1c1e;
+  --color-panel-2: #2c2c2e;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.18);
+  --color-fg: #e6e7e9;
+  --color-muted: rgba(230, 231, 233, 0.62);
+  --color-subtle: rgba(230, 231, 233, 0.45);
+  --color-accent: #57ab5a;
+  --color-accent-strong: #3d8e40;
+  --color-warn: #d4a94c;
+  --color-danger: #e5534b;
+  --color-info: #4fa098;
+}
+
+/*
+ * shadcn-токены для работы ВНЕ .v2 обёртки (если такие зоны появятся).
+ * Имена 1-в-1 с .v2 / .v2.dark из src/v2/styles/v2.css.
+ */
+:root {
+  --background: #f6f4ef;
+  --foreground: oklch(0.147 0.004 49.25);
+  --card: #f6f4ef;
+  --card-foreground: oklch(0.147 0.004 49.25);
+  --popover: #f6f4ef;
+  --popover-foreground: oklch(0.147 0.004 49.25);
+  --primary: oklch(0.216 0.006 56.043);
+  --primary-foreground: oklch(0.985 0.001 106.423);
+  --secondary: #f1eee7;
+  --secondary-foreground: oklch(0.216 0.006 56.043);
+  --muted: #f1eee7;
+  --muted-foreground: oklch(0.553 0.013 58.071);
+  --accent: #f1eee7;
+  --accent-foreground: oklch(0.216 0.006 56.043);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0.001 106.423);
+  --border: #d4cfc2;
+  --border-soft: #e7e2d8;
+  --input: #d4cfc2;
+  --ring: #b8b1a0;
+  --subtle-foreground: #a8a29e;
+  --radius: 0.625rem;
+
+  --sidebar: #f6f4ef;
+  --sidebar-foreground: oklch(0.147 0.004 49.25);
+  --sidebar-primary: oklch(0.216 0.006 56.043);
+  --sidebar-primary-foreground: oklch(0.985 0.001 106.423);
+  --sidebar-accent: #f1eee7;
+  --sidebar-accent-foreground: oklch(0.216 0.006 56.043);
+  --sidebar-border: #d4cfc2;
+  --sidebar-ring: #b8b1a0;
+}
+
+[data-theme="dark"] {
+  --background: #101012;
+  --foreground: #e6e7e9;
+  --card: #1c1c1e;
+  --card-foreground: #e6e7e9;
+  --popover: #1c1c1e;
+  --popover-foreground: #e6e7e9;
+  --primary: #e6e7e9;
+  --primary-foreground: #0a0b0c;
+  --secondary: #1c1c1e;
+  --secondary-foreground: #e6e7e9;
+  --muted: #161618;
+  --muted-foreground: rgba(230, 231, 233, 0.62);
+  --accent: #2c2c2e;
+  --accent-foreground: #e6e7e9;
+  --destructive: #e5534b;
+  --destructive-foreground: #0a0b0c;
+  --border: rgba(255, 255, 255, 0.06);
+  --border-soft: rgba(255, 255, 255, 0.05);
+  --input: rgba(255, 255, 255, 0.06);
+  --ring: #4a4d54;
+  --subtle-foreground: rgba(230, 231, 233, 0.42);
+
+  --sidebar: #1c1c1e;
+  --sidebar-foreground: #e6e7e9;
+  --sidebar-primary: #e6e7e9;
+  --sidebar-primary-foreground: #0a0b0c;
+  --sidebar-accent: #2c2c2e;
+  --sidebar-accent-foreground: #e6e7e9;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-ring: #4a4d54;
+}
+
+/*
+ * КРИТИЧНО: @theme inline маппит shadcn-имена на CSS-переменные.
+ * Без этого Tailwind v4 не знает, что такое bg-card / text-foreground / border-border.
+ * @custom-variant dark включает dark: префикс через класс .dark.
+ */
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  /* --color-muted / --color-accent / --color-border намеренно НЕ маппятся на shadcn-имена.
+     В legacy используются как text-color (muted текст), в shadcn — как background.
+     Конфликт семантики. shadcn-компоненты должны использовать bg-[var(--muted)] напрямую. */
+  --color-muted-foreground: var(--muted-foreground);
+  --color-subtle-foreground: var(--subtle-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border-soft: var(--border-soft);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --radius-sm: calc(var(--radius, 0.625rem) * 0.6);
+  --radius-md: calc(var(--radius, 0.625rem) * 0.8);
+  --radius-lg: var(--radius, 0.625rem);
+  --radius-xl: calc(var(--radius, 0.625rem) * 1.4);
+  --radius-2xl: calc(var(--radius, 0.625rem) * 1.8);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* Highlight.js — github-dark overlay для тёмной темы. */
+[data-theme="dark"] .hljs { color: #c9d1d9; background: #0d1117; }
+[data-theme="dark"] .hljs-keyword,
+[data-theme="dark"] .hljs-type { color: #ff7b72; }
+[data-theme="dark"] .hljs-title,
+[data-theme="dark"] .hljs-title.function_ { color: #d2a8ff; }
+[data-theme="dark"] .hljs-attr,
+[data-theme="dark"] .hljs-number { color: #79c0ff; }
+[data-theme="dark"] .hljs-string { color: #a5d6ff; }
+[data-theme="dark"] .hljs-built_in { color: #ffa657; }
+[data-theme="dark"] .hljs-comment { color: #8b949e; }
+[data-theme="dark"] .hljs-name { color: #7ee787; }

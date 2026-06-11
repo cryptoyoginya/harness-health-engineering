@@ -1,0 +1,1590 @@
+/*
+ * v2.css — изолированный слой темы для /v2/*.
+ *
+ * Принципы:
+ *   - НЕ импортируем повторно "tailwindcss" — он уже подключён в src/styles/globals.css.
+ *   - Все shadcn-переменные живут только внутри селекторов .v2 (light) и .v2.dark (dark).
+ *   - Никаких глобальных правил body/html/* — только то, что внутри .v2-обёртки.
+ *   - Класс .dark ставится на v2-wrapper, не на <html>.
+ */
+
+@import "tw-animate-css";
+
+/*
+ * @custom-variant dark и @theme inline для shadcn-токенов живут
+ * в src/styles/globals.css — потому что Tailwind v4 сканирует @theme
+ * только в основном бандле при сборке, а v2.css подгружается lazy.
+ * Здесь — только значения переменных в .v2 / .v2.dark scope.
+ */
+
+@layer base {
+  /*
+   * Палитра moniq.space.
+   * Light — warm-beige + stone primary. Card == background — однородный фон.
+   * Dark — Telegram macOS, 3-tier elevation (canvas < sidebar/card < accent),
+   * никакого pure-black.
+   */
+  .v2 {
+    --background: #f6f4ef;
+    --foreground: oklch(0.147 0.004 49.25);
+
+    --card: #f6f4ef;
+    --card-foreground: oklch(0.147 0.004 49.25);
+
+    --popover: #f6f4ef;
+    --popover-foreground: oklch(0.147 0.004 49.25);
+
+    --primary: oklch(0.216 0.006 56.043);
+    --primary-foreground: oklch(0.985 0.001 106.423);
+
+    --secondary: #f1eee7;
+    --secondary-foreground: oklch(0.216 0.006 56.043);
+
+    --muted: #f1eee7;
+    --muted-foreground: oklch(0.553 0.013 58.071);
+
+    --accent: #f1eee7;
+    --accent-foreground: oklch(0.216 0.006 56.043);
+
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(0.985 0.001 106.423);
+
+    --border: #e7e2d8;
+    --border-soft: #f1eee7;
+    --input: #e7e2d8;
+    --ring: #d6d0c5;
+
+    --subtle-foreground: #a8a29e;
+
+    --chart-1: oklch(0.785 0.108 296.96);
+    --chart-2: oklch(0.585 0.142 281.27);
+    --chart-3: oklch(0.511 0.183 273.85);
+    --chart-4: oklch(0.457 0.198 271.21);
+    --chart-5: oklch(0.398 0.211 271.93);
+
+    --color-income: #10b981;
+    --color-expense: #f97316;
+    --color-warning: #f59e0b;
+    --color-balance: #0f766e;
+    --color-saldo-pos: #10b981;
+    --color-saldo-neg: #dc2626;
+
+    /* Phase tokens p1..p6 — для дорожной карты, волн миграции и phase-tone карточек.
+       Значения oklch скопированы из src/styles/globals.css (v1) — индиго → синий → циан →
+       зелень → амбер → слейт. Используются через color-mix для мягких фонов и пилюль. */
+    --phase-p1: oklch(0.65 0.18 280);
+    --phase-p2: oklch(0.65 0.16 240);
+    --phase-p3: oklch(0.7 0.15 200);
+    --phase-p4: oklch(0.72 0.16 150);
+    --phase-p5: oklch(0.78 0.15 80);
+    --phase-p6: oklch(0.6 0.05 250);
+
+    --radius: 0.625rem;
+
+    --sidebar: #f6f4ef;
+    --sidebar-foreground: oklch(0.147 0.004 49.25);
+    --sidebar-primary: oklch(0.216 0.006 56.043);
+    --sidebar-primary-foreground: oklch(0.985 0.001 106.423);
+    --sidebar-accent: #f1eee7;
+    --sidebar-accent-foreground: oklch(0.216 0.006 56.043);
+    --sidebar-border: #e7e2d8;
+    --sidebar-ring: #d6d0c5;
+
+    color-scheme: light;
+  }
+
+  .v2.dark {
+    --background: #101012;
+    --foreground: #e6e7e9;
+
+    --card: #1c1c1e;
+    --card-foreground: #e6e7e9;
+
+    --popover: #1c1c1e;
+    --popover-foreground: #e6e7e9;
+
+    --primary: #e6e7e9;
+    --primary-foreground: #0a0b0c;
+
+    --secondary: #1c1c1e;
+    --secondary-foreground: #e6e7e9;
+
+    --muted: #161618;
+    --muted-foreground: rgba(230, 231, 233, 0.62);
+
+    --accent: #2c2c2e;
+    --accent-foreground: #e6e7e9;
+
+    --destructive: #e5534b;
+    --destructive-foreground: #0a0b0c;
+
+    --border: rgba(255, 255, 255, 0.06);
+    --border-soft: rgba(255, 255, 255, 0.05);
+    --input: rgba(255, 255, 255, 0.06);
+    --ring: #4a4d54;
+
+    --subtle-foreground: rgba(230, 231, 233, 0.42);
+
+    --chart-1: oklch(0.785 0.108 296.96);
+    --chart-2: oklch(0.585 0.142 281.27);
+    --chart-3: oklch(0.511 0.183 273.85);
+    --chart-4: oklch(0.457 0.198 271.21);
+    --chart-5: oklch(0.398 0.211 271.93);
+
+    --color-income: #57ab5a;
+    --color-expense: #d98858;
+    --color-warning: #d4a94c;
+    --color-balance: #4fa098;
+    --color-saldo-pos: #57ab5a;
+    --color-saldo-neg: #e5534b;
+
+    /* Phase tokens p1..p6 — dark вариант. Чуть подняли lightness, чтобы пилюли
+       читались на фоне канваса #101012. */
+    --phase-p1: oklch(0.72 0.16 280);
+    --phase-p2: oklch(0.72 0.14 240);
+    --phase-p3: oklch(0.76 0.13 200);
+    --phase-p4: oklch(0.78 0.14 150);
+    --phase-p5: oklch(0.82 0.13 80);
+    --phase-p6: oklch(0.7 0.05 250);
+
+    --sidebar: #1c1c1e;
+    --sidebar-foreground: #e6e7e9;
+    --sidebar-primary: #e6e7e9;
+    --sidebar-primary-foreground: #0a0b0c;
+    --sidebar-accent: #2c2c2e;
+    --sidebar-accent-foreground: #e6e7e9;
+    --sidebar-border: rgba(255, 255, 255, 0.06);
+    --sidebar-ring: #4a4d54;
+
+    color-scheme: dark;
+  }
+}
+
+/*
+ * @theme inline блок переехал в src/styles/globals.css — см. комментарий выше.
+ */
+
+/*
+ * CLI shadcn автоматически дописывал сюда глобальные :root и .dark с --sidebar-*
+ * в hsl(). Эти блоки удалены — они дублируют переменные из .v2/.v2.dark выше
+ * и нарушают принцип «никаких глобальных правил». Все --sidebar-* токены живут
+ * только внутри .v2 / .v2.dark и наследуются shadcn-компонентам корректно
+ * через bg-sidebar/text-sidebar-foreground (через @theme inline → var()).
+ */
+
+/*
+ * KB-элементы — расширения для MarkdownDoc на /v2/*:
+ *   - .kb-numbered-chip — моноширинный бейдж с номером раздела (## 01 · Заголовок)
+ *   - .kb-pill .kb-pill-{ok|warn|risk|blocked|info|muted} — inline-статусы в таблицах и тексте
+ *   - .kb-phase-card[data-status] — карточка фазы с цветной полоской слева
+ *   - .kb-roadmap — горизонтальная цветная полоса этапов P1..P6
+ *
+ * Цвета берём из существующих токенов moniq (--color-income / -warning / -balance /
+ * -saldo-neg / -expense), новые цвета НЕ вводим. Прозрачные оттенки — через color-mix.
+ */
+.v2 .kb-numbered-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 1.5rem;
+  padding: 0 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  background: color-mix(in oklab, var(--muted) 70%, transparent);
+  color: var(--foreground);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  flex-shrink: 0;
+  translate: 0 -0.05em;
+}
+
+.v2 .kb-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+  white-space: nowrap;
+  vertical-align: 0.05em;
+  border: 1px solid transparent;
+}
+.v2 .kb-pill::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: currentColor;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+.v2 .kb-pill-ok {
+  background: color-mix(in oklab, var(--color-income) 12%, transparent);
+  color: var(--color-income);
+  border-color: color-mix(in oklab, var(--color-income) 28%, transparent);
+}
+.v2 .kb-pill-warn {
+  background: color-mix(in oklab, var(--color-warning) 14%, transparent);
+  color: var(--color-warning);
+  border-color: color-mix(in oklab, var(--color-warning) 30%, transparent);
+}
+.v2 .kb-pill-risk {
+  background: color-mix(in oklab, var(--color-saldo-neg) 12%, transparent);
+  color: var(--color-saldo-neg);
+  border-color: color-mix(in oklab, var(--color-saldo-neg) 30%, transparent);
+}
+.v2 .kb-pill-blocked {
+  background: color-mix(in oklab, var(--color-saldo-neg) 20%, transparent);
+  color: var(--color-saldo-neg);
+  border-color: color-mix(in oklab, var(--color-saldo-neg) 40%, transparent);
+}
+.v2 .kb-pill-info {
+  background: color-mix(in oklab, var(--color-balance) 14%, transparent);
+  color: var(--color-balance);
+  border-color: color-mix(in oklab, var(--color-balance) 30%, transparent);
+}
+.v2 .kb-pill-muted {
+  background: color-mix(in oklab, var(--muted-foreground) 14%, transparent);
+  color: var(--muted-foreground);
+  border-color: color-mix(in oklab, var(--muted-foreground) 28%, transparent);
+}
+
+.v2 .kb-phase-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(2.25rem, auto) 1fr;
+  gap: 0 1rem;
+  padding: 0.85rem 1rem 0.9rem 1rem;
+  margin: 0.4rem 0;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--muted) 35%, transparent);
+  overflow: hidden;
+}
+.v2 .kb-phase-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--muted-foreground);
+  opacity: 0.65;
+}
+.v2 .kb-phase-card[data-status="active"]::before {
+  background: var(--color-income);
+  opacity: 1;
+}
+.v2 .kb-phase-card[data-status="upcoming"]::before {
+  background: var(--color-balance);
+}
+.v2 .kb-phase-card[data-status="done"]::before {
+  background: var(--muted-foreground);
+  opacity: 0.4;
+}
+.v2 .kb-phase-card[data-status="blocked"]::before {
+  background: var(--color-saldo-neg);
+}
+.v2 .kb-phase-card[data-status="planned"]::before {
+  background: var(--color-warning);
+}
+.v2 .kb-phase-id {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--foreground);
+  opacity: 0.9;
+  padding-top: 0.1rem;
+}
+.v2 .kb-phase-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+.v2 .kb-phase-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.75rem;
+}
+.v2 .kb-phase-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.v2 .kb-phase-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.65rem;
+  font-size: 0.74rem;
+  color: var(--muted-foreground);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: 0.02em;
+}
+.v2 .kb-phase-meta > span:not(:last-child)::after {
+  content: "·";
+  margin-left: 0.65rem;
+  opacity: 0.5;
+}
+.v2 .kb-phase-goal {
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: color-mix(in oklab, var(--foreground) 88%, transparent);
+  margin: 0;
+}
+
+.v2 .kb-roadmap {
+  display: grid;
+  grid-template-columns: repeat(var(--kb-roadmap-cols, 6), minmax(0, 1fr));
+  gap: 0.35rem;
+  margin: 1rem 0 1.25rem 0;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+.v2 .kb-roadmap-step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.55rem 0.65rem 0.6rem 0.65rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.5rem;
+  background: color-mix(in oklab, var(--muted) 30%, transparent);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  position: relative;
+  overflow: hidden;
+}
+.v2 .kb-roadmap-step::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  background: var(--muted-foreground);
+  opacity: 0.4;
+}
+.v2 .kb-roadmap-step[data-status="active"] {
+  background: color-mix(in oklab, var(--color-income) 10%, transparent);
+}
+.v2 .kb-roadmap-step[data-status="active"]::before {
+  background: var(--color-income);
+  opacity: 1;
+}
+.v2 .kb-roadmap-step[data-status="done"]::before {
+  background: var(--muted-foreground);
+  opacity: 0.3;
+}
+.v2 .kb-roadmap-step[data-status="upcoming"]::before {
+  background: var(--color-balance);
+}
+.v2 .kb-roadmap-step[data-status="planned"]::before {
+  background: var(--color-warning);
+}
+.v2 .kb-roadmap-step[data-status="blocked"]::before {
+  background: var(--color-saldo-neg);
+}
+.v2 .kb-roadmap-id {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--foreground);
+  letter-spacing: 0.06em;
+}
+.v2 .kb-roadmap-name {
+  font-size: 0.7rem;
+  color: var(--muted-foreground);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+.v2 .kb-roadmap-date {
+  font-size: 0.68rem;
+  color: var(--muted-foreground);
+  margin-top: 0.15rem;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   KB-каталог: stat-grid, stack-grid, cohort-grid, compare, risk-grid,
+   deep-grid. Все блоки через rehypeRaw в markdown. Цветовая семантика —
+   data-tone / data-risk / data-severity / data-phase / data-sign /
+   data-tier / data-side / data-cols / data-variant. Никаких новых hex.
+   ───────────────────────────────────────────────────────────────────── */
+
+/* === KbStatGrid === */
+.v2 .kb-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--kb-cols, 4), minmax(0, 1fr));
+  gap: 0.65rem;
+  margin: 1rem 0;
+}
+.v2 .kb-stat-grid[data-cols="1"] { --kb-cols: 1; }
+.v2 .kb-stat-grid[data-cols="2"] { --kb-cols: 2; }
+.v2 .kb-stat-grid[data-cols="3"] { --kb-cols: 3; }
+.v2 .kb-stat-grid[data-cols="4"] { --kb-cols: 4; }
+.v2 .kb-stat-grid[data-cols="5"] { --kb-cols: 5; }
+.v2 .kb-stat-grid[data-cols="6"] { --kb-cols: 6; }
+@media (max-width: 768px) {
+  .v2 .kb-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.v2 .kb-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--muted-foreground);
+  border-radius: 0.5rem;
+  background: color-mix(in oklab, var(--muted) 30%, transparent);
+  position: relative;
+}
+.v2 .kb-stat[data-tone="ok"] { border-left-color: var(--color-income); }
+.v2 .kb-stat[data-tone="warn"] { border-left-color: var(--color-warning); }
+.v2 .kb-stat[data-tone="risk"] { border-left-color: var(--color-saldo-neg); }
+.v2 .kb-stat[data-tone="info"] { border-left-color: var(--color-balance); }
+.v2 .kb-stat[data-tone="muted"] { border-left-color: var(--muted-foreground); opacity: 0.85; }
+.v2 .kb-stat-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+.v2 .kb-stat-value {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.v2 .kb-stat[data-tone="ok"] .kb-stat-value { color: var(--color-income); }
+.v2 .kb-stat[data-tone="warn"] .kb-stat-value { color: var(--color-warning); }
+.v2 .kb-stat[data-tone="risk"] .kb-stat-value { color: var(--color-saldo-neg); }
+.v2 .kb-stat[data-tone="info"] .kb-stat-value { color: var(--color-balance); }
+.v2 .kb-stat-sub {
+  font-size: 0.74rem;
+  color: var(--muted-foreground);
+  line-height: 1.4;
+}
+.v2 .kb-stat-grid[data-variant="compact"] .kb-stat { padding: 0.55rem 0.7rem; }
+.v2 .kb-stat-grid[data-variant="compact"] .kb-stat-value { font-size: 0.95rem; }
+.v2 .kb-stat-grid[data-variant="kpi"] .kb-stat-value { font-size: 1.4rem; letter-spacing: -0.02em; }
+.v2 .kb-stat-grid[data-variant="kpi"] .kb-stat { padding: 0.85rem 1rem; }
+
+/* === KbStackGrid (карточки с phase-tone) === */
+.v2 .kb-stack-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--kb-cols, 3), minmax(0, 1fr));
+  gap: 0.85rem;
+  margin: 1.25rem 0;
+}
+.v2 .kb-stack-grid[data-cols="1"] { --kb-cols: 1; }
+.v2 .kb-stack-grid[data-cols="2"] { --kb-cols: 2; }
+.v2 .kb-stack-grid[data-cols="3"] { --kb-cols: 3; }
+.v2 .kb-stack-grid[data-cols="4"] { --kb-cols: 4; }
+@media (max-width: 768px) {
+  .v2 .kb-stack-grid { grid-template-columns: 1fr; }
+}
+.v2 .kb-stack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.95rem 1rem 1rem 1rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--muted) 28%, transparent);
+  overflow: hidden;
+}
+.v2 .kb-stack::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: var(--muted-foreground);
+  opacity: 0.4;
+}
+.v2 .kb-stack[data-phase="p1"]::before { background: var(--phase-p1); opacity: 1; }
+.v2 .kb-stack[data-phase="p2"]::before { background: var(--phase-p2); opacity: 1; }
+.v2 .kb-stack[data-phase="p3"]::before { background: var(--phase-p3); opacity: 1; }
+.v2 .kb-stack[data-phase="p4"]::before { background: var(--phase-p4); opacity: 1; }
+.v2 .kb-stack[data-phase="p5"]::before { background: var(--phase-p5); opacity: 1; }
+.v2 .kb-stack[data-phase="p6"]::before { background: var(--phase-p6); opacity: 1; }
+.v2 .kb-stack[data-tone="ok"]::before { background: var(--color-income); opacity: 1; }
+.v2 .kb-stack[data-tone="warn"]::before { background: var(--color-warning); opacity: 1; }
+.v2 .kb-stack[data-tone="risk"]::before { background: var(--color-saldo-neg); opacity: 1; }
+.v2 .kb-stack[data-tone="info"]::before { background: var(--color-balance); opacity: 1; }
+.v2 .kb-stack-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 0.4rem;
+  background: color-mix(in oklab, var(--muted) 65%, transparent);
+  color: var(--foreground);
+  font-size: 1rem;
+}
+.v2 .kb-stack-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin: 0;
+}
+.v2 .kb-stack-body {
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: color-mix(in oklab, var(--foreground) 88%, transparent);
+  margin: 0;
+}
+.v2 .kb-stack-list {
+  margin: 0.2rem 0 0 0;
+  padding-left: 1rem;
+  list-style: disc;
+  color: color-mix(in oklab, var(--foreground) 85%, transparent);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+.v2 .kb-stack-list li { margin: 0.1rem 0; }
+.v2 .kb-stack-list li::marker { color: var(--muted-foreground); }
+
+/* === KbCohortGrid === */
+.v2 .kb-cohort-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--kb-cols, 4), minmax(0, 1fr));
+  gap: 0.7rem;
+  margin: 1rem 0 1.25rem 0;
+}
+.v2 .kb-cohort-grid[data-cols="2"] { --kb-cols: 2; }
+.v2 .kb-cohort-grid[data-cols="3"] { --kb-cols: 3; }
+.v2 .kb-cohort-grid[data-cols="4"] { --kb-cols: 4; }
+@media (max-width: 1024px) {
+  .v2 .kb-cohort-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .v2 .kb-cohort-grid { grid-template-columns: 1fr; }
+}
+.v2 .kb-cohort {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.75rem 0.85rem 0.85rem 0.85rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.6rem;
+  background: color-mix(in oklab, var(--muted) 28%, transparent);
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.v2 .kb-cohort:hover {
+  border-color: color-mix(in oklab, var(--foreground) 25%, transparent);
+  background: color-mix(in oklab, var(--muted) 55%, transparent);
+}
+.v2 .kb-cohort::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--muted-foreground);
+  opacity: 0.5;
+}
+.v2 .kb-cohort[data-risk="ok"]::before { background: var(--color-income); opacity: 1; }
+.v2 .kb-cohort[data-risk="warn"]::before { background: var(--color-warning); opacity: 1; }
+.v2 .kb-cohort[data-risk="risk"]::before { background: var(--color-saldo-neg); opacity: 1; }
+.v2 .kb-cohort[data-risk="blocked"]::before { background: var(--color-saldo-neg); opacity: 1; }
+.v2 .kb-cohort[data-risk="info"]::before { background: var(--color-balance); opacity: 1; }
+.v2 .kb-cohort[data-risk="muted"]::before { background: var(--muted-foreground); opacity: 0.6; }
+.v2 .kb-cohort-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.v2 .kb-cohort-name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.v2 .kb-cohort-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.6rem;
+  font-size: 0.72rem;
+  color: var(--muted-foreground);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+.v2 .kb-cohort-meta > span:not(:last-child)::after {
+  content: "·";
+  margin-left: 0.6rem;
+  opacity: 0.5;
+}
+.v2 .kb-cohort-delta {
+  font-size: 0.86rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--foreground);
+}
+.v2 .kb-cohort-delta[data-sign="pos"] { color: var(--color-income); }
+.v2 .kb-cohort-delta[data-sign="neg"] { color: var(--color-saldo-neg); }
+.v2 .kb-cohort-waves {
+  display: inline-flex;
+  gap: 0.3rem;
+  margin-top: 0.1rem;
+}
+.v2 .kb-cohort-waves > span {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.05rem 0.4rem;
+  border-radius: 0.3rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border: 1px solid transparent;
+}
+.v2 .kb-cohort-waves > span[data-wave="w1"] {
+  background: color-mix(in oklab, var(--phase-p4) 18%, transparent);
+  color: var(--phase-p4);
+  border-color: color-mix(in oklab, var(--phase-p4) 35%, transparent);
+}
+.v2 .kb-cohort-waves > span[data-wave="w2"] {
+  background: color-mix(in oklab, var(--phase-p5) 18%, transparent);
+  color: var(--phase-p5);
+  border-color: color-mix(in oklab, var(--phase-p5) 35%, transparent);
+}
+.v2 .kb-cohort-waves > span[data-wave="w3"] {
+  background: color-mix(in oklab, var(--phase-p2) 18%, transparent);
+  color: var(--phase-p2);
+  border-color: color-mix(in oklab, var(--phase-p2) 35%, transparent);
+}
+.v2 .kb-cohort-cta {
+  margin-top: 0.2rem;
+  font-size: 0.74rem;
+  color: var(--muted-foreground);
+  text-decoration: none;
+}
+.v2 .kb-cohort-cta:hover { color: var(--foreground); }
+
+/* === KbCompare (V2 → V3) === */
+.v2 .kb-compare {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.75rem;
+  align-items: stretch;
+  margin: 1rem 0;
+}
+@media (max-width: 768px) {
+  .v2 .kb-compare {
+    grid-template-columns: 1fr;
+  }
+  .v2 .kb-compare .kb-compare-arrow { rotate: 90deg; justify-self: center; }
+}
+.v2 .kb-compare-col {
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.6rem;
+  background: color-mix(in oklab, var(--muted) 30%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.v2 .kb-compare-col[data-side="before"] {
+  border-color: color-mix(in oklab, var(--muted-foreground) 30%, transparent);
+  background: color-mix(in oklab, var(--muted) 45%, transparent);
+}
+.v2 .kb-compare-col[data-side="after"] {
+  border-color: color-mix(in oklab, var(--color-income) 35%, transparent);
+  background: color-mix(in oklab, var(--color-income) 8%, transparent);
+}
+.v2 .kb-compare-col h5 {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+.v2 .kb-compare-col[data-side="after"] h5 {
+  color: var(--color-income);
+}
+.v2 .kb-compare-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-foreground);
+  font-size: 1.2rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+.v2 .kb-compare-pain {
+  grid-column: 1 / -1;
+  margin: 0.25rem 0 0 0;
+  padding: 0.6rem 0.8rem;
+  border-left: 2px solid var(--color-warning);
+  background: color-mix(in oklab, var(--color-warning) 8%, transparent);
+  border-radius: 0 0.4rem 0.4rem 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: color-mix(in oklab, var(--foreground) 90%, transparent);
+}
+
+/* === KbRiskGrid === */
+.v2 .kb-risk-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--kb-cols, 2), minmax(0, 1fr));
+  gap: 0.85rem;
+  margin: 1rem 0 1.25rem 0;
+}
+.v2 .kb-risk-grid[data-cols="1"] { --kb-cols: 1; }
+.v2 .kb-risk-grid[data-cols="2"] { --kb-cols: 2; }
+.v2 .kb-risk-grid[data-cols="3"] { --kb-cols: 3; }
+@media (max-width: 1024px) {
+  .v2 .kb-risk-grid { grid-template-columns: 1fr; }
+}
+.v2 .kb-risk {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.95rem 1rem 1rem 1rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--muted) 28%, transparent);
+  overflow: hidden;
+}
+.v2 .kb-risk::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--muted-foreground);
+  opacity: 0.5;
+}
+.v2 .kb-risk[data-severity="ok"]::before { background: var(--color-income); opacity: 1; }
+.v2 .kb-risk[data-severity="warn"]::before { background: var(--color-warning); opacity: 1; }
+.v2 .kb-risk[data-severity="risk"]::before { background: var(--color-saldo-neg); opacity: 1; }
+.v2 .kb-risk[data-severity="blocked"]::before { background: var(--color-saldo-neg); opacity: 1; }
+.v2 .kb-risk-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.v2 .kb-risk-pi {
+  display: inline-flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+.v2 .kb-risk-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.35;
+}
+.v2 .kb-risk-body {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: color-mix(in oklab, var(--foreground) 88%, transparent);
+}
+.v2 .kb-risk-owner {
+  margin-top: 0.2rem;
+  font-size: 0.74rem;
+  color: var(--muted-foreground);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* === KbDeepGrid === */
+.v2 .kb-deep-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--kb-cols, 2), minmax(0, 1fr));
+  gap: 0.7rem;
+  margin: 1rem 0 1.25rem 0;
+}
+.v2 .kb-deep-grid[data-cols="2"] { --kb-cols: 2; }
+.v2 .kb-deep-grid[data-cols="3"] { --kb-cols: 3; }
+.v2 .kb-deep-grid[data-cols="4"] { --kb-cols: 4; }
+.v2 .kb-deep-grid[data-cols="5"] { --kb-cols: 5; }
+@media (max-width: 1024px) {
+  .v2 .kb-deep-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .v2 .kb-deep-grid { grid-template-columns: 1fr; }
+}
+.v2 .kb-deep {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.65rem;
+  align-items: start;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.5rem;
+  background: color-mix(in oklab, var(--muted) 22%, transparent);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+}
+.v2 .kb-deep:hover {
+  border-color: color-mix(in oklab, var(--foreground) 25%, transparent);
+  background: color-mix(in oklab, var(--muted) 50%, transparent);
+}
+.v2 .kb-deep[data-tier="primary"] {
+  background: color-mix(in oklab, var(--muted) 38%, transparent);
+}
+.v2 .kb-deep-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 0.4rem;
+  background: color-mix(in oklab, var(--muted) 60%, transparent);
+  color: var(--foreground);
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+.v2 .kb-deep[data-tier="primary"] .kb-deep-icon {
+  background: color-mix(in oklab, var(--color-balance) 14%, transparent);
+  color: var(--color-balance);
+}
+.v2 .kb-deep-title {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.3;
+}
+.v2 .kb-deep-desc {
+  margin: 0.2rem 0 0 0;
+  font-size: 0.78rem;
+  color: var(--muted-foreground);
+  line-height: 1.4;
+}
+.v2 .kb-deep-arrow {
+  align-self: center;
+  color: var(--muted-foreground);
+  font-size: 1rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.v2 .kb-deep:hover .kb-deep-arrow {
+  color: var(--color-balance);
+  transform: translateX(2px);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   KbRoadmap (этап C) — интерактивный модуль дорожной карты.
+   Views: gantt / cards / compact. Toggles: legalTrack / CDX-гейты.
+   Phase-tokens p1..p6 берутся из --phase-pN (определены выше).
+   ───────────────────────────────────────────────────────────────────── */
+
+.v2 .kb-rm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1rem 0 1.25rem 0;
+}
+.v2 .kb-rm-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+.v2 .kb-rm-toolbar-spacer { flex: 1 1 auto; }
+.v2 .kb-rm-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  user-select: none;
+}
+.v2 .kb-rm-toggle input { accent-color: var(--color-balance); }
+.v2 .kb-rm-toggle:hover { color: var(--foreground); }
+
+/* === Compact strip (P1..P6 в одной полосе) === */
+.v2 .kb-rm-compact {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.4rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (max-width: 768px) {
+  .v2 .kb-rm-compact { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.v2 .kb-rm-compact-step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.6rem 0.7rem 0.7rem 0.7rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.5rem;
+  background: color-mix(in oklab, var(--muted) 28%, transparent);
+  position: relative;
+  overflow: hidden;
+}
+.v2 .kb-rm-compact-step::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  opacity: 1;
+  background: var(--muted-foreground);
+}
+.v2 .kb-rm-compact-step[data-phase="p1"]::before { background: var(--phase-p1); }
+.v2 .kb-rm-compact-step[data-phase="p2"]::before { background: var(--phase-p2); }
+.v2 .kb-rm-compact-step[data-phase="p3"]::before { background: var(--phase-p3); }
+.v2 .kb-rm-compact-step[data-phase="p4"]::before { background: var(--phase-p4); }
+.v2 .kb-rm-compact-step[data-phase="p5"]::before { background: var(--phase-p5); }
+.v2 .kb-rm-compact-step[data-phase="p6"]::before { background: var(--phase-p6); }
+.v2 .kb-rm-compact-step[data-status="active"] {
+  background: color-mix(in oklab, var(--color-income) 8%, transparent);
+}
+.v2 .kb-rm-compact-id {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--foreground);
+  letter-spacing: 0.06em;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+.v2 .kb-rm-compact-name {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  line-height: 1.3;
+}
+.v2 .kb-rm-compact-date {
+  font-size: 0.7rem;
+  color: var(--muted-foreground);
+  margin-top: 0.1rem;
+}
+
+/* === Gantt === */
+.v2 .kb-rm-gantt {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.6rem;
+  background: color-mix(in oklab, var(--muted) 18%, transparent);
+  overflow: hidden;
+}
+.v2 .kb-rm-gantt-scroll {
+  overflow-x: auto;
+  min-height: 0;
+}
+.v2 .kb-rm-gantt-inner {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-width: 900px;
+}
+.v2 .kb-rm-axis-head {
+  position: relative;
+  grid-column: 2 / 3;
+  height: 1.75rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+.v2 .kb-rm-axis-month {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.7rem;
+  color: var(--muted-foreground);
+  padding-left: 0.4rem;
+  border-left: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.04em;
+}
+.v2 .kb-rm-axis-fill {
+  grid-column: 1 / 2;
+  border-bottom: 1px solid var(--border-soft);
+  background: color-mix(in oklab, var(--muted) 30%, transparent);
+}
+.v2 .kb-rm-lane {
+  display: contents;
+}
+.v2 .kb-rm-lane-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.65rem 0.8rem;
+  border-right: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+  background: color-mix(in oklab, var(--muted) 25%, transparent);
+  min-height: 3.6rem;
+}
+.v2 .kb-rm-lane-id {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--foreground);
+}
+.v2 .kb-rm-lane-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.3;
+}
+.v2 .kb-rm-lane-leader {
+  font-size: 0.7rem;
+  color: var(--muted-foreground);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+.v2 .kb-rm-lane-track {
+  position: relative;
+  border-bottom: 1px solid var(--border-soft);
+  background: repeating-linear-gradient(
+    to right,
+    transparent,
+    transparent calc(100% / 7 - 1px),
+    color-mix(in oklab, var(--border-soft) 60%, transparent) calc(100% / 7 - 1px),
+    color-mix(in oklab, var(--border-soft) 60%, transparent) calc(100% / 7)
+  );
+  min-height: 3.6rem;
+}
+.v2 .kb-rm-bar {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 1.8rem;
+  display: flex;
+  align-items: center;
+  padding: 0 0.5rem;
+  border-radius: 0.4rem;
+  background: color-mix(in oklab, var(--muted) 70%, transparent);
+  border: 1px solid var(--border);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.7rem;
+  color: var(--foreground);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: filter 0.15s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.v2 .kb-rm-bar:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--foreground) 12%, transparent);
+}
+.v2 .kb-rm-bar:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-balance);
+}
+.v2 .kb-rm-bar[data-phase="p1"] { background: color-mix(in oklab, var(--phase-p1) 22%, var(--muted)); border-color: color-mix(in oklab, var(--phase-p1) 45%, transparent); }
+.v2 .kb-rm-bar[data-phase="p2"] { background: color-mix(in oklab, var(--phase-p2) 22%, var(--muted)); border-color: color-mix(in oklab, var(--phase-p2) 45%, transparent); }
+.v2 .kb-rm-bar[data-phase="p3"] { background: color-mix(in oklab, var(--phase-p3) 22%, var(--muted)); border-color: color-mix(in oklab, var(--phase-p3) 45%, transparent); }
+.v2 .kb-rm-bar[data-phase="p4"] { background: color-mix(in oklab, var(--phase-p4) 22%, var(--muted)); border-color: color-mix(in oklab, var(--phase-p4) 45%, transparent); }
+.v2 .kb-rm-bar[data-phase="p5"] { background: color-mix(in oklab, var(--phase-p5) 22%, var(--muted)); border-color: color-mix(in oklab, var(--phase-p5) 45%, transparent); }
+.v2 .kb-rm-bar[data-phase="p6"] { background: color-mix(in oklab, var(--phase-p6) 22%, var(--muted)); border-color: color-mix(in oklab, var(--phase-p6) 45%, transparent); }
+.v2 .kb-rm-bar[data-status="active"] {
+  box-shadow: 0 0 0 1px var(--color-income) inset;
+}
+
+/* Today line — вертикальная красная линия в track-области */
+.v2 .kb-rm-today {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-saldo-neg);
+  z-index: 2;
+  pointer-events: none;
+}
+.v2 .kb-rm-today::before {
+  content: "сегодня";
+  position: absolute;
+  top: -1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.65rem;
+  color: var(--color-saldo-neg);
+  white-space: nowrap;
+  background: var(--background);
+  padding: 0 0.25rem;
+}
+
+/* Gate / legal / cdx маркеры — diamond */
+.v2 .kb-rm-gate {
+  position: absolute;
+  top: 50%;
+  width: 0.65rem;
+  height: 0.65rem;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: var(--foreground);
+  border: 1px solid var(--background);
+  z-index: 3;
+  cursor: help;
+}
+.v2 .kb-rm-gate[data-kind="phase"] { background: var(--foreground); }
+.v2 .kb-rm-gate[data-kind="legal"] {
+  background: var(--color-warning);
+  border-color: color-mix(in oklab, var(--color-warning) 60%, var(--background));
+}
+.v2 .kb-rm-gate[data-kind="cdx"] {
+  background: var(--color-balance);
+  border-color: color-mix(in oklab, var(--color-balance) 60%, var(--background));
+}
+
+/* Доп.лейн для legal/cdx — тонкий ряд под основными */
+.v2 .kb-rm-sublane-label {
+  font-size: 0.7rem;
+  color: var(--muted-foreground);
+  padding: 0.5rem 0.8rem;
+  border-right: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+.v2 .kb-rm-sublane-track {
+  position: relative;
+  border-bottom: 1px solid var(--border-soft);
+  min-height: 2rem;
+  background: color-mix(in oklab, var(--muted) 12%, transparent);
+}
+
+/* === Legend === */
+.v2 .kb-rm-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  padding: 0.6rem 0.8rem;
+  border-top: 1px solid var(--border-soft);
+  font-size: 0.7rem;
+  color: var(--muted-foreground);
+  background: color-mix(in oklab, var(--muted) 18%, transparent);
+}
+.v2 .kb-rm-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.v2 .kb-rm-legend-swatch {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 2px;
+}
+.v2 .kb-rm-legend-swatch[data-diamond="true"] {
+  transform: rotate(45deg);
+  width: 0.55rem;
+  height: 0.55rem;
+}
+
+/* === Cards view === */
+.v2 .kb-rm-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.v2 .kb-rm-card {
+  display: grid;
+  grid-template-columns: minmax(2.5rem, auto) 1fr auto;
+  gap: 0 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.6rem;
+  background: color-mix(in oklab, var(--muted) 28%, transparent);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  text-align: left;
+  width: 100%;
+  font: inherit;
+}
+.v2 .kb-rm-card:hover {
+  border-color: color-mix(in oklab, var(--foreground) 25%, transparent);
+  background: color-mix(in oklab, var(--muted) 50%, transparent);
+}
+.v2 .kb-rm-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+}
+.v2 .kb-rm-card[data-phase="p1"]::before { background: var(--phase-p1); }
+.v2 .kb-rm-card[data-phase="p2"]::before { background: var(--phase-p2); }
+.v2 .kb-rm-card[data-phase="p3"]::before { background: var(--phase-p3); }
+.v2 .kb-rm-card[data-phase="p4"]::before { background: var(--phase-p4); }
+.v2 .kb-rm-card[data-phase="p5"]::before { background: var(--phase-p5); }
+.v2 .kb-rm-card[data-phase="p6"]::before { background: var(--phase-p6); }
+.v2 .kb-rm-card-id {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--foreground);
+  padding-top: 0.15rem;
+}
+.v2 .kb-rm-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+.v2 .kb-rm-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.75rem;
+}
+.v2 .kb-rm-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.v2 .kb-rm-card-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.65rem;
+  font-size: 0.72rem;
+  color: var(--muted-foreground);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+.v2 .kb-rm-card-meta > span:not(:last-child)::after {
+  content: "·";
+  margin-left: 0.6rem;
+  opacity: 0.5;
+}
+.v2 .kb-rm-card-goal {
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: color-mix(in oklab, var(--foreground) 88%, transparent);
+  margin: 0;
+}
+.v2 .kb-rm-card-cta {
+  align-self: center;
+  color: var(--muted-foreground);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+}
+.v2 .kb-rm-card:hover .kb-rm-card-cta { color: var(--foreground); }
+
+/* ─────────────────────────────────────────────────────────────────────
+   Prose ↔ KB-блоки. После D1 typography reset утилиты mt-6/max-w-[75ch]
+   на компонентах p/ul/ol через react-markdown components-override
+   попадают и на HTML-теги внутри rehypeRaw-блоков (kb-stack-body и т.п.).
+   Снимаем их, чтобы карточки сохранили свою плотность.
+   ───────────────────────────────────────────────────────────────────── */
+.v2 [class*="kb-"] > p,
+.v2 [class*="kb-"] > ul,
+.v2 [class*="kb-"] > ol,
+.v2 [class*="kb-"] p[class*="kb-"],
+.v2 [class*="kb-"] ul[class*="kb-"],
+.v2 [class*="kb-"] ol[class*="kb-"] {
+  margin-top: 0;
+  max-width: none;
+}
+.v2 .kb-stack-body,
+.v2 .kb-stack-list,
+.v2 .kb-stack-list li,
+.v2 .kb-phase-goal,
+.v2 .kb-cohort-meta,
+.v2 .kb-cohort-delta,
+.v2 .kb-risk-body,
+.v2 .kb-stat-sub,
+.v2 .kb-stat-label,
+.v2 .kb-deep-desc,
+.v2 .kb-compare-col p,
+.v2 .kb-compare-pain,
+.v2 .kb-rm-card-goal,
+.v2 .kb-rm-card-meta {
+  margin-top: 0;
+  max-width: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Этап D3 — канонические KB-компоненты: steps / accordion / tabs /
+   file-tree / link-card. Только токены moniq, без новых hex.
+   ───────────────────────────────────────────────────────────────────── */
+
+/* === KbSteps === */
+.v2 .kb-steps {
+  list-style: none;
+  margin: 1.25rem 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.v2 .kb-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.75rem 1fr;
+  gap: 0 0.85rem;
+  padding-bottom: 1.25rem;
+}
+.v2 .kb-step:last-child { padding-bottom: 0; }
+.v2 .kb-step::before {
+  content: "";
+  position: absolute;
+  top: 1.75rem;
+  bottom: 0;
+  left: calc(0.875rem - 1px);
+  width: 1px;
+  background: var(--border);
+}
+.v2 .kb-step:last-child::before { display: none; }
+.v2 .kb-step-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--muted) 70%, transparent);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.v2 .kb-step-body {
+  min-width: 0;
+  padding-top: 0.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.v2 .kb-step-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--foreground);
+}
+.v2 .kb-step-content {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: color-mix(in oklab, var(--foreground) 88%, transparent);
+}
+.v2 .kb-step-content > :first-child { margin-top: 0; }
+.v2 .kb-step-content > :last-child { margin-bottom: 0; }
+
+/* === KbAccordion === */
+.v2 .kb-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 1rem 0 1.25rem 0;
+}
+.v2 .kb-accordion-item {
+  border: 1px solid var(--border-soft);
+  border-radius: 0.55rem;
+  background: color-mix(in oklab, var(--muted) 22%, transparent);
+  overflow: hidden;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.v2 .kb-accordion-item[data-state="open"] {
+  border-color: color-mix(in oklab, var(--foreground) 18%, transparent);
+  background: color-mix(in oklab, var(--muted) 40%, transparent);
+}
+.v2 .kb-accordion-anchor {
+  position: relative;
+  top: -64px;
+  height: 0;
+  width: 0;
+  overflow: hidden;
+}
+.v2 .kb-accordion-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.7rem 0.95rem;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  color: var(--foreground);
+  text-align: left;
+  cursor: pointer;
+}
+.v2 .kb-accordion-trigger:hover { background: color-mix(in oklab, var(--muted) 20%, transparent); }
+.v2 .kb-accordion-trigger:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--color-balance) 65%, transparent);
+  outline-offset: -2px;
+}
+.v2 .kb-accordion-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.4;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.v2 .kb-accordion-chevron {
+  width: 1rem;
+  height: 1rem;
+  color: var(--muted-foreground);
+  transition: transform 0.18s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+.v2 .kb-accordion-chevron[data-state="open"] {
+  transform: rotate(180deg);
+  color: var(--foreground);
+}
+.v2 .kb-accordion-content { overflow: hidden; }
+.v2 .kb-accordion-content-inner {
+  padding: 0 0.95rem 0.95rem 0.95rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: color-mix(in oklab, var(--foreground) 88%, transparent);
+}
+.v2 .kb-accordion-content-inner > :first-child { margin-top: 0; }
+.v2 .kb-accordion-content-inner > :last-child { margin-bottom: 0; }
+
+/* === KbTabs === */
+.v2 .kb-tabs { margin: 1rem 0 1.25rem 0; }
+.v2 .kb-tabs-content {
+  margin-top: 0.35rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.55rem;
+  background: color-mix(in oklab, var(--muted) 20%, transparent);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.v2 .kb-tabs-content > :first-child { margin-top: 0; }
+.v2 .kb-tabs-content > :last-child { margin-bottom: 0; }
+
+/* === KbFileTree === */
+.v2 .kb-tree {
+  list-style: none;
+  margin: 1rem 0 1.25rem 0;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.55rem;
+  background: color-mix(in oklab, var(--muted) 22%, transparent);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  color: var(--foreground);
+}
+.v2 .kb-tree ul.kb-tree-children {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 1.1rem;
+  border-left: 1px dashed color-mix(in oklab, var(--border) 80%, transparent);
+  margin-left: 0.5rem;
+}
+.v2 .kb-tree-node { margin: 0; padding: 0; list-style: none; }
+.v2 .kb-tree-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.18rem 0.4rem;
+  border-radius: 0.3rem;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  line-height: 1.5;
+}
+.v2 .kb-tree-row-file { cursor: default; }
+.v2 .kb-tree-folder > .kb-tree-row:hover {
+  background: color-mix(in oklab, var(--muted) 50%, transparent);
+}
+.v2 .kb-tree-caret {
+  width: 0.85rem;
+  height: 0.85rem;
+  color: var(--muted-foreground);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+.v2 .kb-tree-caret-open { transform: rotate(90deg); }
+.v2 .kb-tree-caret-empty { width: 0.85rem; height: 0.85rem; visibility: hidden; }
+.v2 .kb-tree-icon { width: 0.95rem; height: 0.95rem; flex-shrink: 0; }
+.v2 .kb-tree-icon-folder { color: var(--color-balance); }
+.v2 .kb-tree-icon-file { color: var(--muted-foreground); }
+.v2 .kb-tree-name {
+  font-size: 0.82rem;
+  letter-spacing: 0;
+  color: var(--foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.v2 .kb-tree-node[data-highlight="true"] > .kb-tree-row {
+  background: color-mix(in oklab, var(--color-balance) 14%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-balance) 30%, transparent);
+}
+.v2 .kb-tree-node[data-highlight="true"] > .kb-tree-row .kb-tree-name {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* === KbLinkCard === */
+.v2 .kb-linkcard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  margin: 1rem 0 1.25rem 0;
+  padding: 0.95rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--muted) 22%, transparent);
+  color: var(--foreground);
+  text-decoration: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+}
+.v2 .kb-linkcard:hover {
+  border-color: var(--foreground);
+  background: color-mix(in oklab, var(--muted) 45%, transparent);
+}
+.v2 .kb-linkcard:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--color-balance) 65%, transparent);
+  outline-offset: 2px;
+}
+.v2 .kb-linkcard-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.v2 .kb-linkcard-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.3;
+}
+.v2 .kb-linkcard-desc {
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+.v2 .kb-linkcard-arrow {
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.v2 .kb-linkcard:hover .kb-linkcard-arrow {
+  color: var(--foreground);
+  transform: translateX(2px);
+}

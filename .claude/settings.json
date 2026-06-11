@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "_comment": "Личный health-харнесс. Принцип: безопасное чтение и whitelist read-only скриптов — allow; мутирующие скрипты, запись в immutable-слои/.claude и Whoop-sync (пишет в логи) — ask; чтение секретов/токенов и force-push — deny. Hooks держат дисциплину утверждений и frontmatter.",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Grep",
+      "Glob",
+      "WebFetch",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm run setup:*)",
+      "Bash(pnpm kb:*)",
+      "Bash(node scripts/kb-doctor.mjs:*)",
+      "Bash(node scripts/semantic/search.mjs:*)",
+      "Bash(node scripts/semantic/think.mjs:*)",
+      "Bash(node scripts/semantic/backlinks.mjs:*)",
+      "Bash(node scripts/semantic/index.mjs:*)",
+      "Bash(node scripts/search-quality-probes.mjs:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)"
+    ],
+    "ask": [
+      "Edit(00_context/**)",
+      "Write(00_context/**)",
+      "Edit(01_raw/**)",
+      "Write(01_raw/**)",
+      "Edit(AGENTS.md)",
+      "Edit(README.md)",
+      "Edit(.claude/**)",
+      "Write(.claude/**)",
+      "Bash(node scripts/whoop/sync.mjs:*)",
+      "Bash(node scripts/whoop/auth.mjs:*)",
+      "Bash(pnpm whoop:*)",
+      "Bash(node scripts/dream-cycle.mjs:*)",
+      "Bash(node scripts/skillopt/cli.mjs:*)",
+      "Bash(rm:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git rebase:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./**/.env)",
+      "Read(./.whoop/**)",
+      "Read(~/.ssh/**)",
+      "Read(./**/*.pem)",
+      "Read(./**/id_rsa)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $CLAUDE_PROJECT_DIR/scripts/session-start-context.mjs",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $CLAUDE_PROJECT_DIR/scripts/check-decisions.mjs",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "node $CLAUDE_PROJECT_DIR/scripts/check-md-frontmatter.mjs",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

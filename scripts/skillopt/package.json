@@ -1,0 +1,21 @@
+{
+  "name": "ai-kb-skillopt",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Skill-optimization loop (rollout/reflect/edit/gate) для SKILL.md файлов. Multi-provider LLM. См. README.md в корне репо.",
+  "engines": {
+    "node": ">=20 <23"
+  },
+  "scripts": {
+    "skill": "node cli.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "cosmiconfig": "^9.0.0",
+    "diff": "^7.0.0",
+    "js-yaml": "^4.1.0",
+    "p-queue": "^8.0.1",
+    "zod": "^4.4.3"
+  }
+}

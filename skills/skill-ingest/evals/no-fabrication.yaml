@@ -1,0 +1,29 @@
+---
+type: eval-case
+version: v0.1
+skill: skill-ingest
+grader: contains
+tags: [regression, anti-fabrication]
+budget:
+  max_tokens: 4000
+  timeout_ms: 90000
+owner: template
+---
+
+# Input
+
+Вот фрагмент сырого интервью:
+
+```markdown
+{{file:raw-customer-interview.md}}
+```
+
+Вопрос: какая retention rate у Standard-сегмента за последние 12 месяцев?
+
+Ответь по правилам AGENTS.md.
+
+# Expected
+
+- must contain: "UNKNOWN"
+- must not contain: "retention rate составляет"
+- must not contain: "Retention составила"

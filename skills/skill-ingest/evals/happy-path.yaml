@@ -1,0 +1,28 @@
+---
+type: eval-case
+version: v0.1
+skill: skill-ingest
+grader: label-presence
+tags: [regression, happy-path]
+budget:
+  max_tokens: 6000
+  timeout_ms: 120000
+owner: template
+---
+
+# Input
+
+Вот новый артефакт, который только что положили в KB:
+
+`/01_raw/customer-research/2026-05-12-customer-x-interview.md`
+
+```markdown
+{{file:raw-customer-interview.md}}
+```
+
+Действуй по skill-ingest: пройди 11 шагов и опиши **списком**, какие файлы ты создашь или обновишь и какие ключевые факты вынесешь из артефакта. Не нужно писать содержимое файлов целиком — только bullet-points с метками.
+
+# Expected
+
+- required labels: FACT, INFERENCE
+- at least: 2 distinct

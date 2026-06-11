@@ -1,0 +1,43 @@
+# Node
+node_modules/
+*.log
+.DS_Store
+
+# Viewer build output
+tools/viewer/dist/
+tools/viewer/.vite/
+
+# Semantic index (генерируется локально, переиндексируется по mtime)
+.semantic-index.sqlite
+.semantic-index.sqlite-wal
+.semantic-index.sqlite-shm
+
+# SkillOpt metrics
+.skillopt-metrics.sqlite
+.skillopt-metrics.sqlite-wal
+.skillopt-metrics.sqlite-shm
+.skillopt.local.json
+
+# Секреты (Whoop client id/secret и пр.)
+.env
+
+# Whoop OAuth-токены (refresh/access) — НИКОГДА не коммитим
+.whoop/
+
+# Кэш моделей transformers.js (~120 MB)
+scripts/semantic/.transformers-cache/
+
+# Рабочая зона: черновики, attachments, dream-reports
+.context/
+
+# Сессионная working memory (core.md коммитим, остальное нет)
+.remember/now.md
+.remember/today.md
+
+# Служебные локи Claude
+.claude/scheduled_tasks.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp

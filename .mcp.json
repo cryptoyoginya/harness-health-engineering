@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "kb-local": {
+      "command": "node",
+      "args": ["scripts/semantic/mcp-server.mjs"],
+      "description": "Локальный semantic-индекс KB. Tools: kb_search (hybrid retrieval), kb_think (синтез с цитатами через AGENTS.md), kb_backlinks (кто ссылается на файл)."
+    },
+    "skillopt-local": {
+      "command": "node",
+      "args": ["scripts/skillopt/mcp-server.mjs"],
+      "description": "SkillOpt observability (read-only). Tools: skill_list_runs, skill_get_trace, skill_get_proposal, skill_list_evals, skill_get_eval. Мутации (rollout/reflect/apply) — только через CLI: pnpm skill <verb>."
+    }
+  }
+}

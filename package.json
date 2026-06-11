@@ -1,0 +1,23 @@
+{
+  "name": "health-harness",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Личный AI-харнесс по здоровью в духе Blueprint: markdown-репо = база знаний о теле и психике, Whoop API = автоматический ingest физиологии, агент ведёт по слоям KB. Перед использованием: pnpm run setup.",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "setup": "pnpm -C scripts/semantic install && pnpm -C scripts/skillopt install && pnpm -C tools/viewer install",
+    "skill": "node scripts/skillopt/cli.mjs",
+    "kb:index": "node scripts/semantic/index.mjs",
+    "kb:search": "node scripts/semantic/search.mjs",
+    "kb:think": "node scripts/semantic/think.mjs",
+    "kb:doctor": "node scripts/kb-doctor.mjs",
+    "kb:dream": "node scripts/dream-cycle.mjs",
+    "whoop:auth": "node scripts/whoop/auth.mjs",
+    "whoop:sync": "node scripts/whoop/sync.mjs",
+    "viewer:dev": "cd tools/viewer && pnpm dev",
+    "viewer:build": "cd tools/viewer && pnpm build"
+  }
+}
