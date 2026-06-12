@@ -10,7 +10,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, loadEnv, requireEnv, todayISO } from '../whoop/lib.mjs';
 import { fetchSnapshot, whoopBaseline, whoopTrend, whoopAdvice } from '../whoop/advice.mjs';
-import { formatExperiments, createExperiment, cancelExperiment } from '../experiments.mjs';
+import { formatExperiments, createExperiment, cancelExperiment, extendExperiment } from '../experiments.mjs';
 import { getNorthStar, setNorthStar } from '../northstar.mjs';
 
 loadEnv();
@@ -58,7 +58,11 @@ const INTRO = [
   '',
   'Чем живее и честнее детали, тем сильнее выводы. Recovery, HRV и сон Whoop тянет сам по утрам — дублировать не надо; утром пришлю короткий бриф по телу.',
   '',
-  'По воскресеньям — разбор недели: агент читает 7 логов, находит паттерны, которые сам не замечаешь, выносит вердикт «лучше ли живётся» и, если гипотеза созрела, заводит n-of-1 эксперимент — меняем одну переменную, через 2–3 недели вердикт merge или revert.',
+  'По воскресеньям — разбор недели: агент читает 7 логов, находит паттерны, которые сам не замечаешь, выносит вердикт «лучше ли живётся» и, если гипотеза созрела, заводит n-of-1 эксперимент.',
+  '',
+  'Два слова про главное:',
+  '• North-star — твоё долгосрочное направление: куда ты хочешь, чтобы шла жизнь (смысл, не цифра). Обязательно задай его командой /north — от него зависит, к чему я тебя приведу. Без него я оптимизирую вслепую.',
+  '• n-of-1 эксперимент — личная проверка одной гипотезы: меняешь ровно одну переменную на пару недель, я смотрю эффект на твоих данных, и в конце вердикт — оставить или откатить. Так находим, что работает именно у тебя, а не «вообще». Заводить, отменять и продлевать — командой /exp.',
   '',
   'А если будешь со мной долго, мы сможем понять, как меняется твое качество жизни в перспективе 😎',
   '',
@@ -66,8 +70,8 @@ const INTRO = [
   '/whoop — твои показатели прямо сейчас (recovery, сон, HRV, светофор дня)',
   '/week — сводка за 7 дней',
   '/month — разбор за месяц · /year — за год',
-  '/exp — n-of-1 эксперименты: список, /exp new <гипотеза>, /exp stop <номер>',
-  '/north — north-star: твоё долгосрочное направление (показать/задать)',
+  '/exp — n-of-1 эксперименты',
+  '/north — north-star: твоё долгосрочное направление',
   '/today — сегодняшний лог целиком',
   '/undo — убрать последнюю запись (если опечатка)',
   '/help — это сообщение',
@@ -75,6 +79,15 @@ const INTRO = [
   'Просто начни писать или говорить. Это твой склад всего, что хочется знать о себе.',
   '',
   'Body data in. Life decisions out 🤍',
+].join('\n');
+
+// Краткая справка по /exp — показывается при нажатии /exp и при ошибке ввода.
+const EXP_HELP = [
+  'Как пользоваться:',
+  '• завести: /exp new <гипотеза> — напр. «/exp new убрать сахар после 18:00 — проверить сон»',
+  '   срок по умолчанию 3 недели; свой задаётся фразой в конце: «… на 2 недели»',
+  '• отменить: /exp stop <номер>',
+  '• продлить: /exp extend <номер> [недель] — по умолчанию +2',
 ].join('\n');
 
 function readOffset() {
@@ -203,7 +216,7 @@ async function registerCommands() {
     { command: 'week',  description: 'сводка за 7 дней' },
     { command: 'month', description: 'разбор за месяц' },
     { command: 'year',  description: 'разбор за год' },
-    { command: 'exp',   description: 'эксперименты: список, new, stop' },
+    { command: 'exp',   description: 'n-of-1 эксперименты' },
     { command: 'north', description: 'north-star — моё направление' },
     { command: 'today', description: 'сегодняшний лог целиком' },
     { command: 'undo',  description: 'убрать последнюю запись' },
@@ -323,31 +336,40 @@ async function handle(msg) {
   if (text === '/exp' || text.startsWith('/exp ')) {
     const arg = text.slice(4).trim();
     if (!arg) {
-      await send(chatId, `${formatExperiments()}\n\nДобавить: /exp new <гипотеза>\nОтменить: /exp stop <номер>`);
+      await send(chatId, `${formatExperiments()}\n\n${EXP_HELP}`);
       return;
     }
     const sub = arg.split(/\s+/)[0].toLowerCase();
     const payload = arg.slice(sub.length).trim();
     if (['new', 'новый', 'add', '+'].includes(sub)) {
       if (!payload) {
-        await send(chatId, 'Опиши гипотезу: /exp new <что меняешь и что проверяешь>\nНапр.: /exp new убрать сахар после 18:00 — проверить сон');
+        await send(chatId, `Опиши гипотезу: /exp new <что меняешь и что проверяешь>\n\n${EXP_HELP}`);
         return;
       }
-      const e = createExperiment(payload);
+      // срок: «на N недель» в конце фразы → задаёт длительность, иначе 3 недели
+      let weeks = 3, hyp = payload;
+      const m = hyp.match(/\bна\s+(\d{1,2})\s*(?:недел[яьи]|нед)\.?\b/i);
+      if (m) { weeks = Math.min(12, Math.max(1, +m[1])); hyp = hyp.replace(m[0], '').replace(/\s{2,}/g, ' ').trim(); }
+      const e = createExperiment(hyp, weeks);
       appendInbox(`🧪 завела эксперимент ${e.title}`);
-      await send(chatId, `🧪 Завела ${e.title}\nЧерновик, срок 3 недели (до ${e.endsOn}). Дизайн (baseline, критерий) агент уточнит на ближайшем разборе — так точнее.`);
+      await send(chatId, `🧪 Завела ${e.title}\nЧерновик, срок ${weeks} нед (до ${e.endsOn}). Дизайн (baseline, критерий) агент уточнит на ближайшем разборе — так точнее.`);
       return;
     }
     if (['stop', 'cancel', 'отмена', 'стоп', '-'].includes(sub)) {
-      if (!payload) {
-        await send(chatId, 'Укажи номер: /exp stop 1 (номер виден в /exp)');
-        return;
-      }
+      if (!payload) { await send(chatId, 'Укажи номер: /exp stop 1 (номер виден в /exp)'); return; }
       const r = cancelExperiment(payload);
       await send(chatId, r ? `↩️ Отменила ${r.title} (revert).` : `Не нашла эксперимент «${payload}». Список — /exp`);
       return;
     }
-    await send(chatId, 'Не поняла. /exp — список · /exp new <гипотеза> · /exp stop <номер>');
+    if (['extend', 'продлить', 'продли', 'prolong'].includes(sub)) {
+      const [num, wkRaw] = payload.split(/\s+/);
+      if (!num) { await send(chatId, 'Укажи номер: /exp extend 1 (по умолчанию +2 недели; можно «/exp extend 1 3»)'); return; }
+      const wk = wkRaw ? Math.min(12, Math.max(1, parseInt(wkRaw, 10) || 2)) : 2;
+      const r = extendExperiment(num, wk);
+      await send(chatId, r ? `⏳ Продлила ${r.title} на ${wk} нед — теперь до ${r.endsOn}.` : `Не нашла эксперимент «${num}». Список — /exp`);
+      return;
+    }
+    await send(chatId, `Не поняла команду.\n\n${EXP_HELP}`);
     return;
   }
   if (text === '/north' || text.startsWith('/north ')) {

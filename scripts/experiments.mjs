@@ -123,13 +123,19 @@ DECISION: ${hypothesis}.
   return { id, title, endsOn: dmy(end) };
 }
 
-// Отменить эксперимент по номеру (1, 01, 001, EXP-001) → status reverted + пометка.
-export function cancelExperiment(arg) {
+function findExpFile(arg) {
   if (!existsSync(DIR)) return null;
   const num = String(arg).replace(/\D/g, '');
   if (!num) return null;
   const re = new RegExp(`^EXP-0*${+num}(?:[-.]|$)`, 'i');
-  const file = readdirSync(DIR).find((f) => re.test(f));
+  return readdirSync(DIR).find((f) => re.test(f)) || null;
+}
+
+const ddmmyyyy = () => new Date().toLocaleDateString('sv-SE').split('-').reverse().join('.');
+
+// Отменить эксперимент по номеру (1, 01, 001, EXP-001) → status reverted + пометка.
+export function cancelExperiment(arg) {
+  const file = findExpFile(arg);
   if (!file) return null;
   const p = join(DIR, file);
   let body = readFileSync(p, 'utf8');
@@ -137,10 +143,29 @@ export function cancelExperiment(arg) {
   body = /^status:/m.test(body)
     ? body.replace(/^status:.*/m, 'status: reverted')
     : body.replace(/^---\n/, '---\nstatus: reverted\n');
-  const today = new Date().toLocaleDateString('sv-SE').split('-').reverse().join('.');
-  body = body.replace(/\n*$/, '\n') + `\n- DECISION: revert — отменён вручную ${today}.\n`;
+  body = body.replace(/\n*$/, '\n') + `\n- DECISION: revert — отменён вручную ${ddmmyyyy()}.\n`;
   writeFileSync(p, body);
   return { title };
+}
+
+// Продлить эксперимент на N недель (по умолчанию +2). Сдвигает «до …», возвращает в активные.
+export function extendExperiment(arg, addWeeks = 2) {
+  const file = findExpFile(arg);
+  if (!file) return null;
+  const p = join(DIR, file);
+  let body = readFileSync(p, 'utf8');
+  const title = body.match(/^#\s+(EXP-.+)$/m)?.[1] || file.replace(/\.md$/, '');
+  let base = parseEndDate(body) || new Date();
+  if (base < new Date()) base = new Date(); // если срок уже вышел — продлеваем от сегодня
+  const end = new Date(base);
+  end.setDate(end.getDate() + addWeeks * 7);
+  body = /^- \*\*Срок:\*\*/m.test(body)
+    ? body.replace(/^- \*\*Срок:\*\*.*$/m, `- **Срок:** продлён до ${dmy(end)}`)
+    : body.replace(/\n*$/, '\n') + `\n- **Срок:** продлён до ${dmy(end)}\n`;
+  body = body.replace(/^status:.*/m, 'status: active'); // возобновляем, если был отменён/завершён
+  body = body.replace(/\n*$/, '\n') + `\n- продлён вручную ${ddmmyyyy()} на ${addWeeks} нед.\n`;
+  writeFileSync(p, body);
+  return { title, endsOn: dmy(end) };
 }
 
 // Однострочный нудж для утреннего брифа (самый срочный эксперимент).
