@@ -10,7 +10,8 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, loadEnv, requireEnv, todayISO } from '../whoop/lib.mjs';
 import { fetchSnapshot, whoopBaseline, whoopTrend, whoopAdvice } from '../whoop/advice.mjs';
-import { formatExperiments } from '../experiments.mjs';
+import { formatExperiments, createExperiment, cancelExperiment } from '../experiments.mjs';
+import { getNorthStar, setNorthStar } from '../northstar.mjs';
 
 loadEnv();
 const TOKEN = requireEnv('TELEGRAM_BOT_TOKEN');
@@ -64,7 +65,9 @@ const INTRO = [
   'Команды:',
   '/whoop — твои показатели прямо сейчас (recovery, сон, HRV, светофор дня)',
   '/week — сводка за 7 дней',
-  '/exp — мои активные n-of-1 эксперименты (сколько осталось, критерий)',
+  '/month — разбор за месяц · /year — за год',
+  '/exp — n-of-1 эксперименты: список, /exp new <гипотеза>, /exp stop <номер>',
+  '/north — north-star: твоё долгосрочное направление (показать/задать)',
   '/today — сегодняшний лог целиком',
   '/undo — убрать последнюю запись (если опечатка)',
   '/help — это сообщение',
@@ -145,11 +148,11 @@ function showToday() {
   return existsSync(file) ? readFileSync(file, 'utf8') : `Лог за ${todayISO()} ещё пуст.`;
 }
 
-// --- /week: быстрая сводка за 7 дней из daily-логов (глубокий разбор — у агента в воскресенье) ---
-function weekSummary() {
+// --- Сводка за период из daily-логов. Использует /week (7), /month (30), /year (365). ---
+function summarizeRange(days) {
   const recs = [], sleeps = [], moods = [], energies = [];
   let logged = 0, nights7 = 0;
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < days; i++) {
     const d = new Date();
     d.setDate(d.getDate() - i);
     const iso = d.toLocaleDateString('sv-SE');
@@ -165,6 +168,17 @@ function weekSummary() {
   const avg = (a) => a.length ? (a.reduce((s, x) => s + x, 0) / a.length) : null;
   return { logged, nights7, sleepDays: sleeps.length,
     recAvg: avg(recs), sleepAvg: avg(sleeps), moodAvg: avg(moods), energyAvg: avg(energies) };
+}
+const weekSummary = () => summarizeRange(7);
+
+// Строки-метрики для сводки (общие для /week /month /year).
+function summaryLines(w) {
+  const lines = [];
+  if (w.recAvg != null)    lines.push(`• recovery: ср. ${Math.round(w.recAvg)}%`);
+  if (w.sleepAvg != null)  lines.push(`• сон: ср. ${w.sleepAvg.toFixed(1)} ч, ночей ≥7ч: ${w.nights7}/${w.sleepDays}`);
+  if (w.moodAvg != null)   lines.push(`• настроение: ср. ${w.moodAvg.toFixed(1)}/5`);
+  if (w.energyAvg != null) lines.push(`• энергия: ср. ${w.energyAvg.toFixed(1)}/5`);
+  return lines;
 }
 
 // --- /undo: убрать последнюю записанную строку из сегодняшнего лога ---
@@ -187,7 +201,10 @@ async function registerCommands() {
   const commands = [
     { command: 'whoop', description: 'мои показатели сейчас — recovery, сон, HRV' },
     { command: 'week',  description: 'сводка за 7 дней' },
-    { command: 'exp',   description: 'мои активные эксперименты' },
+    { command: 'month', description: 'разбор за месяц' },
+    { command: 'year',  description: 'разбор за год' },
+    { command: 'exp',   description: 'эксперименты: список, new, stop' },
+    { command: 'north', description: 'north-star — моё направление' },
     { command: 'today', description: 'сегодняшний лог целиком' },
     { command: 'undo',  description: 'убрать последнюю запись' },
     { command: 'help',  description: 'как всё устроено' },
@@ -276,17 +293,74 @@ async function handle(msg) {
       await send(chatId, 'За последние 7 дней логов нет. Начни писать — через неделю будет что свести.');
       return;
     }
-    const lines = [`🗓 Неделя (${w.logged}/7 дней с логом):`];
-    if (w.recAvg != null)    lines.push(`• recovery: ср. ${Math.round(w.recAvg)}%`);
-    if (w.sleepAvg != null)  lines.push(`• сон: ср. ${w.sleepAvg.toFixed(1)} ч, ночей ≥7ч: ${w.nights7}/${w.sleepDays}`);
-    if (w.moodAvg != null)   lines.push(`• настроение: ср. ${w.moodAvg.toFixed(1)}/5`);
-    if (w.energyAvg != null) lines.push(`• энергия: ср. ${w.energyAvg.toFixed(1)}/5`);
+    const lines = [`🗓 Неделя (${w.logged}/7 дней с логом):`, ...summaryLines(w)];
     lines.push('', 'Глубокий разбор — в воскресенье скажи агенту «разбери неделю».');
     await send(chatId, lines.join('\n'));
     return;
   }
-  if (text === '/exp') {
-    await send(chatId, formatExperiments());
+  if (text === '/month') {
+    const w = summarizeRange(30);
+    if (w.logged < 14) {
+      await send(chatId, `🗓 Месячный разбор: данных пока мало (${w.logged} дн с логом за 30 дней).\nОн оживёт после ~3–4 недель регулярных записей — там видны паттерны, которых не поймать за неделю.\nОстаёмся на связи! 🤍`);
+      return;
+    }
+    const lines = [`🗓 Месяц (${w.logged}/30 дней с логом):`, ...summaryLines(w)];
+    lines.push('', 'Глубокий месячный разбор — у агента: скажи «разбери месяц» (что отличало хорошие недели, рычаги, метрики-пустышки).');
+    await send(chatId, lines.join('\n'));
+    return;
+  }
+  if (text === '/year') {
+    const w = summarizeRange(365);
+    if (w.logged < 90) {
+      await send(chatId, `📅 Годовой разбор: пока рано — ${w.logged} дн с логом.\nЭто марафон: годовой обзор показывает, как меняется качество жизни в больших циклах (сезоны, фазы). Накопится за несколько месяцев — я никуда не денусь.\nОстаёмся на связи! 🤍`);
+      return;
+    }
+    const lines = [`📅 Год (${w.logged} дней с логом):`, ...summaryLines(w)];
+    lines.push('', 'Глубокий годовой обзор — у агента: скажи «разбери год» (сезонность, рост, сверка с north-star).');
+    await send(chatId, lines.join('\n'));
+    return;
+  }
+  if (text === '/exp' || text.startsWith('/exp ')) {
+    const arg = text.slice(4).trim();
+    if (!arg) {
+      await send(chatId, `${formatExperiments()}\n\nДобавить: /exp new <гипотеза>\nОтменить: /exp stop <номер>`);
+      return;
+    }
+    const sub = arg.split(/\s+/)[0].toLowerCase();
+    const payload = arg.slice(sub.length).trim();
+    if (['new', 'новый', 'add', '+'].includes(sub)) {
+      if (!payload) {
+        await send(chatId, 'Опиши гипотезу: /exp new <что меняешь и что проверяешь>\nНапр.: /exp new убрать сахар после 18:00 — проверить сон');
+        return;
+      }
+      const e = createExperiment(payload);
+      appendInbox(`🧪 завела эксперимент ${e.title}`);
+      await send(chatId, `🧪 Завела ${e.title}\nЧерновик, срок 3 недели (до ${e.endsOn}). Дизайн (baseline, критерий) агент уточнит на ближайшем разборе — так точнее.`);
+      return;
+    }
+    if (['stop', 'cancel', 'отмена', 'стоп', '-'].includes(sub)) {
+      if (!payload) {
+        await send(chatId, 'Укажи номер: /exp stop 1 (номер виден в /exp)');
+        return;
+      }
+      const r = cancelExperiment(payload);
+      await send(chatId, r ? `↩️ Отменила ${r.title} (revert).` : `Не нашла эксперимент «${payload}». Список — /exp`);
+      return;
+    }
+    await send(chatId, 'Не поняла. /exp — список · /exp new <гипотеза> · /exp stop <номер>');
+    return;
+  }
+  if (text === '/north' || text.startsWith('/north ')) {
+    const arg = text.slice(6).trim();
+    if (!arg) {
+      const ns = getNorthStar();
+      await send(chatId, ns
+        ? `🧭 Твой north-star:\n\n${ns}\n\nИзменить: /north <новое направление>`
+        : 'North-star ещё не задан.\nЭто твоё долгосрочное направление — куда ты хочешь, чтобы шла жизнь (смысл, не цифра). Агент будет сверять с ним недельные и квартальные выводы.\nЗадай: /north <текст>\nНапр.: /north больше энергии и тёплых связей, меньше тревоги и спешки');
+      return;
+    }
+    setNorthStar(arg);
+    await send(chatId, `🧭 Записала north-star:\n\n${arg}\n\nТеперь это твой ориентир — агент сверяет с ним, туда ли движется жизнь.`);
     return;
   }
   if (text === '/undo') {

@@ -2,7 +2,7 @@
 // Эксперименты — killer-фича харнесса (причинность вместо корреляций). Этот модуль выводит
 // их в ежедневный контур: /exp в боте, строка в утреннем брифе, проверка на разборе недели.
 
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT } from './whoop/lib.mjs';
 
@@ -68,6 +68,79 @@ export function formatExperiments() {
     return lines.join('\n');
   });
   return 'Активные эксперименты:\n\n' + blocks.join('\n\n') + '\n\nСверка с данными — на воскресном разборе.';
+}
+
+// --- Создание / отмена вручную (из бота и агента) ---
+
+function nextId() {
+  let max = 0;
+  if (existsSync(DIR)) {
+    for (const f of readdirSync(DIR)) {
+      const m = f.match(/^EXP-(\d+)/i);
+      if (m) max = Math.max(max, +m[1]);
+    }
+  }
+  return String(max + 1).padStart(3, '0');
+}
+
+// Завести черновик n-of-1 из одной фразы. Агент уточнит дизайн (baseline/метрики/критерий) позже.
+export function createExperiment(hypothesis, weeks = 3) {
+  const id = nextId();
+  const now = new Date();
+  const end = new Date(now);
+  end.setDate(end.getDate() + weeks * 7);
+  const date = now.toLocaleDateString('sv-SE');
+  const short = hypothesis.split(/\s+/).slice(0, 6).join(' ').replace(/[.!?,;:]+$/, '');
+  const title = `EXP-${id}: ${short}`;
+  const body = `---
+type: experiment
+status: proposed
+date: ${date}
+related:
+  - /00_context/health-metrics.md
+---
+
+# ${title}
+
+> n-of-1 trial. Создан вручную из бота — агент уточнит дизайн (baseline, метрики, критерий) на ближайшем разборе.
+
+DECISION: ${hypothesis}.
+
+- **Гипотеза:** ${hypothesis}
+- **Что меняю:** <ровно одна переменная — уточнить с агентом>
+- **Baseline (до):** <медиана за стартовую неделю — уточнить>
+- **Срок:** ${weeks} недели (до ${dmy(end)})
+- **Метрики:** <уточнить — Whoop и/или субъективно>
+- **Критерий успеха (пред-регистрация):** <порог ДО данных — уточнить>
+
+## Итог (заполнить по окончании)
+
+- **Результат:** <цифры после vs baseline vs критерий>
+- DECISION: merge (→ правило в \`CLAUDE.md\`) / revert / продлить.
+`;
+  if (!existsSync(DIR)) mkdirSync(DIR, { recursive: true });
+  writeFileSync(join(DIR, `EXP-${id}.md`), body);
+  return { id, title, endsOn: dmy(end) };
+}
+
+// Отменить эксперимент по номеру (1, 01, 001, EXP-001) → status reverted + пометка.
+export function cancelExperiment(arg) {
+  if (!existsSync(DIR)) return null;
+  const num = String(arg).replace(/\D/g, '');
+  if (!num) return null;
+  const re = new RegExp(`^EXP-0*${+num}(?:[-.]|$)`, 'i');
+  const file = readdirSync(DIR).find((f) => re.test(f));
+  if (!file) return null;
+  const p = join(DIR, file);
+  let body = readFileSync(p, 'utf8');
+  const title = body.match(/^#\s+(EXP-.+)$/m)?.[1] || file.replace(/\.md$/, '');
+  body = /^status:/m.test(body)
+    ? body.replace(/^status:.*/m, 'status: reverted')
+    : body.replace(/^---\n/, '---\nstatus: reverted\n');
+  const today = new Date().toLocaleDateString('sv-SE').split('-').reverse().join('.');
+  body = body.replace(/\n*$/, '\n') + `\n- DECISION: revert — отменён вручную ${today}.\n`;
+  writeFileSync(p, body);
+  return { title };
 }
 
 // Однострочный нудж для утреннего брифа (самый срочный эксперимент).
