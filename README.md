@@ -27,7 +27,7 @@ all as plain **Markdown you own**.
 |---|---|---|
 | ⭐ [The one idea](#the-one-idea) | 🔬 [The engine](#the-engine-n-of-1-experiments-) | 🆚 [vs Whoop journal](#why-its-different-from-whoops-journal) |
 | 🔄 [How it works](#how-it-works) | 📥 [Three ways in](#three-ways-in-) | 🤳 [Photo diaries](#three-photo-diaries-one-on-device-eye-) |
-| 🧱 [Architecture](#architecture-the-knowledge-pyramid-) | 🛠️ [Technology](#technology) | 🚀 [Quickstart](#quickstart) |
+| 🧱 [Architecture](#architecture-the-knowledge-pyramid-) | 🛠️ [Technology](#technology) | 🚀 [Deploy your own](./SETUP.md) |
 
 ---
 
@@ -294,6 +294,9 @@ lives in [`METHODOLOGY.md`](./METHODOLOGY.md); the layer contracts in [`AGENTS.m
 
 ## Quickstart
 
+> 📖 **Standing up your own copy?** Follow the full step-by-step in **[`SETUP.md`](./SETUP.md)** —
+> Telegram bot, Whoop app, `.env`, auto-start, and an honest privacy breakdown.
+
 ```bash
 corepack enable
 pnpm run setup
@@ -305,14 +308,20 @@ pnpm kb:think "what actually moves my life quality?"
 pnpm kb:doctor
 ```
 
-Daily rhythm: **morning** sync + brief run themselves · **evening** text your diary to the bot ·
-**Sunday** ask the agent to *review the week*.
+Daily rhythm: **morning** sync + brief run themselves · **evening** text/voice/photo your diary to the
+bot · **Sunday** ask the agent to *review the week*.
 
 ## Privacy & safety
 
-Local-first — your record lives on your disk; the only egress is the Whoop call that fetches *your* data.
-Secrets (`.env`, `.whoop/`) are gitignored and `deny`-read by the agent. **Not a medical device:** the
-agent never diagnoses; any worrying signal resolves to one recommendation — see a specialist.
+**Local-first, but honest about the edges.** Your record lives on your disk; pre-processing
+(voice→text, photo-type, search) runs **on-device**; photos and sensitive diaries are git-ignored and
+never pushed; secrets (`.env`, `.whoop/`) are git-ignored and `deny`-read by the agent. What *does*
+leave the machine, by design: messages transit **Telegram** (the Bot API is not end-to-end encrypted),
+**Claude/Anthropic** processes what you send the agent to analyse, and **Whoop** returns your
+physiology. Nothing is sold or posted publicly. Full breakdown in [`SETUP.md`](./SETUP.md).
+
+**Not a medical device.** The agent never diagnoses; any worrying signal resolves to one
+recommendation — see a specialist.
 
 ## Contributing
 
