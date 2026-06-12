@@ -94,13 +94,6 @@ const fmtDur = (ms) => {
   return `${Math.floor(min / 60)}:${String(min % 60).padStart(2, '0')}`;
 };
 
-function verdictFor(rec) {
-  if (rec == null) return '';
-  if (rec > 66) return '🟢 зелёный — можно грузить по плану';
-  if (rec >= 40) return '🟡 жёлтый — умеренно, без рекордов';
-  return '🔴 красный — лёгкий день, режь нагрузку, ранний отбой';
-}
-
 async function whoopSnapshot() {
   const one = async (p) => {
     try { const d = await whoopGet(p, { limit: 1 }); return d.records?.[0] ?? null; }
@@ -110,21 +103,80 @@ async function whoopSnapshot() {
     one('/v2/recovery'), one('/v2/cycle'), one('/v2/activity/sleep'),
   ]);
   const s = recovery?.score;
-  const parts = [];
-  if (s?.recovery_score != null) parts.push(`recovery ${Math.round(s.recovery_score)}%`);
+
+  let hrv = s?.hrv_rmssd_milli ?? null;
+  if (hrv != null && hrv < 1) hrv *= 1000; // API иногда отдаёт секунды
+  hrv = hrv != null ? Math.round(hrv) : null;
+
   const ss = sleep?.score?.stage_summary;
+  let sleepMs = null;
   if (ss) {
-    const asleep = (ss.total_in_bed_time_milli ?? 0) - (ss.total_awake_time_milli ?? 0) - (ss.total_no_data_time_milli ?? 0);
-    if (asleep > 0) parts.push(`сон ${fmtDur(asleep)}`);
+    const a = (ss.total_in_bed_time_milli ?? 0) - (ss.total_awake_time_milli ?? 0) - (ss.total_no_data_time_milli ?? 0);
+    if (a > 0) sleepMs = a;
   }
-  if (s?.hrv_rmssd_milli != null) {
-    let hrv = s.hrv_rmssd_milli;
-    if (hrv < 1) hrv *= 1000; // API иногда отдаёт секунды
-    parts.push(`HRV ${Math.round(hrv)}`);
+  const rhr = s?.resting_heart_rate != null ? Math.round(s.resting_heart_rate) : null;
+  const strain = cycle?.score?.strain ?? null;
+  const rec = s?.recovery_score != null ? Math.round(s.recovery_score) : null;
+
+  const parts = [];
+  if (rec != null) parts.push(`recovery ${rec}%`);
+  if (sleepMs != null) parts.push(`сон ${fmtDur(sleepMs)}`);
+  if (hrv != null) parts.push(`HRV ${hrv}`);
+  if (strain != null) parts.push(`strain ${strain.toFixed(1)}`);
+  if (rhr != null) parts.push(`пульс покоя ${rhr}`);
+
+  return { parts, rec, hrv, rhr, sleepMs, strain };
+}
+
+// Личный базовый уровень из логов (14 дней до сегодня) — чтобы советовать относительно ТЕБЯ, а не таблиц.
+function whoopBaseline(days = 14) {
+  const hrv = [], rhr = [], rec = [];
+  for (let i = 1; i <= days; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const iso = d.toLocaleDateString('sv-SE');
+    const f = join(ROOT, '01_raw', 'health', `${iso}.md`);
+    if (!existsSync(f)) continue;
+    const t = readFileSync(f, 'utf8');
+    const h = t.match(/HRV (\d+)/);          if (h) hrv.push(+h[1]);
+    const p = t.match(/пульс покоя (\d+)/);  if (p) rhr.push(+p[1]);
+    const r = t.match(/recovery (\d+)%/);    if (r) rec.push(+r[1]);
   }
-  if (cycle?.score?.strain != null) parts.push(`strain ${cycle.score.strain.toFixed(1)}`);
-  if (s?.resting_heart_rate != null) parts.push(`пульс покоя ${Math.round(s.resting_heart_rate)}`);
-  return { parts, rec: s?.recovery_score ?? null };
+  const avg = (a) => a.length ? a.reduce((s, x) => s + x, 0) / a.length : null;
+  return { hrv: avg(hrv), rhr: avg(rhr), rec: avg(rec), n: Math.max(hrv.length, rhr.length) };
+}
+
+// Точечный совет: светофор по recovery + флаги по отклонениям HRV/пульса/сна от твоей нормы.
+// Это тренировочно-бытовая навигация, НЕ диагностика. Стойкие сигналы — к специалисту.
+function whoopAdvice(s, base) {
+  const lines = [];
+  if (s.rec != null) {
+    if (s.rec > 66) lines.push('🟢 Зелёный день — есть запас под серьёзную нагрузку: силовая, интервалы, длинная.');
+    else if (s.rec >= 40) lines.push('🟡 Жёлтый день — техника и зона 2, без рекордов и интервалов.');
+    else lines.push('🔴 Красный день — восстановление: прогулка, растяжка, ранний отбой.');
+  }
+
+  const ctx = [];
+  if (base.n >= 3) {
+    if (s.hrv != null && base.hrv != null) {
+      if (s.hrv >= base.hrv * 1.08) ctx.push(`HRV ${s.hrv} — выше твоего среднего (${Math.round(base.hrv)}): нервная система свежая, тело готово.`);
+      else if (s.hrv <= base.hrv * 0.92) ctx.push(`HRV ${s.hrv} — ниже среднего (${Math.round(base.hrv)}): знак недовосстановления или стресса, не геройствуй даже при зелёном.`);
+    }
+    if (s.rhr != null && base.rhr != null) {
+      if (s.rhr >= base.rhr + 4) ctx.push(`Пульс покоя ${s.rhr} — выше обычного (${Math.round(base.rhr)}): часто это нагрузка, недосып или подступающее недомогание. Понаблюдай за собой.`);
+      else if (s.rhr <= base.rhr - 3) ctx.push(`Пульс покоя ${s.rhr} — ниже обычного (${Math.round(base.rhr)}): хороший знак восстановления.`);
+    }
+  }
+  if (s.sleepMs != null && s.sleepMs / 3600000 < 7) {
+    ctx.push(`Сон ${fmtDur(s.sleepMs)} — меньше 7 ч: добери сегодня, недосып бьёт по завтрашнему recovery.`);
+  }
+  if (s.strain != null && s.rec != null && s.rec < 40 && s.strain >= 14) {
+    ctx.push(`Вчерашний strain ${s.strain.toFixed(1)} высокий на фоне низкого recovery — тело в долгу, сегодня правда полегче.`);
+  }
+
+  if (ctx.length) { lines.push(''); lines.push(...ctx.map((c) => '• ' + c)); }
+  else if (s.rec != null && base.n >= 3) { lines.push(''); lines.push('• HRV, пульс и сон — в твоей норме, флагов нет.'); }
+  return lines.join('\n');
 }
 
 // --- /week: быстрая сводка за 7 дней из daily-логов (глубокий разбор — у агента в воскресенье) ---
@@ -209,13 +261,13 @@ async function handle(msg) {
   }
   if (text === '/whoop' || text === '/body') {
     await send(chatId, '📡 тяну Whoop…');
-    const { parts, rec } = await whoopSnapshot();
-    if (!parts.length) {
+    const snap = await whoopSnapshot();
+    if (!snap.parts.length) {
       await send(chatId, 'Whoop пока молчит — синк ещё не прошёл или нет свежей ночи. Загляни попозже.');
       return;
     }
-    const v = verdictFor(rec);
-    await send(chatId, `📊 Сейчас:\n${parts.join('\n')}${v ? '\n\n' + v : ''}`);
+    const advice = whoopAdvice(snap, whoopBaseline());
+    await send(chatId, `📊 Сейчас:\n${snap.parts.join('\n')}${advice ? '\n\n' + advice : ''}`);
     return;
   }
   if (text === '/week') {
