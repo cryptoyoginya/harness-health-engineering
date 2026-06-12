@@ -1,9 +1,14 @@
+<div align="center">
+
 # 🧬 Harness Health Engineering
 
-> **A local AI lab that helps you discover what actually improves your life.**
-> Your physiology streams in automatically from Whoop; your lived experience goes in by text, voice, or
-> selfie; an on-device AI agent runs *n-of-1 experiments* on you and tells you what actually
-> makes your life better. All as plain Markdown you own.
+### *A local AI lab that helps you discover what actually improves your life.*
+
+Physiology streams in from **Whoop** · lived experience goes in by **text · voice · selfie** ·
+an **on-device agent** runs *n-of-1 experiments* and tells you what actually makes life better —
+all as plain **Markdown you own**.
+
+<br/>
 
 ![local-first](https://img.shields.io/badge/local--first-on--device-2563eb)
 ![method](https://img.shields.io/badge/method-n--of--1%20trials-16a34a)
@@ -11,6 +16,18 @@
 ![RAG](https://img.shields.io/badge/RAG-e5--small%20·%20sqlite--vec%20·%20FTS5%20·%20RRF-0ea5e9)
 ![Whoop](https://img.shields.io/badge/Whoop-API%20v2-FF0026)
 ![License](https://img.shields.io/badge/license-MIT-444)
+
+</div>
+
+---
+
+### 🧭 Explore
+
+|   |   |   |
+|---|---|---|
+| ⭐ [The one idea](#the-one-idea) | 🔬 [The engine](#the-engine-n-of-1-experiments-) | 🆚 [vs Whoop journal](#why-its-different-from-whoops-journal) |
+| 🔄 [How it works](#how-it-works) | 📥 [Three ways in](#three-ways-in-) | 🤳 [Photo diaries](#three-photo-diaries-one-on-device-eye-) |
+| 🧱 [Architecture](#architecture-the-knowledge-pyramid-) | 🛠️ [Technology](#technology) | 🚀 [Quickstart](#quickstart) |
 
 ---
 
@@ -55,6 +72,21 @@ sentence no tracker will ever give you:
 
 One variable at a time. A clock. A criterion. A verdict that becomes a rule. That's the whole game, and
 it's why this gets smarter every week instead of just logging more.
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> proposed: /exp new · or agent proposes
+    proposed --> active: baseline + criterion set
+    active --> active: /exp extend
+    active --> merged: criterion met → becomes a rule
+    active --> reverted: missed / stopped → logged why
+    merged --> [*]
+    reverted --> [*]
+```
+
+You drive it from anywhere: `/exp new` to start, `/exp extend` to give it more time, `/exp stop` to call
+it — or just ask the agent to design a tighter one. Either way it ends in a verdict, not a vibe.
 
 ## Why it's different from Whoop's journal
 
@@ -214,6 +246,36 @@ Method: the clinical **Bristol Stool Scale** (type 1–7, with 3–4 as the heal
 - **Shooting noise** — light, angle, makeup, time of day distort more than physiology; mismatched shots → low confidence.
 - **Biology lags** — skin breakouts (and gut shifts) surface days after a trigger; never pinned to "yesterday."
 - **One shot ≠ a pattern** — value is the trend; strongest evidence = **paired shots, *"morning after X vs morning without X"*** — already almost an n-of-1.
+
+## Architecture: the knowledge pyramid 🧱
+
+Everything is plain Markdown in a **layered pyramid** — raw signal at the base, decisions at the top.
+Each layer only consumes the one below it, so evidence flows *upward* and nothing is asserted without a
+trail back to its source.
+
+| Layer | Holds | Example |
+|---|---|---|
+| ⭐ `00_context` | north-star, metrics, the domain frame | *"is life better?"*, leading vs lagging metrics |
+| 📥 `01_raw` | daily records — you + Whoop | `2026-06-13.md`, photos, voice notes |
+| 🔖 `02_sources` | weekly notes, evidence-labelled | `FACT` / `INFERENCE` per week |
+| 📚 `03_wiki` | what you've learned, baselines | personal HRV, supplement stack |
+| 🧩 `04_synthesis` | patterns + life-quality | the cross-layer story |
+| 🔬 `05_decisions` | **n-of-1 experiments** | one variable · criterion · verdict |
+| 🎁 `06_outputs` | finished artefacts | specs, talks |
+
+```mermaid
+flowchart TB
+    CAP["✍️ 🎙️ 🤳 capture · ⌚ Whoop"] --> R["📥 01 · raw"]
+    R --> S["🔖 02 · sources<br/>FACT / INFERENCE"]
+    S --> Y["🧩 04 · synthesis<br/>patterns · life-quality"]
+    Y --> D["🔬 05 · decisions<br/>n-of-1 experiments"]
+    D --> RU["✅ rules that stuck"]
+    D -. "merge / revert" .-> R
+    NS["⭐ 00 · north-star"] -. "is life better?" .-> Y
+```
+
+The retrieval, hooks, and agent all read this pyramid — never raw guesses. The full scientific rationale
+lives in [`METHODOLOGY.md`](./METHODOLOGY.md); the layer contracts in [`AGENTS.md`](./AGENTS.md).
 
 ## Technology
 
