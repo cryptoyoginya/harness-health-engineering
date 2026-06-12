@@ -33,6 +33,7 @@
 - [Красный recovery](./skills/health-red-recovery.md)
 - [Долг сна](./skills/health-sleep-debt.md)
 - [Спад настроения](./skills/health-mood-dip.md)
+- [«Это я или биология?» — атрибуция спада](./skills/health-attribution.md) ⭐ killer-фича
 - [Травма / боль](./skills/health-injury.md)
 - [Возврат в режим](./skills/health-getting-back.md)
 - [Недельный синтез](./skills/health-weekly-synthesis.md)
