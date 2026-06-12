@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Harness Health Engineering — body data in, life decisions out</title>
+<meta name="description" content="A local AI lab that runs n-of-1 experiments on your life and tells you, with proof, what actually makes it better." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#000; --fg:#fff; --mut:#8a8a8a; --dim:#5a5a5a; --line:#1c1c1c;
+    --head:'Space Grotesk',"Helvetica Neue",Arial,system-ui,sans-serif;
+    --body:'Inter',"Helvetica Neue",Arial,system-ui,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--fg);font-family:var(--body);
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.6}
+  a{color:inherit}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+  .eyebrow{font-family:var(--head);font-size:12px;letter-spacing:.42em;text-transform:uppercase;color:var(--mut)}
+  h1,h2,h3{font-family:var(--head);font-weight:700;letter-spacing:-.02em;line-height:1.02;text-transform:uppercase}
+  .mut{color:var(--mut)} .dim{color:var(--dim)}
+
+  /* nav */
+  nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+    padding:18px 28px;backdrop-filter:blur(8px);background:rgba(0,0,0,.35);border-bottom:1px solid var(--line)}
+  nav .brand{font-family:var(--head);font-weight:700;letter-spacing:.04em;font-size:15px;text-transform:uppercase}
+  nav .brand span{color:var(--dim)}
+  nav a.cta{font-family:var(--head);font-size:12px;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;
+    border:1px solid #2a2a2a;padding:9px 16px;border-radius:999px;transition:.25s}
+  nav a.cta:hover{background:#fff;color:#000;border-color:#fff}
+
+  /* hero */
+  .hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+  #dna{position:absolute;inset:0;width:100%;height:100%;opacity:.9}
+  .hero .vignette{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 45%,transparent 38%,#000 86%);pointer-events:none}
+  .hero .inner{position:relative;z-index:2;padding:0 20px}
+  .hero h1{font-size:clamp(40px,9vw,116px)}
+  .hero h1 .l2{color:var(--mut)}
+  .hero p.sub{max-width:620px;margin:26px auto 0;font-size:clamp(15px,1.6vw,19px);color:#cfcfcf}
+  .scrollcue{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:2;font-family:var(--head);
+    font-size:11px;letter-spacing:.3em;color:var(--dim);text-transform:uppercase;animation:bob 2.4s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
+
+  /* sections */
+  section{padding:clamp(80px,12vw,170px) 0;border-top:1px solid var(--line)}
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  .big{font-size:clamp(30px,5.4vw,68px);line-height:1.04;max-width:16ch}
+  .lead{font-size:clamp(16px,1.8vw,21px);color:#cfcfcf;max-width:60ch;margin-top:26px}
+  .kicker{margin-bottom:22px}
+
+  /* metric / north star */
+  .northstar .big{max-width:20ch}
+  .northstar .q{display:block;margin-top:14px;font-size:clamp(34px,7vw,92px);color:#fff}
+
+  /* science cards */
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:54px}
+  .grid4 .cell{background:#000;padding:30px 24px;min-height:190px}
+  .grid4 .n{font-family:var(--head);font-size:13px;color:var(--dim);letter-spacing:.2em}
+  .grid4 .cell h3{font-size:21px;margin:16px 0 10px}
+  .grid4 .cell p{font-size:14px;color:var(--mut)}
+  .quote{margin-top:54px;font-family:var(--head);font-weight:500;font-size:clamp(20px,3.4vw,40px);line-height:1.18;letter-spacing:-.01em;text-transform:none}
+  .quote .by{display:block;margin-top:16px;font-family:var(--body);font-size:14px;letter-spacing:.04em;color:var(--dim);text-transform:uppercase}
+
+  /* features */
+  .feat{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:54px}
+  .feat .f{background:#000;padding:34px 26px}
+  .feat .f .ix{font-family:var(--head);font-size:12px;color:var(--dim);letter-spacing:.22em}
+  .feat .f h3{font-size:19px;margin:18px 0 10px;text-transform:none;letter-spacing:0}
+  .feat .f p{font-size:14px;color:var(--mut)}
+
+  /* tech */
+  .tech .big{max-width:18ch}
+  .stack{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:50px}
+  .stack .row{background:#000;padding:22px 24px;display:flex;gap:18px;align-items:flex-start}
+  .stack .row .k{font-family:var(--head);font-size:12px;letter-spacing:.16em;color:#fff;min-width:128px;text-transform:uppercase}
+  .stack .row .v{font-size:14px;color:var(--mut)}
+  .stack .row .v b{color:#dcdcdc;font-weight:500}
+
+  /* vs */
+  .vs .cols{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:50px}
+  .vs .col{background:#000;padding:34px 28px}
+  .vs .col .lab{font-family:var(--head);font-size:12px;letter-spacing:.2em;color:var(--dim)}
+  .vs .col.you .lab{color:#fff}
+  .vs .col ul{list-style:none;margin-top:20px;display:flex;flex-direction:column;gap:14px}
+  .vs .col li{font-size:15px;color:var(--mut);padding-left:20px;position:relative}
+  .vs .col li::before{content:"";position:absolute;left:0;top:9px;width:7px;height:7px;background:#2a2a2a}
+  .vs .col.you li{color:#eaeaea}
+  .vs .col.you li::before{background:#fff}
+
+  /* cta */
+  .cta-s{text-align:center}
+  .cta-s .big{margin:0 auto;max-width:22ch}
+  .btn{display:inline-flex;align-items:center;gap:12px;margin-top:40px;font-family:var(--head);font-size:14px;
+    letter-spacing:.16em;text-transform:uppercase;text-decoration:none;background:#fff;color:#000;
+    padding:18px 30px;border-radius:999px;transition:.25s}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 0 0 6px rgba(255,255,255,.08)}
+  .btn.ghost{background:transparent;color:#fff;border:1px solid #2a2a2a}
+  .btn.ghost:hover{background:#fff;color:#000;border-color:#fff;box-shadow:none}
+  .btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+
+  footer{border-top:1px solid var(--line);padding:54px 0 70px;text-align:center}
+  footer .made{font-size:15px;color:#cfcfcf}
+  footer .made a{font-weight:500;text-decoration:none;border-bottom:1px solid #444;transition:.2s}
+  footer .made a:hover{border-color:#fff}
+  footer .heart{display:inline-block;transform:translateY(1px)}
+  footer .tiny{margin-top:14px;font-family:var(--head);font-size:11px;letter-spacing:.28em;color:var(--dim);text-transform:uppercase}
+
+  @media(max-width:780px){
+    .grid4,.feat,.stack,.vs .cols{grid-template-columns:1fr}
+    nav .brand{font-size:13px}
+  }
+  @media(prefers-reduced-motion:reduce){.reveal{transition:none;opacity:1;transform:none}.scrollcue{animation:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">Harness <span>/ Health</span></div>
+  <a class="cta" href="https://github.com/cryptoyoginya/harness-health-engineering">View the repo ↗</a>
+</nav>
+
+<header class="hero">
+  <canvas id="dna"></canvas>
+  <div class="vignette"></div>
+  <div class="inner">
+    <div class="eyebrow">Harness · Health Engineering</div>
+    <h1>Body data in.<br /><span class="l2">Life decisions out.</span></h1>
+    <p class="sub">A local AI lab that runs experiments on <em>your</em> life — and tells you, with proof, what actually makes it better.</p>
+  </div>
+  <div class="scrollcue">Scroll</div>
+</header>
+
+<section class="manifesto">
+  <div class="wrap">
+    <div class="eyebrow kicker reveal">The problem</div>
+    <h2 class="big reveal">Every tracker optimised a number. Your life fell out of frame.</h2>
+    <p class="lead reveal">Recovery. HRV. Steps. Somewhere the metric became the point — while whether you felt good, did meaningful work, or saw people you love quietly stopped counting. That's Goodhart's law wearing a fitness band: when a measure becomes the target, it stops measuring anything that matters.</p>
+  </div>
+</section>
+
+<section class="northstar">
+  <div class="wrap">
+    <div class="eyebrow kicker reveal">The shift</div>
+    <h2 class="big reveal">So we deleted the dashboard and kept one question.<span class="q reveal">Is my life actually better?</span></h2>
+    <p class="lead reveal">Everything else — sleep, HRV, supplements, training load — is demoted to what it really is: an instrument in service of that answer. The system will tell you your body looks great this week and your life doesn't — then help you fix the right thing.</p>
+  </div>
+</section>
+
+<section class="science">
+  <div class="wrap">
+    <div class="eyebrow kicker reveal">The science</div>
+    <h2 class="big reveal">Personal science, not correlations.</h2>
+    <p class="lead reveal">Correlations are guesses. We borrow the method clinical medicine uses to decide whether something works for one specific person — the n-of-1 trial. Pre-registered, controlled, judged against a line drawn before the data arrives.</p>
+    <div class="grid4">
+      <div class="cell reveal"><div class="n">01</div><h3>Hypothesis</h3><p>A specific causal claim — not a vibe.</p></div>
+      <div class="cell reveal"><div class="n">02</div><h3>One variable</h3><p>Change exactly one thing. The rule everyone breaks.</p></div>
+      <div class="cell reveal"><div class="n">03</div><h3>Pre-set criterion</h3><p>The threshold is written before the data, so you can't fool yourself.</p></div>
+      <div class="cell reveal"><div class="n">04</div><h3>Verdict → rule</h3><p>Merge it into your life, or revert and log why.</p></div>
+    </div>
+    <p class="quote reveal">“Creatine moved nothing for you in three weeks — stop paying for it.”
+      <span class="by">— the kind of sentence no wearable will ever say</span></p>
+  </div>
+</section>
+
+<section class="features">
+  <div class="wrap">
+    <div class="eyebrow kicker reveal">What it does</div>
+    <h2 class="big reveal">One inbox for your whole life.</h2>
+    <div class="feat">
+      <div class="f reveal"><div class="ix">Capture</div><h3>Text, voice, photo</h3><p>Type, talk, or snap. Selfie, food, and stool photos are sorted automatically — no captions, no forms.</p></div>
+      <div class="f reveal"><div class="ix">On-device</div><h3>Private intelligence</h3><p>Voice→text and photo-type run locally. Your raw life never gets uploaded to be processed.</p></div>
+      <div class="f reveal"><div class="ix">Weekly</div><h3>The verdict</h3><p>Every Sunday the agent reads your week, finds patterns you can't see, and scores them against your north-star.</p></div>
+      <div class="f reveal"><div class="ix">Causal</div><h3>n-of-1 experiments</h3><p>Start, extend, or stop a trial in one tap. It ends in a verdict that becomes a standing rule.</p></div>
+      <div class="f reveal"><div class="ix">Direction</div><h3>Your north-star</h3><p>You set what a good life means. Everything optimises toward that — not toward a leaderboard.</p></div>
+      <div class="f reveal"><div class="ix">Horizons</div><h3>Week · month · year</h3><p>Zoom out as data compounds and watch how your quality of life actually moves over seasons.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="tech">
+  <div class="wrap">
+    <div class="eyebrow kicker reveal">The engineering</div>
+    <h2 class="big reveal">Local-first. No servers. No surveillance.</h2>
+    <p class="lead reveal">Your entire life is a folder of plain Markdown you own — searchable, versioned, yours to delete. The intelligence runs on the machine in front of you.</p>
+    <div class="stack">
+      <div class="row reveal"><div class="k">On-device voice</div><div class="v"><b>Whisper</b> (ONNX) transcribes voice notes locally, decoded by a prebuilt ffmpeg — audio never leaves the device.</div></div>
+      <div class="row reveal"><div class="k">On-device vision</div><div class="v"><b>CLIP</b> zero-shot classification routes every photo into the right diary, on the machine, in milliseconds.</div></div>
+      <div class="row reveal"><div class="k">Hybrid RAG</div><div class="v"><b>multilingual-e5</b> embeddings + <b>sqlite-vec</b> + FTS5 BM25, fused with reciprocal-rank — your history, retrieved with citations.</div></div>
+      <div class="row reveal"><div class="k">Agent surface</div><div class="v">An <b>MCP server</b> exposes search, synthesis, and backlinks to any client — the model reasons over your pyramid, never raw guesses.</div></div>
+      <div class="row reveal"><div class="k">Knowledge pyramid</div><div class="v">Layered Markdown <b>00→06</b> with frontmatter contracts and evidence labels — fact, inference, assumption, separated by design.</div></div>
+      <div class="row reveal"><div class="k">Quietly automatic</div><div class="v">Race-safe Whoop OAuth, a morning brief via <b>launchd</b>, and a <b>kb-doctor</b> health-check keep it honest, hands-off.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="vs">
+  <div class="wrap">
+    <div class="eyebrow kicker reveal">Where it sits</div>
+    <h2 class="big reveal">Whoop is a brilliant sensor. This is the decision layer above it.</h2>
+    <div class="cols">
+      <div class="col reveal">
+        <div class="lab">Wearable journal</div>
+        <ul>
+          <li>Top metric is a body score</li>
+          <li>Evidence is correlation</li>
+          <li>Sees the body, nothing else</li>
+          <li>Output is dashboards</li>
+          <li>Reasoning is a black box</li>
+        </ul>
+      </div>
+      <div class="col you reveal">
+        <div class="lab">Harness Health</div>
+        <ul>
+          <li>Top metric is your life quality</li>
+          <li>Evidence is n-of-1 causation → rules</li>
+          <li>Body × work × people × supplements</li>
+          <li>Output is decisions and experiments</li>
+          <li>On-device, cited, asked in plain language</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-s">
+  <div class="wrap">
+    <h2 class="big reveal">Own your data. Run the experiment.</h2>
+    <p class="lead reveal" style="margin-left:auto;margin-right:auto">Open-source, local-first, and built to generalise to any self-quantifier. Clone it, point it at your life, and find your real levers.</p>
+    <div class="btns reveal">
+      <a class="btn" href="https://github.com/cryptoyoginya/harness-health-engineering">View the repo ↗</a>
+      <a class="btn ghost" href="https://github.com/cryptoyoginya/harness-health-engineering/blob/main/SETUP.md">Deploy your own ↗</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="made">Made by <a href="https://t.me/vintersbrain">Christina Vinter</a>, w/ <span class="heart">🤍</span></p>
+    <p class="tiny">Body data in · Life decisions out</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var c=document.getElementById('dna'), ctx=c.getContext('2d');
+  var W=0,H=0,DPR=1;
+  function resize(){
+    DPR=Math.min(2, window.devicePixelRatio||1);
+    W=c.clientWidth; H=c.clientHeight;
+    c.width=W*DPR; c.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  window.addEventListener('resize', resize); resize();
+
+  var N=150, turns=4.2, pairs=[];
+  for(var i=0;i<N;i++){
+    var f=i/(N-1), ang=f*Math.PI*2*turns, y=(f-0.5)*2;
+    pairs.push({ang:ang, y:y});
+  }
+  function frame(t){
+    ctx.clearRect(0,0,W,H);
+    var cx=W/2, cy=H/2;
+    var R=Math.min(W,H)*0.17;
+    var sy=Math.min(W*0.62,H*0.46);
+    var yaw=t*0.00032;
+    var drift=Math.sin(t*0.00012)*0.12;
+    var nodes=[];
+    for(var i=0;i<pairs.length;i++){
+      var p=pairs[i], a=p.ang+yaw, yy=(p.y+drift)*sy;
+      var a0=a, a1=a+Math.PI;
+      var d0=Math.sin(a0), d1=Math.sin(a1);
+      var x0=cx+Math.cos(a0)*R, x1=cx+Math.cos(a1)*R;
+      nodes.push({x0:x0,x1:x1,y:cy+yy,d0:d0,d1:d1,da:(d0+d1)/2});
+    }
+    var order=nodes.map(function(n,i){return i;}).sort(function(a,b){return nodes[a].da-nodes[b].da;});
+    for(var k=0;k<order.length;k++){
+      var n=nodes[order[k]];
+      var ar=0.12+0.40*((n.da+1)/2);
+      ctx.strokeStyle='rgba(255,255,255,'+ar+')';
+      ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(n.x0,n.y); ctx.lineTo(n.x1,n.y); ctx.stroke();
+      dot(n.x0,n.y,n.d0); dot(n.x1,n.y,n.d1);
+    }
+    requestAnimationFrame(frame);
+  }
+  function dot(x,y,d){
+    var r=1.6+2.6*((d+1)/2);
+    var a=0.25+0.6*((d+1)/2);
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,'+a+')'; ctx.fill();
+  }
+  requestAnimationFrame(frame);
+
+  var obs=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target);} });
+  },{threshold:0.16});
+  document.querySelectorAll('.reveal').forEach(function(el,i){
+    el.style.transitionDelay=((i%4)*70)+'ms';
+    obs.observe(el);
+  });
+})();
+</script>
+</body>
+</html>
