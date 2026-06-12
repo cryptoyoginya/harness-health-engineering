@@ -35,6 +35,7 @@ const INTRO = [
   '• текстом',
   '• голосовым — расшифрую прямо на устройстве (аудио никуда не уходит)',
   '• селфи — коплю в локальный визуальный дневник; динамику кожи/лица/отёков потом смотрит агент по запросу (описывает изменения, без диагнозов)',
+  '• по желанию — фото еды или стула: подпиши «еда» или «стул», разложу в отдельный дневник. Агент разберёт еду по составу/таймингу, стул — по Бристольской шкале. Тоже без диагнозов; тревожное — к врачу',
   '',
   'Несколько записей и несколько селфи за день — это норма и даже лучше: каждое сообщение падает строкой «- 14:30 твой текст» в файл сегодняшнего дня, и по таймстемпам виден ход дня, а не один усреднённый итог.',
   '',
@@ -81,6 +82,13 @@ const INTRO = [
   'Body data in. Life decisions out 🤍',
 ].join('\n');
 
+// Ответы бота на фото по типу. Бот только хранит локально; разбор — у агента, недиагностично.
+const PHOTO_REPLY = {
+  selfie: (rel) => `✓ селфи сохранила локально (${rel}) — фото не уходит с устройства.\nДинамику разберёт агент: скажи ему «посмотри селфи за неделю».`,
+  stool: (rel) => `✓ сохранила (стул) локально (${rel}) — приватно, с устройства не уходит.\nАгент разберёт по Бристольской шкале: «разбери стул за неделю». Не диагностика; кровь/чёрный/стойкие изменения — к врачу.`,
+  food: (rel) => `✓ сохранила (еда) локально (${rel}).\nАгент разберёт состав и тайминг: «разбери еду за неделю». Точнее, если подпишешь — что это и во сколько.`,
+};
+
 // Краткая справка по /exp — показывается при нажатии /exp и при ошибке ввода.
 const EXP_HELP = [
   'Как пользоваться:',
@@ -123,16 +131,28 @@ async function transcribeVoice(fileId) {
   return transcribeFn(buf);
 }
 
-// Сохранить селфи в локальный визуальный дневник (gitignored — биометрия не уходит в репо).
-// Разбор динамики делает агент по запросу; бот только хранит. Возвращает относительный путь.
-async function saveSelfie(fileId) {
+// Тип фото по подписи: стул / еда / селфи (по умолчанию). Всё — локальный дневник, gitignored.
+function classifyPhoto(caption = '') {
+  const c = caption.toLowerCase();
+  const has = (...w) => w.some((x) => c.includes(x));
+  if (has('стул', 'кал', 'туалет', 'какашк', 'poop', 'stool')) return 'stool';
+  if (has('еда', 'еду', 'ела', 'поел', 'food', 'meal', 'завтрак', 'обед', 'ужин', 'перекус', 'блюдо', 'breakfast', 'lunch', 'dinner', 'snack')) return 'food';
+  return 'selfie';
+}
+
+const PHOTO_SUBDIR = { selfie: '', stool: 'stool', food: 'food' };
+
+// Сохранить фото в локальный дневник (gitignored — приватные данные не уходят в репо).
+// Разбор делает агент по запросу; бот только хранит. Возвращает относительный путь.
+async function savePhoto(fileId, kind = 'selfie') {
   const buf = await downloadFile(fileId);
-  const dir = join(ROOT, '01_raw', 'health', 'photos');
+  const sub = PHOTO_SUBDIR[kind] ?? '';
+  const dir = join(ROOT, '01_raw', 'health', 'photos', sub);
   mkdirSync(dir, { recursive: true });
   const stamp = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/:/g, '');
   const name = `${todayISO()}-${stamp}.jpg`;
   writeFileSync(join(dir, name), buf);
-  return `photos/${name}`;
+  return sub ? `photos/${sub}/${name}` : `photos/${name}`;
 }
 
 function todayFile() {
@@ -248,15 +268,17 @@ async function handle(msg) {
     return;
   }
 
-  // Фото-селфи → локальный визуальный дневник. Бот только хранит, «смотрит» агент по запросу.
+  // Фото → локальный дневник. Тип по подписи: селфи (умолч.) / стул / еда. Хранит бот, «смотрит» агент.
   const photo = (msg.photo && msg.photo[msg.photo.length - 1]) ||
     (msg.document && /^image\//.test(msg.document.mime_type || '') ? msg.document : null);
   if (photo) {
+    const cap = (msg.caption || '').trim();
+    const kind = classifyPhoto(cap);
     try {
-      const rel = await saveSelfie(photo.file_id);
-      const cap = (msg.caption || '').trim();
-      appendInbox(`📸 селфи → ${rel}${cap ? ' — ' + cap : ''}`);
-      await send(chatId, `✓ селфи сохранила локально (${rel}) — фото не уходит с устройства.\nДинамику разберёт агент: скажи ему «посмотри селфи за неделю».`);
+      const rel = await savePhoto(photo.file_id, kind);
+      const mark = kind === 'stool' ? '💩 стул' : kind === 'food' ? '🍽 еда' : '📸 селфи';
+      appendInbox(`${mark} → ${rel}${cap ? ' — ' + cap : ''}`);
+      await send(chatId, PHOTO_REPLY[kind](rel));
     } catch (e) {
       await send(chatId, `Не смогла сохранить фото: ${e.message}`);
     }

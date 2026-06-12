@@ -118,6 +118,15 @@ Lived experience is messy, and you shouldn't have to sit at a keyboard to captur
 | 🎙️ **Voice** | send a voice note | transcribed **on-device** (Whisper ONNX) → text | audio never leaves the machine |
 | 🤳 **Selfie** | send a photo | archived to a **local visual diary**, reviewed on demand by the agent | biometric — never committed to git |
 
+A photo is routed by its caption into one of three **local, opt-in diaries**, each read against its own
+canon — all descriptive, never diagnostic:
+
+| Caption | Diary | Canon the agent uses |
+|---|---|---|
+| *(none)* → selfie | face | skin / fluid / affect signals over time |
+| "food" | meals | plate composition · protein · fibre · processing · timing |
+| "stool" | gut | **Bristol Stool Scale** — type, colour, frequency |
+
 Every message lands as a timestamped line `- 14:30 …` in `01_raw/health/YYYY-MM-DD.md`, so the *shape* of
 the day is preserved — not flattened into one average. Commands set the rest: `/north` for your
 north-star, `/exp` to run an n-of-1, `/week` · `/month` · `/year` for horizons.
