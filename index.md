@@ -7,6 +7,7 @@
 - [Домен «Здоровье»](./00_context/health.md) — что это, роль Whoop, измерения, медицинская граница
 - [Метрики (evals)](./00_context/health-metrics.md) — ведущие/запаздывающие + north-star
 - [Semantic invariant](./.remember/core.md) — цель, контекст, hard rules
+- [METHODOLOGY](./METHODOLOGY.md) — научный слой: n-of-1 trials, north-star, метки, конфаундеры
 
 ## Источники
 

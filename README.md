@@ -1,128 +1,150 @@
 # 🧬 Harness Health Engineering
 
-> **A Bryan-Johnson-grade health operating system you actually own.** Your body's objective signals
-> flow in automatically from Whoop; your subjective signals (mood, energy, social) flow in by hand;
-> an on-device AI agent finds the patterns at the seam — all as plain Markdown on your machine.
+> **A personal life-quality operating system that treats your body as an instrument, not a target.**
+> Your physiology streams in automatically from Whoop; your lived experience goes in by hand; an
+> on-device AI agent runs *n-of-1 experiments* on you and tells you — with citations — what actually
+> makes your life better. All as plain Markdown you own.
 
 ![local-first](https://img.shields.io/badge/local--first-on--device-2563eb)
-![RAG](https://img.shields.io/badge/RAG-e5--small%20·%20sqlite--vec%20·%20FTS5%20·%20RRF-16a34a)
+![method](https://img.shields.io/badge/method-n--of--1%20trials-16a34a)
+![north star](https://img.shields.io/badge/north_star-"is_life_better%3F"-eab308)
+![RAG](https://img.shields.io/badge/RAG-e5--small%20·%20sqlite--vec%20·%20FTS5%20·%20RRF-0ea5e9)
 ![Whoop](https://img.shields.io/badge/Whoop-API%20v2-FF0026)
-![MCP](https://img.shields.io/badge/MCP-server-7c3aed)
-![Node](https://img.shields.io/badge/node-22-339933?logo=node.js&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-444)
 
 ---
 
-## The thesis
+## The one idea
 
-Quantified-self tools measure a lot and *change* almost nothing. They live in silos, they read your
-body but never your mind, and they hand you dashboards instead of decisions. **Harness Health
-Engineering** treats your health like a long-running engineering project:
+Every health gadget you've owned optimised a *number*. Recovery. HRV. Steps. And somewhere along the
+way the number became the point, and your actual life — whether you felt good, did meaningful work, saw
+people you love — fell out of frame. That's **Goodhart's law** wearing a fitness band: *when a measure
+becomes the target, it stops measuring anything that matters.*
 
-- **Whoop is your linter for the body** — morning recovery surfaces the "error" *before* you compile
-  it into overtraining or burnout.
-- **The repo is your memory** — every day is durable, versioned, searchable evidence, not a number
-  that scrolls off a feed.
-- **The agent is your synthesis layer** — it correlates *objective* physiology with *subjective*
-  state, the one place no wearable can reach.
+This project flips it. The top-level metric here is not a body score. It is one honest question:
 
-The whole system is **local-first**: the only thing that ever leaves your machine is the outbound
-call to Whoop to pull your own numbers.
+> ### ⭐ North-star: *"Is my life actually better?"*
+
+Everything else — recovery, sleep, HRV, supplements, training load — is demoted to what it really is: an
+**instrument** in service of that question. The system will happily tell you that your body looks great
+this week *and your life doesn't*, and then help you fix the right thing. No wearable can say that,
+because no wearable knows what your good life looks like.
+
+## The engine: n-of-1 experiments 🔬
+
+Correlations are guesses. "You sleep worse when you drink" can't tell you if the drink did it or if a
+hard day caused both. So instead of guessing, the harness runs **n-of-1 trials** — single-subject
+experiments, the real methodology personalised medicine uses to decide if something works *for one
+specific person*. Every experiment is pre-registered:
+
+| Step | Rule |
+|---|---|
+| **Hypothesis** | a specific causal claim |
+| **One variable** | change exactly one thing — the rule everyone breaks |
+| **Baseline** | a measured "before" |
+| **Duration + criterion** | written *before* the data, so you can't fool yourself |
+| **Verdict** | `merge` → it becomes a standing rule, or `revert` → drop it and log why |
+
+This is the difference between *"I tried a thing once"* and knowledge that compounds. The payoff is a
+sentence no tracker will ever give you:
+
+> *"Creatine moved nothing for you in three weeks — stop paying for it."*
+> *"Caffeine before 14:00 bought you +35 min of deep sleep — it's a rule now."*
+
+One variable at a time. A clock. A criterion. A verdict that becomes a rule. That's the whole game, and
+it's why this gets smarter every week instead of just logging more.
+
+## Why it's different from Whoop's journal
+
+Whoop's journaling is genuinely good — and it has a ceiling. Here's where this goes that it structurally
+can't:
+
+| | Wearable journal | Harness Health Engineering |
+|---|---|---|
+| Top metric | a body score | **your life quality** |
+| Evidence | correlation | **n-of-1 causation → rules** |
+| Scope | body only | **body × work × people × supplements × bloodwork** |
+| Output | dashboards | **decisions and experiments** |
+| Reasoning | a black box | **on-device, cited, interrogable in plain language** |
+| Memory | a feed | **a versioned record you can ask "why was March hard?"** |
+| Guardrail | — | **flags metric-tyranny: proxy up, life flat → that's a fail** |
+
+The discipline is the product. The data is just raw material. The full scientific rationale —
+n-of-1 design, surrogate-endpoint failure, evidence labelling, confounding — is in
+[`METHODOLOGY.md`](./METHODOLOGY.md).
 
 ## How it works
 
 ```mermaid
 flowchart TD
-    W["Whoop API v2"] -->|"OAuth2 · auto sync 9:00"| SYNC["scripts/whoop/sync.mjs"]
-    H(["You · 20s/evening"]) -->|"mood · energy · supplements · social"| RAW
-    SYNC -->|"recovery · HRV · sleep · strain"| RAW["01_raw · daily logs"]
+    W["Whoop API v2"] -->|"OAuth2 · auto 9:00 · serialized refresh"| SYNC["sync.mjs"]
+    H(["You · daily diary"]) -->|"events · mood · energy · social · work · movement"| BOT["Telegram bot<br/>(dumb collector)"]
+    SYNC -->|"recovery · HRV · sleep · strain"| RAW["01_raw · daily record"]
+    BOT --> RAW
     RAW --> SRC["02_sources · weekly notes<br/>FACT / INFERENCE"]
-    SRC --> SYN["04_synthesis · patterns"]
-    SYN --> EXP["05_decisions · experiments<br/>one variable at a time"]
-    EXP --> OUT["06_outputs · plans · routines"]
-    EXP -.->|"feedback → rule"| RAW
+    SRC --> SYN["04_synthesis · patterns + life-quality"]
+    SYN --> EXP["05_decisions · n-of-1 experiments<br/>one variable · criterion · verdict"]
+    EXP --> RULE["CLAUDE.md · rules that stuck"]
+    EXP -.->|"merge / revert"| RAW
+    NS["⭐ north-star:<br/>is life better?"] --- SYN
 
-    RAG["on-device hybrid RAG<br/>e5-small · sqlite-vec · FTS5 · RRF"] --- KB[("Markdown KB 00→06")]
-    MCP["MCP server<br/>kb_search · kb_think · kb_backlinks"] --- KB
-    RAW --- KB
-    SRC --- KB
-    SYN --- KB
+    AGENT["on-device agent<br/>RAG · cited synthesis · MCP"] --- RAW
+    AGENT --- SYN
+    AGENT --- EXP
 ```
 
-The cycle: **Signal → Ingest → Source note → Synthesis → Decision/experiment → Output → Feedback →
-Iterate.** Each loop makes you *measurably smarter about yourself*, instead of "I tried a thing once."
+**The loop:** Signal → Ingest → Source note → Synthesis → **Experiment** → Verdict → Rule → repeat.
+Objective body data arrives on its own; you add a 40-second diary; on Sundays the agent scores your week
+against the north-star and finds what's actually moving it.
 
-## What it tracks (multi-dimensional, Blueprint-style)
+## What it tracks
 
-Sleep & recovery · supplement stack + adherence · training load · activity types · nutrition timing ·
-**socialization** · mental state (mood / energy / anxiety). Objective from Whoop, subjective by hand,
-**value at the intersection.**
-
-## Why it's different
-
-| | Typical wearable app | Harness Health Engineering |
-|---|---|---|
-| Data ownership | Their cloud | **Your disk, plain Markdown** |
-| Mind + body | Body only | **Both — correlated in synthesis** |
-| Output | Dashboards | **Decisions & experiments** |
-| Memory | A feed | **Versioned, searchable KB** |
-| AI | Black box | **On-device RAG you can read** |
-| Rigor | Vibes | **FACT/INFERENCE labels, one variable per experiment** |
-| Safety | — | **Hard medical boundary: no diagnoses → see a doctor** |
+**Daily (auto):** recovery, HRV, resting HR, sleep, strain — from Whoop.
+**Daily (you, ~40s):** events (your impressions journal), mood, energy, social, work, movement, supplements.
+**Weekly:** one integral *"is life better?"* 1–5. **Quarterly:** six life dimensions — emotion,
+connection, body, meaning, autonomy, growth.
 
 ## Technology
 
 | Layer | Stack |
 |---|---|
-| Ingest | Whoop API v2, OAuth2 (authorization-code + refresh), Node 22 (no deps) |
-| Knowledge base | Markdown layer pyramid `00_context → 06_outputs` with frontmatter contracts |
-| Retrieval | Hybrid RAG — `multilingual-e5-small` (ONNX via transformers.js) + `sqlite-vec` (vectors) + SQLite **FTS5** (BM25), fused with **Reciprocal Rank Fusion** |
-| Agent interface | MCP server exposing `kb_search` / `kb_think` / `kb_backlinks` to any MCP client |
-| Control plane | Claude Code hooks (SessionStart context, PreToolUse evidence + frontmatter linters), permissioned tools, working-memory invariant |
-| Automation | macOS `launchd` agent runs the morning sync at 09:00, fully hands-off |
-| Quality | `kb-doctor` health-check, weekly `dream-cycle` LLM audit |
-| Viewer | Vite + React graph/search UI (optional, localhost) |
-
-See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the deep dive.
+| Ingest | Whoop API v2, OAuth2 (serialized, race-safe token refresh), Node 22, zero-dep |
+| Capture | free Telegram bot (local, long-polling) + Markdown |
+| Knowledge base | layered Markdown pyramid `00→06` with frontmatter contracts + evidence labels |
+| Retrieval | hybrid RAG — `multilingual-e5-small` (ONNX) + `sqlite-vec` + FTS5 BM25, fused via RRF |
+| Agent | MCP server (`kb_search` / `kb_think` / `kb_backlinks`) for any MCP client |
+| Control plane | Claude Code hooks (evidence + frontmatter linters), permissions, working-memory invariant |
+| Automation | macOS `launchd` — morning sync + brief, hands-off |
+| Quality | `kb-doctor` health-check, weekly `dream-cycle` audit |
 
 ## Quickstart
 
 ```bash
 corepack enable
-pnpm run setup                 # semantic + skillopt + viewer sub-packages
-cp .env.example .env           # add WHOOP_CLIENT_ID / WHOOP_CLIENT_SECRET
-pnpm whoop:auth                # one-time OAuth (browser → .whoop/token.json, gitignored)
-pnpm whoop:sync                # pull physiology into today's log
-pnpm kb:index                  # build the semantic index (first run downloads ~120 MB ONNX)
-pnpm kb:think "why did my mood drop this week?"
-pnpm kb:doctor                 # KB health-check
+pnpm run setup
+cp .env.example .env            # WHOOP + Telegram bot tokens
+pnpm whoop:auth                 # one-time OAuth → .whoop/ (gitignored)
+pnpm whoop:sync                 # pull physiology + push a morning brief
+pnpm kb:index
+pnpm kb:think "what actually moves my life quality?"
+pnpm kb:doctor
 ```
 
-Then the daily rhythm is: **morning** sync runs itself · **evening** log one line ·
-**Sunday** ask the agent to *synthesize the week*.
-
-Evening logging is easiest via the **Telegram bot** (`scripts/bot/`) — a free, zero-dependency,
-local "dumb collector" that drops whatever you text it into today's log. No LLM, no API key: the
-reasoning stays with the agent in Claude Code. See [`scripts/bot/README.md`](./scripts/bot/README.md).
+Daily rhythm: **morning** sync + brief run themselves · **evening** text your diary to the bot ·
+**Sunday** ask the agent to *review the week*.
 
 ## Privacy & safety
 
-- **Local-first.** Your health data lives in this repo on your disk. Nothing is sent anywhere except
-  the Whoop API call that fetches your own data.
-- **Secrets never committed.** `.env` and `.whoop/` (OAuth tokens) are gitignored and `deny`-read by
-  the agent.
-- **Not a medical device.** The agent never diagnoses or interprets symptoms as conditions. Any
-  worrying signal resolves to a single recommendation: *see a specialist.*
+Local-first — your record lives on your disk; the only egress is the Whoop call that fetches *your* data.
+Secrets (`.env`, `.whoop/`) are gitignored and `deny`-read by the agent. **Not a medical device:** the
+agent never diagnoses; any worrying signal resolves to one recommendation — see a specialist.
 
 ## Contributing
 
-This started as one person's body-as-codebase — but the architecture generalizes to any
-self-quantifier. **PRs welcome**, especially: more wearable adapters (Oura, Garmin, Apple Health), a
-live Whoop MCP server, richer experiment templates, and synthesis evals. If you're building the
-future of human optimization and this resonates — open an issue, let's talk. *(Yes, Bryan, this
-includes you.)*
-
-See [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+Built as one person's body-as-codebase, designed to generalise to any self-quantifier. PRs especially
+welcome on: wearable adapters (Oura, Garmin, Apple Health), a live Whoop MCP server, richer experiment
+designs, and synthesis evals. See [`CONTRIBUTING.md`](./CONTRIBUTING.md) and the open
+[issues](https://github.com/cryptoyoginya/harness-health-engineering/issues). *(Yes, Bryan, you too.)*
 
 ## License
 
