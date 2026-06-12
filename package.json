@@ -8,7 +8,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "setup": "pnpm -C scripts/semantic install && pnpm -C scripts/skillopt install && pnpm -C tools/viewer install",
+    "setup": "pnpm -C scripts/semantic install && pnpm -C scripts/skillopt install && pnpm -C scripts/bot install && pnpm -C tools/viewer install",
     "skill": "node scripts/skillopt/cli.mjs",
     "kb:index": "node scripts/semantic/index.mjs",
     "kb:search": "node scripts/semantic/search.mjs",

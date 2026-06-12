@@ -25,6 +25,8 @@ const INTRO = [
   '',
   'Я тут — сборщик. Тупой и честный: всё, что ты пишешь, кладу строкой в сегодняшний лог. ИИ внутри меня нет — думает потом агент над этими логами.',
   '',
+  'Можно текстом или голосовым — голос расшифрую прямо на устройстве, аудио никуда не уходит.',
+  '',
   'Что писать — вечером, одной-двумя фразами, как импрессия дня (не отчёт):',
   '• настроение и энергия — словами или 1–5',
   '• сон, тренировка, движение',
@@ -61,6 +63,23 @@ async function send(chatId, text) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ chat_id: chatId, text }),
   });
+}
+
+// Скачать файл из Telegram по file_id → Buffer.
+async function downloadFile(fileId) {
+  const r = await fetch(`${API}/getFile?file_id=${fileId}`);
+  const j = await r.json();
+  if (!j.ok) throw new Error('getFile не сработал');
+  const fr = await fetch(`https://api.telegram.org/file/bot${TOKEN}/${j.result.file_path}`);
+  return Buffer.from(await fr.arrayBuffer());
+}
+
+// Расшифровать голосовое on-device. transcribe.mjs (тяжёлый ML) грузится лениво — только тут.
+let transcribeFn = null;
+async function transcribeVoice(fileId) {
+  const buf = await downloadFile(fileId);
+  if (!transcribeFn) ({ transcribe: transcribeFn } = await import('./transcribe.mjs'));
+  return transcribeFn(buf);
 }
 
 function todayFile() {
@@ -161,6 +180,24 @@ async function handle(msg) {
     return;
   }
 
+  // Голосовое / аудио / видео-кружок → расшифровка on-device → в лог как обычная запись.
+  const voice = msg.voice || msg.audio || msg.video_note;
+  if (voice) {
+    await send(chatId, '🎧 расшифровываю…');
+    try {
+      const heard = await transcribeVoice(voice.file_id);
+      if (!heard) {
+        await send(chatId, 'Не разобрал — попробуй ещё раз, чуть ближе к микрофону.');
+        return;
+      }
+      appendInbox(heard);
+      await send(chatId, `✓ записал (голос): ${heard}\n\nНе то расслышал? /undo и надиктуй заново.`);
+    } catch (e) {
+      await send(chatId, `Сбой расшифровки: ${e.message}`);
+    }
+    return;
+  }
+
   if (text === '/start' || text === '/help') {
     await send(chatId, INTRO);
     return;
@@ -201,7 +238,7 @@ async function handle(msg) {
     return;
   }
   if (!text) {
-    await send(chatId, 'Пришли текст — запишу. Фото и голосовые пока не умею.');
+    await send(chatId, 'Пришли текст или голосовое — запишу. Фото пока не умею.');
     return;
   }
 
@@ -212,6 +249,8 @@ async function handle(msg) {
 async function loop() {
   console.log('[bot] запущен (long-polling). Ctrl+C для остановки.');
   await registerCommands();
+  // Прогрев Whisper в фоне — чтобы первое голосовое не ждало загрузку модели в память.
+  import('./transcribe.mjs').then((m) => m.warmup()).catch(() => {});
   let offset = readOffset();
   // eslint-disable-next-line no-constant-condition
   while (true) {
