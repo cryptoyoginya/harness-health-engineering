@@ -132,27 +132,41 @@ Every message lands as a timestamped line `- 14:30 …` in `01_raw/health/YYYY-M
 the day is preserved — not flattened into one average. Commands set the rest: `/north` for your
 north-star, `/exp` to run an n-of-1, `/week` · `/month` · `/year` for horizons.
 
-## The visual diary 🤳
+## Three photo diaries, one on-device eye 🤳
 
-Skin, puffiness, and the *spark* in a face shift with sleep, salt, alcohol, stress, and cycle — a
-wearable is blind to all of it. The harness turns selfies into a **longitudinal signal**, while staying
-strictly on the safe side of the line: it *describes and compares over time*, it never diagnoses.
+Your face, your plate, and your gut all leave visible traces of how you live — and a wearable sees none
+of them. The harness turns photos into **longitudinal signals**, while staying strictly on the safe side
+of the line: it *describes and compares over time*, it never diagnoses.
+
+### The on-device eye: how routing works 👁️
+
+Send any photo — **no caption, no menu**. The bot identifies what it is with **CLIP zero-shot image
+classification running locally** (ONNX, the same on-device stack as the voice transcriber). The image
+**never leaves the machine**; nothing is uploaded.
 
 ```mermaid
-flowchart LR
-    P["🤳 selfie<br/>(Telegram)"] --> BOT["bot: download"]
-    BOT --> STORE["01_raw/health/photos/<br/>local · gitignored"]
-    BOT --> LOG["daily record<br/>filename reference only"]
-    STORE -.->|"on request:<br/>'review my selfies'"| AGENT["agent vision"]
-    LOG -.-> AGENT
-    AGENT --> OBS["dated observations<br/>visual-diary.md · local"]
-    OBS --> HYP["hypothesis"]
-    HYP --> EXP["n-of-1 experiment"]
+flowchart TD
+    P["📷 photo<br/>(Telegram)"] --> DL["bot: download"]
+    DL --> CLIP{"on-device CLIP<br/>zero-shot · ONNX"}
+    CLIP -->|face| S1["photos/ · face"]
+    CLIP -->|meal| S2["photos/food/ · food"]
+    CLIP -->|toilet| S3["photos/stool/ · gut"]
+    S1 --> STORE["local · gitignored<br/>only a filename ref in the daily log"]
+    S2 --> STORE
+    S3 --> STORE
+    STORE -.->|"on request: 'review my …'"| AGENT["agent vision<br/>(strong model)"]
+    AGENT --> OBS["dated observations · local"]
+    OBS --> HYP["hypothesis"] --> EXP["n-of-1 experiment"]
 ```
 
-The **only automatic step is storage.** No image is ever auto-analysed, uploaded, or committed.
-Comparison happens *only when you ask*, using the agent's vision — keeping a strong model's quality
-without sending your face anywhere by default.
+- **Selfie is the safe default** — the classifier must clear a confidence margin to file a photo as food
+  or stool; otherwise it stays in the neutral face diary.
+- **A caption always wins** — write "food" / "stool" / "selfie" to override the guess.
+- **Storage is the only automatic step.** Content is never auto-analysed — the deep read happens *only
+  when you ask the agent* ("review my selfies / food / stool"), keeping a strong model's quality without
+  sending anything anywhere by default. (Warm classification ≈ 150 ms.)
+
+### 1 · Face — the visual diary
 
 **What the agent reads from a face — over time, not in one shot:**
 
@@ -164,13 +178,42 @@ without sending your face anywhere by default.
 | 👁️ Eyes | sclera redness, dark circles, clarity of gaze | tiredness, irritation | sleep, alcohol, screens, allergy |
 | 🌳 Affect / vitality | jaw/brow tension, downturned vs lit-up | mood, energy | mood/energy 1–5, *"lived as wanted?"* |
 
-**Hard limits, by design:**
+### 2 · Food — read against the plate canon
+
+Method: the **plate canon** — ~½ vegetables · ~¼ protein · ~¼ complex carbs · + healthy fat.
+
+| Signal | May reflect | Cross-checked against |
+|---|---|---|
+| protein present? | satiety, stable glucose | energy, afternoon sugar cravings |
+| fibre / veg share | gut transit, fullness | stool, energy |
+| processing level (whole vs ultra-processed) | inflammation *(hypothesis)* | mood, energy |
+| refined sugar / fast carbs | glucose swings | energy, sleep, skin |
+| meal timing (late eating) | overnight recovery | sleep, next-day recovery |
+
+> **No calorie counting** — unreliable from a photo; the agent reads *composition and timing*, not
+> numbers. Described **neutrally, never moralised** — an eating-disorder guardrail keeps the focus on
+> *food → how you feel*, not control or guilt.
+
+### 3 · Gut — the Bristol Stool Scale
+
+Method: the clinical **Bristol Stool Scale** (type 1–7, with 3–4 as the healthy middle) plus colour.
+
+| Read | May reflect | Cross-checked against |
+|---|---|---|
+| type 1–2 (hard lumps) | slow transit, constipation-leaning | water, fibre, magnesium, travel |
+| type 3–4 | normal | — |
+| type 6–7 (loose / watery) | fast transit | trigger foods, stress, FODMAPs, caffeine |
+| colour (pale-clay · black-tarry · red) | bile flow · possible bleed | **red-flag → doctor** |
+
+> Black/tarry stool or visible blood → **see a doctor**, not a diary entry — no interpretation attempted.
+
+### Hard limits, across all three diaries
 
 - **Not a diagnosis** — any worrying sign resolves to *"see a doctor,"* never an interpretation.
-- **Constitution ≠ trend** — innate dark circles or face shape are constants, not changes.
+- **Constitution ≠ trend** — innate features (dark circles, face shape) are constants, not changes.
 - **Shooting noise** — light, angle, makeup, time of day distort more than physiology; mismatched shots → low confidence.
-- **Skin lags** — breakouts surface days after a trigger; never pinned to "yesterday."
-- **Strongest evidence = paired shots** — *"morning after X vs morning without X"* — which is already almost an n-of-1.
+- **Biology lags** — skin breakouts (and gut shifts) surface days after a trigger; never pinned to "yesterday."
+- **One shot ≠ a pattern** — value is the trend; strongest evidence = **paired shots, *"morning after X vs morning without X"*** — already almost an n-of-1.
 
 ## Technology
 
