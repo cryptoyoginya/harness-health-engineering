@@ -8,6 +8,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, loadEnv, whoopGet, todayISO } from './lib.mjs';
+import { buildSnapshot, whoopBaseline, whoopTrend, whoopAdvice } from './advice.mjs';
 
 loadEnv();
 
@@ -111,11 +112,9 @@ async function sendBrief(text) {
   }
 }
 
-const rec = recovery?.score?.recovery_score;
-let verdict = '';
-if (rec != null) {
-  if (rec > 66) verdict = '🟢 зелёный день — можно грузить по плану';
-  else if (rec >= 40) verdict = '🟡 жёлтый день — умеренно, без рекордов';
-  else verdict = '🔴 красный день — лёгкий, режь нагрузку, ранний отбой';
-}
-await sendBrief(`☀️ Доброе утро\n${whoopLine}${verdict ? '\n' + verdict : ''}\n\nВечером черкни, как прошёл день.`);
+// Совет — тот же, что в боте /whoop: светофор + флаги по отклонениям от нормы + тренд.
+// Сегодняшняя строка whoop: уже записана выше, поэтому baseline (14 дн до сегодня) и
+// trend (включая сегодня) читаются из логов корректно.
+const snap = buildSnapshot(recovery, cycle, sleep);
+const advice = whoopAdvice(snap, whoopBaseline(), whoopTrend());
+await sendBrief(`☀️ Доброе утро\n${whoopLine}${advice ? '\n\n' + advice : ''}\n\nВечером черкни, как прошёл день.`);
