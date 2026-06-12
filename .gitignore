@@ -31,6 +31,9 @@ tools/viewer/.vite/
 # В git попадает только ссылка-имя файла в daily-логе, не само изображение.
 01_raw/health/photos/
 
+# Наблюдения по внешности — тоже чувствительное, держим локально (репо публичный).
+04_synthesis/visual-diary.md
+
 # Кэш моделей transformers.js (~120 MB)
 scripts/semantic/.transformers-cache/
 
