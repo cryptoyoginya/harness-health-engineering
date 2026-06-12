@@ -27,6 +27,10 @@ tools/viewer/.vite/
 # Telegram-бот: служебный offset long-polling
 .bot/
 
+# Визуальный дневник: селфи лица — биометрия, НИКОГДА не коммитим (репо публичный).
+# В git попадает только ссылка-имя файла в daily-логе, не само изображение.
+01_raw/health/photos/
+
 # Кэш моделей transformers.js (~120 MB)
 scripts/semantic/.transformers-cache/
 

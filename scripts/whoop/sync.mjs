@@ -9,6 +9,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, loadEnv, whoopGet, todayISO } from './lib.mjs';
 import { buildSnapshot, whoopBaseline, whoopTrend, whoopAdvice } from './advice.mjs';
+import { experimentNudge } from '../experiments.mjs';
 
 loadEnv();
 
@@ -117,4 +118,10 @@ async function sendBrief(text) {
 // trend (включая сегодня) читаются из логов корректно.
 const snap = buildSnapshot(recovery, cycle, sleep);
 const advice = whoopAdvice(snap, whoopBaseline(), whoopTrend());
-await sendBrief(`☀️ Доброе утро\n${whoopLine}${advice ? '\n\n' + advice : ''}\n\nВечером черкни, как прошёл день.`);
+const nudge = experimentNudge(); // строка про активный эксперимент, если идёт
+await sendBrief(
+  `☀️ Доброе утро\n${whoopLine}` +
+  (advice ? `\n\n${advice}` : '') +
+  (nudge ? `\n\n${nudge}` : '') +
+  '\n\nВечером черкни, как прошёл день.',
+);

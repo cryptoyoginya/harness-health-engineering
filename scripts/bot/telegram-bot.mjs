@@ -10,6 +10,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, loadEnv, requireEnv, todayISO } from '../whoop/lib.mjs';
 import { fetchSnapshot, whoopBaseline, whoopTrend, whoopAdvice } from '../whoop/advice.mjs';
+import { formatExperiments } from '../experiments.mjs';
 
 loadEnv();
 const TOKEN = requireEnv('TELEGRAM_BOT_TOKEN');
@@ -27,6 +28,8 @@ const INTRO = [
   '',
   'Можно текстом или голосовым — голос расшифрую прямо на устройстве, аудио никуда не уходит.',
   '',
+  'Можно и селфи — коплю их в локальный визуальный дневник (фото остаётся у тебя на маке). Динамику кожи/лица/отёков смотрит агент по запросу «посмотри селфи за неделю» — описывает изменения, без диагнозов. Тревожное — к специалисту.',
+  '',
   'Что писать — вечером, одной-двумя фразами, как импрессия дня (не отчёт):',
   '• настроение и энергия — словами или 1–5',
   '• сон, тренировка, движение',
@@ -42,6 +45,7 @@ const INTRO = [
   'Команды:',
   '/whoop — твои показатели прямо сейчас (recovery, сон, HRV, светофор дня)',
   '/week — сводка за 7 дней',
+  '/exp — мои активные n-of-1 эксперименты (сколько осталось, критерий)',
   '/today — сегодняшний лог целиком',
   '/undo — убрать последнюю запись (если опечатка)',
   '/help — это сообщение',
@@ -80,6 +84,18 @@ async function transcribeVoice(fileId) {
   const buf = await downloadFile(fileId);
   if (!transcribeFn) ({ transcribe: transcribeFn } = await import('./transcribe.mjs'));
   return transcribeFn(buf);
+}
+
+// Сохранить селфи в локальный визуальный дневник (gitignored — биометрия не уходит в репо).
+// Разбор динамики делает агент по запросу; бот только хранит. Возвращает относительный путь.
+async function saveSelfie(fileId) {
+  const buf = await downloadFile(fileId);
+  const dir = join(ROOT, '01_raw', 'health', 'photos');
+  mkdirSync(dir, { recursive: true });
+  const stamp = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/:/g, '');
+  const name = `${todayISO()}-${stamp}.jpg`;
+  writeFileSync(join(dir, name), buf);
+  return `photos/${name}`;
 }
 
 function todayFile() {
@@ -150,6 +166,7 @@ async function registerCommands() {
   const commands = [
     { command: 'whoop', description: 'мои показатели сейчас — recovery, сон, HRV' },
     { command: 'week',  description: 'сводка за 7 дней' },
+    { command: 'exp',   description: 'мои активные эксперименты' },
     { command: 'today', description: 'сегодняшний лог целиком' },
     { command: 'undo',  description: 'убрать последнюю запись' },
     { command: 'help',  description: 'как всё устроено' },
@@ -177,6 +194,21 @@ async function handle(msg) {
   // Безопасность: пишем в лог только из разрешённого чата.
   if (String(chatId) !== String(ALLOWED)) {
     await send(chatId, 'Не авторизовано.');
+    return;
+  }
+
+  // Фото-селфи → локальный визуальный дневник. Бот только хранит, «смотрит» агент по запросу.
+  const photo = (msg.photo && msg.photo[msg.photo.length - 1]) ||
+    (msg.document && /^image\//.test(msg.document.mime_type || '') ? msg.document : null);
+  if (photo) {
+    try {
+      const rel = await saveSelfie(photo.file_id);
+      const cap = (msg.caption || '').trim();
+      appendInbox(`📸 селфи → ${rel}${cap ? ' — ' + cap : ''}`);
+      await send(chatId, `✓ селфи сохранила локально (${rel}) — фото не уходит с устройства.\nДинамику разберёт агент: скажи ему «посмотри селфи за неделю».`);
+    } catch (e) {
+      await send(chatId, `Не смогла сохранить фото: ${e.message}`);
+    }
     return;
   }
 
@@ -232,18 +264,37 @@ async function handle(msg) {
     await send(chatId, lines.join('\n'));
     return;
   }
+  if (text === '/exp') {
+    await send(chatId, formatExperiments());
+    return;
+  }
   if (text === '/undo') {
     const removed = undoLast();
     await send(chatId, removed ? `↩️ убрал: ${removed}` : 'Сегодня нечего убирать.');
     return;
   }
   if (!text) {
-    await send(chatId, 'Пришли текст или голосовое — запишу. Фото пока не умею.');
+    await send(chatId, 'Пришли текст, голосовое или селфи — запишу. Другие типы (стикеры, гео) пока не умею.');
     return;
   }
 
   appendInbox(text);
   await send(chatId, `✓ записал в ${todayISO()}`);
+}
+
+// Воскресный пинг «пора разобрать неделю» — раз в воскресенье после 18:00, один раз за день.
+const PING_FILE = join(ROOT, '.bot', 'weekly-ping');
+async function maybeWeeklyPing() {
+  if (!ALLOWED) return;
+  const now = new Date();
+  if (now.getDay() !== 0 || now.getHours() < 18) return; // 0 = воскресенье
+  let last = '';
+  try { last = readFileSync(PING_FILE, 'utf8').trim(); } catch { /* первого раза ещё не было */ }
+  const today = todayISO();
+  if (last === today) return;
+  mkdirSync(join(ROOT, '.bot'), { recursive: true });
+  writeFileSync(PING_FILE, today);
+  await send(ALLOWED, '🗓 Воскресенье — пора разобрать неделю.\nОткрой агента в health-harness и скажи «разбери неделю»: он сведёт 7 дней → найдёт паттерны → вердикт «лучше ли живётся» и сверит активные эксперименты с данными.');
 }
 
 async function loop() {
@@ -255,6 +306,7 @@ async function loop() {
   // eslint-disable-next-line no-constant-condition
   while (true) {
     try {
+      await maybeWeeklyPing();
       const r = await fetch(`${API}/getUpdates?timeout=50&offset=${offset + 1}`);
       const data = await r.json();
       if (!data.ok) {
