@@ -93,3 +93,29 @@ ${whoopLine}
 }
 
 console.log(`  ${whoopLine}`);
+
+// --- Утренний бриф в Telegram (если настроен бот) ---
+async function sendBrief(text) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chat = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chat) return;
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chat, text }),
+    });
+    console.log('[whoop] бриф отправлен в Telegram');
+  } catch (e) {
+    console.warn('[whoop] telegram бриф не отправлен:', e.message);
+  }
+}
+
+const rec = recovery?.score?.recovery_score;
+let verdict = '';
+if (rec != null) {
+  if (rec > 66) verdict = '🟢 зелёный день — можно грузить по плану';
+  else if (rec >= 40) verdict = '🟡 жёлтый день — умеренно, без рекордов';
+  else verdict = '🔴 красный день — лёгкий, режь нагрузку, ранний отбой';
+}
+await sendBrief(`☀️ Доброе утро\n${whoopLine}${verdict ? '\n' + verdict : ''}\n\nВечером черкни, как прошёл день.`);

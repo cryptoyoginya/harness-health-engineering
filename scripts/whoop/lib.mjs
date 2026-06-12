@@ -51,34 +51,76 @@ export function loadToken() {
   return JSON.parse(readFileSync(TOKEN_PATH, 'utf8'));
 }
 
-async function refresh(refresh_token) {
+// Алерт в Telegram (если бот настроен), чтобы фоновый sync не падал молча.
+async function alertTelegram(text) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chat = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chat) return;
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chat, text }),
+    });
+  } catch { /* алерт необязателен */ }
+}
+
+async function postToken(refresh_token) {
+  // Формат, который Whoop принимает на refresh: client creds в теле, БЕЗ параметра scope
+  // (со scope капризничает). Ответ содержит новый ротированный refresh_token.
   const body = new URLSearchParams({
     grant_type: 'refresh_token',
     refresh_token,
     client_id: requireEnv('WHOOP_CLIENT_ID'),
     client_secret: requireEnv('WHOOP_CLIENT_SECRET'),
-    scope: 'offline',
   });
-  const r = await fetch(TOKEN_URL, {
+  return fetch(TOKEN_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body,
   });
+}
+
+async function refresh(refresh_token) {
+  // Эндпоинт токенов Whoop периодически отдаёт транзиентные 400/500 (с обманчивым
+  // сообщением про redirect_uri). 400 НЕ расходует refresh_token, поэтому повтор тем же
+  // токеном безопасен. Ретраим с нарастающей паузой; успех ротирует токен и выходит из цикла.
+  let r, lastBody;
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    r = await postToken(refresh_token);
+    if (r.ok) break;
+    lastBody = await r.text();
+    console.warn(`[whoop] refresh попытка ${attempt}/5: ${r.status}`);
+    if (attempt < 5) await new Promise((s) => setTimeout(s, 1500 * attempt));
+  }
   if (!r.ok) {
-    console.error(`[whoop] refresh не удался: ${r.status} ${await r.text()}`);
-    console.error('[whoop] возможно, токен отозван — перезапусти pnpm whoop:auth');
+    console.error(`[whoop] refresh не удался после ретраев: ${lastBody}`);
+    console.error('[whoop] если повторяется — переподключи: pnpm whoop:auth');
+    await alertTelegram('⚠️ Whoop: не удалось обновить токен (после ретраев). Если повторится — переподключи: pnpm whoop:auth');
     process.exit(1);
   }
-  return saveToken(await r.json());
+  const json = await r.json();
+  // На всякий случай сохраняем прежний refresh_token, если ответ его не вернул.
+  if (!json.refresh_token) json.refresh_token = refresh_token;
+  return saveToken(json);
 }
+
+// Singleton-замок: при параллельных вызовах (sync дёргает recovery/cycle/sleep через Promise.all)
+// refresh выполняется РОВНО ОДИН раз. Иначе несколько refresh гонятся за один refresh_token,
+// первый его ротирует, остальные держат мёртвый токен → 400. Это и была главная причина сбоев.
+let refreshing = null;
 
 // Возвращает валидный access_token, обновляя по необходимости.
 export async function getAccessToken() {
-  let tok = loadToken();
-  if (!tok.expires_at || tok.expires_at < Date.now() + 60_000) {
-    tok = await refresh(tok.refresh_token);
+  const tok = loadToken();
+  if (tok.expires_at && tok.expires_at >= Date.now() + 60_000) {
+    return tok.access_token;
   }
-  return tok.access_token;
+  if (!refreshing) {
+    refreshing = refresh(tok.refresh_token).finally(() => { refreshing = null; });
+  }
+  const fresh = await refreshing;
+  return fresh.access_token;
 }
 
 // GET к v2 API. pathname вида '/v2/recovery'.

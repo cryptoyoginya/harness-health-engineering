@@ -67,6 +67,7 @@ async function handle(msg) {
 
   // Онбординг: если chat_id не задан — подсказать и не писать в лог.
   if (!ALLOWED) {
+    console.log(`[bot] CHAT_ID=${chatId}`);
     await send(chatId, `Твой chat_id: ${chatId}\nВпиши его в .env как TELEGRAM_CHAT_ID и перезапусти бота — тогда начну собирать.`);
     return;
   }
