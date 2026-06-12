@@ -57,7 +57,7 @@ async function refresh(refresh_token) {
     refresh_token,
     client_id: requireEnv('WHOOP_CLIENT_ID'),
     client_secret: requireEnv('WHOOP_CLIENT_SECRET'),
-    scope: SCOPES,
+    scope: 'offline',
   });
   const r = await fetch(TOKEN_URL, {
     method: 'POST',
