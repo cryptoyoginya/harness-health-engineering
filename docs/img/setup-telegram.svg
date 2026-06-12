@@ -1,0 +1,49 @@
+<svg viewBox="0 0 720 540" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, sans-serif">
+  <rect x="8" y="8" width="704" height="524" rx="16" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+  <!-- header -->
+  <path d="M8 24 a16 16 0 0 1 16 -16 h672 a16 16 0 0 1 16 16 v44 h-704 z" fill="#517da2"/>
+  <circle cx="44" cy="46" r="18" fill="#ffffff" opacity="0.9"/>
+  <text x="44" y="52" text-anchor="middle" font-size="20" fill="#517da2">🤖</text>
+  <text x="74" y="42" font-size="18" font-weight="700" fill="#ffffff">BotFather</text>
+  <text x="74" y="60" font-size="12" fill="#dce6f0">bot · official</text>
+  <text x="690" y="50" text-anchor="end" font-size="13" fill="#dce6f0">illustration</text>
+  <!-- chat area -->
+  <rect x="8" y="68" width="704" height="464" fill="#e7ebf0"/>
+
+  <!-- user: /newbot -->
+  <g>
+    <rect x="430" y="86" width="262" height="40" rx="12" fill="#d9fdd3"/>
+    <text x="450" y="111" font-size="15" fill="#1f2328" font-family="monospace">/newbot</text>
+  </g>
+  <!-- bot reply -->
+  <g>
+    <rect x="28" y="134" width="430" height="56" rx="12" fill="#ffffff" stroke="#e3e3e3"/>
+    <text x="46" y="160" font-size="14" fill="#1f2328">Alright, a new bot. How are we going to</text>
+    <text x="46" y="180" font-size="14" fill="#1f2328">call it? Please choose a name for your bot.</text>
+  </g>
+  <!-- user: name -->
+  <g>
+    <rect x="430" y="198" width="262" height="40" rx="12" fill="#d9fdd3"/>
+    <text x="450" y="223" font-size="15" fill="#1f2328">Health Harness</text>
+  </g>
+  <!-- bot reply -->
+  <g>
+    <rect x="28" y="246" width="430" height="56" rx="12" fill="#ffffff" stroke="#e3e3e3"/>
+    <text x="46" y="272" font-size="14" fill="#1f2328">Good. Now let's choose a username. It must</text>
+    <text x="46" y="292" font-size="14" fill="#1f2328">end in `bot`.</text>
+  </g>
+  <!-- user: username -->
+  <g>
+    <rect x="406" y="310" width="286" height="40" rx="12" fill="#d9fdd3"/>
+    <text x="426" y="335" font-size="15" fill="#1f2328" font-family="monospace">my_health_harness_bot</text>
+  </g>
+  <!-- bot reply: token -->
+  <g>
+    <rect x="28" y="358" width="556" height="150" rx="12" fill="#ffffff" stroke="#e3e3e3"/>
+    <text x="46" y="384" font-size="14" fill="#1f2328">Done! Congratulations on your new bot.</text>
+    <text x="46" y="410" font-size="14" fill="#1f2328">Use this token to access the HTTP API:</text>
+    <rect x="46" y="424" width="520" height="34" rx="8" fill="#fff8c5" stroke="#d4a72c"/>
+    <text x="60" y="446" font-size="14" fill="#1f2328" font-family="monospace">7654321:AAH•••••••••••••••••••••  ← TELEGRAM_BOT_TOKEN</text>
+    <text x="46" y="486" font-size="13" fill="#57606a">Keep it secret — paste it into your local .env, never commit it.</text>
+  </g>
+</svg>

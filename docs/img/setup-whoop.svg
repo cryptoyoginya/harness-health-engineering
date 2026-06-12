@@ -1,0 +1,44 @@
+<svg viewBox="0 0 720 540" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, sans-serif">
+  <rect x="8" y="8" width="704" height="524" rx="16" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+  <!-- header -->
+  <path d="M8 24 a16 16 0 0 1 16 -16 h672 a16 16 0 0 1 16 16 v48 h-704 z" fill="#0b0b0c"/>
+  <text x="32" y="50" font-size="20" font-weight="800" fill="#ffffff">WHOOP</text>
+  <text x="120" y="50" font-size="15" fill="#ff0026" font-weight="600">Developer · Create app</text>
+  <text x="690" y="48" text-anchor="end" font-size="13" fill="#8b8b8b">illustration</text>
+
+  <!-- App name -->
+  <text x="32" y="104" font-size="13" font-weight="700" fill="#57606a">APP NAME</text>
+  <rect x="32" y="114" width="640" height="40" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="48" y="139" font-size="15" fill="#1f2328">Health Harness</text>
+
+  <!-- Redirect URL -->
+  <text x="32" y="184" font-size="13" font-weight="700" fill="#57606a">REDIRECT URL</text>
+  <rect x="32" y="194" width="640" height="40" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="48" y="219" font-size="15" fill="#1f2328" font-family="monospace">http://localhost:7777/callback</text>
+
+  <!-- Scopes -->
+  <text x="32" y="264" font-size="13" font-weight="700" fill="#57606a">SCOPES</text>
+  <g font-size="14" fill="#1f2328">
+    <rect x="32"  y="276" width="150" height="34" rx="17" fill="#eafaf0" stroke="#1a7f37"/>
+    <text x="50"  y="298">✓ recovery</text>
+    <rect x="192" y="276" width="120" height="34" rx="17" fill="#eafaf0" stroke="#1a7f37"/>
+    <text x="210" y="298">✓ sleep</text>
+    <rect x="322" y="276" width="130" height="34" rx="17" fill="#eafaf0" stroke="#1a7f37"/>
+    <text x="340" y="298">✓ cycles</text>
+    <rect x="462" y="276" width="140" height="34" rx="17" fill="#eafaf0" stroke="#1a7f37"/>
+    <text x="480" y="298">✓ workout</text>
+    <rect x="32"  y="318" width="130" height="34" rx="17" fill="#eafaf0" stroke="#1a7f37"/>
+    <text x="50"  y="340">✓ profile</text>
+    <rect x="172" y="318" width="130" height="34" rx="17" fill="#eafaf0" stroke="#1a7f37"/>
+    <text x="190" y="340">✓ offline</text>
+  </g>
+
+  <!-- credentials -->
+  <text x="32" y="392" font-size="13" font-weight="700" fill="#57606a">CLIENT ID</text>
+  <rect x="32" y="402" width="640" height="38" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="48" y="426" font-size="14" fill="#1f2328" font-family="monospace">a1b2c3d4-•••• → WHOOP_CLIENT_ID</text>
+
+  <text x="32" y="466" font-size="13" font-weight="700" fill="#57606a">CLIENT SECRET</text>
+  <rect x="32" y="476" width="640" height="38" rx="8" fill="#fff8c5" stroke="#d4a72c"/>
+  <text x="48" y="500" font-size="14" fill="#1f2328" font-family="monospace">•••••••••••••••• → WHOOP_CLIENT_SECRET (keep secret)</text>
+</svg>

@@ -49,12 +49,20 @@ pnpm run setup          # installs all sub-packages (semantic, bot, skillopt, vi
 1. Message [@BotFather](https://t.me/BotFather) → `/newbot` → follow prompts → copy the **token**.
 2. You'll add the token in step 4. Your `chat_id` is filled in automatically on first run (step 6).
 
+![Telegram BotFather /newbot flow — illustration](docs/img/setup-telegram.svg)
+
+<sub>*Illustration of the flow — your real token replaces the redacted one. Keep it out of git.*</sub>
+
 ## 3 · Create your Whoop developer app
 
 1. Open the [Whoop Developer Dashboard](https://developer.whoop.com) → **new app**.
 2. **Redirect URL:** `http://localhost:7777/callback`
 3. **Scopes:** `recovery` · `sleep` · `cycles` · `workout` · `profile` · `offline`
 4. Copy the **Client ID** and **Client Secret**.
+
+![Whoop developer app form — illustration](docs/img/setup-whoop.svg)
+
+<sub>*Illustration of the form — redirect URL and scopes are exactly what you need; credentials are redacted.*</sub>
 
 ## 4 · Configure `.env`
 
