@@ -1,8 +1,8 @@
 # 🧬 Harness Health Engineering
 
 > **A local AI lab that helps you discover what actually improves your life.**
-> Your physiology streams in automatically from Whoop; your lived experience goes in by hand; an
-> on-device AI agent runs *n-of-1 experiments* on you and tells you what actually
+> Your physiology streams in automatically from Whoop; your lived experience goes in by text, voice, or
+> selfie; an on-device AI agent runs *n-of-1 experiments* on you and tells you what actually
 > makes your life better. All as plain Markdown you own.
 
 ![local-first](https://img.shields.io/badge/local--first-on--device-2563eb)
@@ -80,7 +80,7 @@ n-of-1 design, surrogate-endpoint failure, evidence labelling, confounding — i
 ```mermaid
 flowchart TD
     W["Whoop API v2"] -->|"OAuth2 · auto 9:00 · serialized refresh"| SYNC["sync.mjs"]
-    H(["You · daily diary"]) -->|"events · mood · energy · social · work · movement"| BOT["Telegram bot<br/>(dumb collector)"]
+    H(["You · text · voice · selfie"]) -->|"events · mood · energy · social · work · body"| BOT["Telegram bot<br/>capture layer · on-device"]
     SYNC -->|"recovery · HRV · sleep · strain"| RAW["01_raw · daily record"]
     BOT --> RAW
     RAW --> SRC["02_sources · weekly notes<br/>FACT / INFERENCE"]
@@ -102,16 +102,74 @@ against the north-star and finds what's actually moving it.
 ## What it tracks
 
 **Daily (auto):** recovery, HRV, resting HR, sleep, strain — from Whoop.
-**Daily (you, ~40s):** events (your impressions journal), mood, energy, social, work, movement, supplements.
+**Daily (you, ~40s — by text, voice, or selfie):** events (your impressions journal), mood, energy,
+social, work, movement, supplements.
 **Weekly:** one integral *"is life better?"* 1–5. **Quarterly:** six life dimensions — emotion,
 connection, body, meaning, autonomy, growth.
+
+## Three ways in 📥
+
+Lived experience is messy, and you shouldn't have to sit at a keyboard to capture it. The bot takes
+**three modalities** — mix them freely, several per day:
+
+| Mode | How | Processing | Privacy |
+|---|---|---|---|
+| ✍️ **Text** | type a line | appended to today's record | local |
+| 🎙️ **Voice** | send a voice note | transcribed **on-device** (Whisper ONNX) → text | audio never leaves the machine |
+| 🤳 **Selfie** | send a photo | archived to a **local visual diary**, reviewed on demand by the agent | biometric — never committed to git |
+
+Every message lands as a timestamped line `- 14:30 …` in `01_raw/health/YYYY-MM-DD.md`, so the *shape* of
+the day is preserved — not flattened into one average. Commands set the rest: `/north` for your
+north-star, `/exp` to run an n-of-1, `/week` · `/month` · `/year` for horizons.
+
+## The visual diary 🤳
+
+Skin, puffiness, and the *spark* in a face shift with sleep, salt, alcohol, stress, and cycle — a
+wearable is blind to all of it. The harness turns selfies into a **longitudinal signal**, while staying
+strictly on the safe side of the line: it *describes and compares over time*, it never diagnoses.
+
+```mermaid
+flowchart LR
+    P["🤳 selfie<br/>(Telegram)"] --> BOT["bot: download"]
+    BOT --> STORE["01_raw/health/photos/<br/>local · gitignored"]
+    BOT --> LOG["daily record<br/>filename reference only"]
+    STORE -.->|"on request:<br/>'review my selfies'"| AGENT["agent vision"]
+    LOG -.-> AGENT
+    AGENT --> OBS["dated observations<br/>visual-diary.md · local"]
+    OBS --> HYP["hypothesis"]
+    HYP --> EXP["n-of-1 experiment"]
+```
+
+The **only automatic step is storage.** No image is ever auto-analysed, uploaded, or committed.
+Comparison happens *only when you ask*, using the agent's vision — keeping a strong model's quality
+without sending your face anywhere by default.
+
+**What the agent reads from a face — over time, not in one shot:**
+
+| Group | Signals | May reflect | Cross-checked against |
+|---|---|---|---|
+| 💧 Fluid / puffiness | under-eye bags, facial fullness, lid heaviness | water retention, fatigue | sleep, salt/alcohol at night, cycle phase, stress |
+| 🎨 Skin tone | redness/flush, sallowness, pallor, blotchiness | vascular reaction, tiredness | alcohol, heat/exertion, recovery, hydration |
+| 🧴 Texture / breakouts | spot count & location, shine vs dryness | hormonal pattern, hydration | cycle phase, sugar/dairy *(hypothesis)*, stress, sleep |
+| 👁️ Eyes | sclera redness, dark circles, clarity of gaze | tiredness, irritation | sleep, alcohol, screens, allergy |
+| 🌳 Affect / vitality | jaw/brow tension, downturned vs lit-up | mood, energy | mood/energy 1–5, *"lived as wanted?"* |
+
+**Hard limits, by design:**
+
+- **Not a diagnosis** — any worrying sign resolves to *"see a doctor,"* never an interpretation.
+- **Constitution ≠ trend** — innate dark circles or face shape are constants, not changes.
+- **Shooting noise** — light, angle, makeup, time of day distort more than physiology; mismatched shots → low confidence.
+- **Skin lags** — breakouts surface days after a trigger; never pinned to "yesterday."
+- **Strongest evidence = paired shots** — *"morning after X vs morning without X"* — which is already almost an n-of-1.
 
 ## Technology
 
 | Layer | Stack |
 |---|---|
 | Ingest | Whoop API v2, OAuth2 (serialized, race-safe token refresh), Node 22, zero-dep |
-| Capture | free Telegram bot (local, long-polling) + Markdown |
+| Capture | free Telegram bot (local, long-polling) — **text · voice · selfie** — + Markdown |
+| Voice | `whisper` (ONNX, on-device) + prebuilt `ffmpeg-static` — transcription, audio never leaves the device |
+| Vision | local visual diary (gitignored) + agent vision on demand — non-diagnostic, longitudinal |
 | Knowledge base | layered Markdown pyramid `00→06` with frontmatter contracts + evidence labels |
 | Retrieval | hybrid RAG — `multilingual-e5-small` (ONNX) + `sqlite-vec` + FTS5 BM25, fused via RRF |
 | Agent | MCP server (`kb_search` / `kb_think` / `kb_backlinks`) for any MCP client |
