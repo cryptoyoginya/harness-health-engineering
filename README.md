@@ -28,7 +28,9 @@ This project flips it. The top-level metric here is not a body score. It is one 
 Everything else — recovery, sleep, HRV, supplements, training load — is demoted to what it really is: an
 **instrument** in service of that question. The system will happily tell you that your body looks great
 this week *and your life doesn't*, and then help you fix the right thing. No wearable can say that,
-because no wearable knows what your good life looks like.
+because no wearable knows what your good life looks like. 
+
+This is for people who already track too much, distrust most dashboards, and would rather run one clean self-experiment than collect another year of vibes. Not for people who want motivation, streaks, badges, or a prettier sleep chart.
 
 ## The engine: n-of-1 experiments 🔬
 
