@@ -35,7 +35,7 @@ const INTRO = [
   '• текстом',
   '• голосовым — расшифрую прямо на устройстве (аудио никуда не уходит)',
   '• селфи — коплю в локальный визуальный дневник; динамику кожи/лица/отёков потом смотрит агент по запросу (описывает изменения, без диагнозов)',
-  '• по желанию — фото еды или стула: подпиши «еда» или «стул», разложу в отдельный дневник. Агент разберёт еду по составу/таймингу, стул — по Бристольской шкале. Тоже без диагнозов; тревожное — к врачу',
+  '• по желанию — фото еды или стула: сама пойму, что на фото (подписывать не надо; если подпишешь «еда»/«стул» — перебью). Разложу в отдельный дневник: еду агент разберёт по составу/таймингу, стул — по Бристольской шкале. Тоже без диагнозов; тревожное — к врачу',
   '',
   'Несколько записей и несколько селфи за день — это норма и даже лучше: каждое сообщение падает строкой «- 14:30 твой текст» в файл сегодняшнего дня, и по таймстемпам виден ход дня, а не один усреднённый итог.',
   '',
@@ -131,21 +131,20 @@ async function transcribeVoice(fileId) {
   return transcribeFn(buf);
 }
 
-// Тип фото по подписи: стул / еда / селфи (по умолчанию). Всё — локальный дневник, gitignored.
-function classifyPhoto(caption = '') {
+// Тип фото по подписи, если она явно указывает категорию. Иначе null → решит зрение.
+function captionKind(caption = '') {
   const c = caption.toLowerCase();
   const has = (...w) => w.some((x) => c.includes(x));
   if (has('стул', 'кал', 'туалет', 'какашк', 'poop', 'stool')) return 'stool';
   if (has('еда', 'еду', 'ела', 'поел', 'food', 'meal', 'завтрак', 'обед', 'ужин', 'перекус', 'блюдо', 'breakfast', 'lunch', 'dinner', 'snack')) return 'food';
-  return 'selfie';
+  if (has('селфи', 'selfie', 'лицо', 'face', 'портрет')) return 'selfie';
+  return null;
 }
 
 const PHOTO_SUBDIR = { selfie: '', stool: 'stool', food: 'food' };
 
-// Сохранить фото в локальный дневник (gitignored — приватные данные не уходят в репо).
-// Разбор делает агент по запросу; бот только хранит. Возвращает относительный путь.
-async function savePhoto(fileId, kind = 'selfie') {
-  const buf = await downloadFile(fileId);
+// Сохранить буфер фото в локальный дневник (gitignored — приватные данные не уходят в репо).
+function savePhoto(buf, kind = 'selfie') {
   const sub = PHOTO_SUBDIR[kind] ?? '';
   const dir = join(ROOT, '01_raw', 'health', 'photos', sub);
   mkdirSync(dir, { recursive: true });
@@ -153,6 +152,15 @@ async function savePhoto(fileId, kind = 'selfie') {
   const name = `${todayISO()}-${stamp}.jpg`;
   writeFileSync(join(dir, name), buf);
   return sub ? `photos/${sub}/${name}` : `photos/${name}`;
+}
+
+// Тип фото без подписи — on-device CLIP (vision.mjs грузится лениво). При сбое → null (фолбэк селфи).
+let classifyImageFn = null;
+async function detectPhotoKind(buf) {
+  try {
+    if (!classifyImageFn) ({ classifyImage: classifyImageFn } = await import('./vision.mjs'));
+    return (await classifyImageFn(buf)).kind;
+  } catch { return null; }
 }
 
 function todayFile() {
@@ -273,9 +281,11 @@ async function handle(msg) {
     (msg.document && /^image\//.test(msg.document.mime_type || '') ? msg.document : null);
   if (photo) {
     const cap = (msg.caption || '').trim();
-    const kind = classifyPhoto(cap);
     try {
-      const rel = await savePhoto(photo.file_id, kind);
+      const buf = await downloadFile(photo.file_id);
+      // Подпись важнее (явный выбор пользователя); нет подписи — определяет зрение; фолбэк — селфи.
+      const kind = captionKind(cap) || (await detectPhotoKind(buf)) || 'selfie';
+      const rel = savePhoto(buf, kind);
       const mark = kind === 'stool' ? '💩 стул' : kind === 'food' ? '🍽 еда' : '📸 селфи';
       appendInbox(`${mark} → ${rel}${cap ? ' — ' + cap : ''}`);
       await send(chatId, PHOTO_REPLY[kind](rel));
@@ -439,8 +449,9 @@ async function maybeWeeklyPing() {
 async function loop() {
   console.log('[bot] запущен (long-polling). Ctrl+C для остановки.');
   await registerCommands();
-  // Прогрев Whisper в фоне — чтобы первое голосовое не ждало загрузку модели в память.
+  // Прогрев моделей в фоне — чтобы первое голосовое/фото не ждали загрузку в память.
   import('./transcribe.mjs').then((m) => m.warmup()).catch(() => {});
+  import('./vision.mjs').then((m) => m.warmup()).catch(() => {});
   let offset = readOffset();
   // eslint-disable-next-line no-constant-condition
   while (true) {
