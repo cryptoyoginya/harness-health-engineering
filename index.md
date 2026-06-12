@@ -19,6 +19,7 @@
 
 ## Synthesis
 
+- [Life quality — north-star](./04_synthesis/life-quality.md) ⭐ главная метрика
 - [Недельный синтез (шаблон)](./04_synthesis/health-weekly-template.md)
 - [Open questions](./04_synthesis/open-questions.md) — известные пробелы
 - [Contradictions](./04_synthesis/contradictions.md)
@@ -34,6 +35,7 @@
 - [Долг сна](./skills/health-sleep-debt.md)
 - [Спад настроения](./skills/health-mood-dip.md)
 - [«Это я или биология?» — атрибуция спада](./skills/health-attribution.md) ⭐ killer-фича
+- [Life review — «стало ли лучше жить»](./skills/health-life-review.md) ⭐ north-star
 - [Травма / боль](./skills/health-injury.md)
 - [Возврат в режим](./skills/health-getting-back.md)
 - [Недельный синтез](./skills/health-weekly-synthesis.md)
