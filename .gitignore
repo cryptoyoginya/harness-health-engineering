@@ -24,6 +24,9 @@ tools/viewer/.vite/
 # Whoop OAuth-токены (refresh/access) — НИКОГДА не коммитим
 .whoop/
 
+# Telegram-бот: служебный offset long-polling
+.bot/
+
 # Кэш моделей transformers.js (~120 MB)
 scripts/semantic/.transformers-cache/
 

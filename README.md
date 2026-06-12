@@ -98,8 +98,12 @@ pnpm kb:think "why did my mood drop this week?"
 pnpm kb:doctor                 # KB health-check
 ```
 
-Then the daily rhythm is: **morning** sync runs itself · **evening** add one ~20-second line ·
+Then the daily rhythm is: **morning** sync runs itself · **evening** log one line ·
 **Sunday** ask the agent to *synthesize the week*.
+
+Evening logging is easiest via the **Telegram bot** (`scripts/bot/`) — a free, zero-dependency,
+local "dumb collector" that drops whatever you text it into today's log. No LLM, no API key: the
+reasoning stays with the agent in Claude Code. See [`scripts/bot/README.md`](./scripts/bot/README.md).
 
 ## Privacy & safety
 

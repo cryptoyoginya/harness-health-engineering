@@ -17,6 +17,7 @@
     "kb:dream": "node scripts/dream-cycle.mjs",
     "whoop:auth": "node scripts/whoop/auth.mjs",
     "whoop:sync": "node scripts/whoop/sync.mjs",
+    "bot": "node scripts/bot/telegram-bot.mjs",
     "viewer:dev": "cd tools/viewer && pnpm dev",
     "viewer:build": "cd tools/viewer && pnpm build"
   }

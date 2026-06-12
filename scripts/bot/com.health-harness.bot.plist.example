@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.health-harness.bot</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/bin/node</string>
+        <string>/Users/ВАШ_ПОЛЬЗОВАТЕЛЬ/Documents/GitHub/health-harness/scripts/bot/telegram-bot.mjs</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/Users/ВАШ_ПОЛЬЗОВАТЕЛЬ/Documents/GitHub/health-harness</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Users/ВАШ_ПОЛЬЗОВАТЕЛЬ/Documents/GitHub/health-harness/.bot/bot.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/ВАШ_ПОЛЬЗОВАТЕЛЬ/Documents/GitHub/health-harness/.bot/bot.log</string>
+</dict>
+</plist>
