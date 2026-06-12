@@ -2,7 +2,7 @@
 
 > **A local AI lab that helps you discover what actually improves your life.**
 > Your physiology streams in automatically from Whoop; your lived experience goes in by hand; an
-> on-device AI agent runs *n-of-1 experiments* on you and tells you — with citations — what actually
+> on-device AI agent runs *n-of-1 experiments* on you and tells you what actually
 > makes your life better. All as plain Markdown you own.
 
 ![local-first](https://img.shields.io/badge/local--first-on--device-2563eb)
