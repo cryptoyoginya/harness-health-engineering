@@ -30,7 +30,7 @@ Everything else — recovery, sleep, HRV, supplements, training load — is demo
 this week *and your life doesn't*, and then help you fix the right thing. No wearable can say that,
 because no wearable knows what your good life looks like. 
 
-This is for people who already track too much, distrust most dashboards, and would rather run one clean self-experiment than collect another year of vibes. Not for people who want motivation, streaks, badges, or a prettier sleep chart.
+Built for people who have tried enough supplements, trackers, routines, and protocols to know that the hard question is not “what is optimal?” but “what is optimal for me, in the life I actually live?”. Not for people who want motivation, streaks, badges, or a prettier sleep chart.
 
 ## The engine: n-of-1 experiments 🔬
 
