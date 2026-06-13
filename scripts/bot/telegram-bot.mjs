@@ -6,7 +6,7 @@
 // Логика: всё, что ты пишешь боту, падает строкой `- HH:MM <текст>` в секцию `## входящие`
 // сегодняшнего файла /01_raw/health/<дата>.md. Структурирование и анализ — на агенте (Claude Code).
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, loadEnv, requireEnv, todayISO } from '../whoop/lib.mjs';
 import { fetchSnapshot, whoopBaseline, whoopTrend, whoopAdvice } from '../whoop/advice.mjs';
@@ -250,6 +250,7 @@ async function registerCommands() {
     { command: 'north', description: 'north-star — моё направление' },
     { command: 'today', description: 'сегодняшний лог целиком' },
     { command: 'undo',  description: 'убрать последнюю запись' },
+    { command: 'quiet', description: 'тихий режим: вкл/выкл напоминания' },
     { command: 'help',  description: 'как всё устроено' },
   ];
   try {
@@ -419,6 +420,17 @@ async function handle(msg) {
     await send(chatId, `🧭 Записала north-star:\n\n${arg}\n\nТеперь это твой ориентир — агент сверяет с ним, туда ли движется жизнь.`);
     return;
   }
+  if (text === '/quiet') {
+    if (existsSync(QUIET_FILE)) {
+      unlinkSync(QUIET_FILE);
+      await send(chatId, '🔔 Напоминания и сводки снова включены.');
+    } else {
+      mkdirSync(join(ROOT, '.bot'), { recursive: true });
+      writeFileSync(QUIET_FILE, '1');
+      await send(chatId, '🤫 Тихий режим включён — напоминания и утренняя/вечерняя сводка приходить не будут. /quiet ещё раз — вернуть.');
+    }
+    return;
+  }
   if (text === '/undo') {
     const removed = undoLast();
     await send(chatId, removed ? `↩️ убрал: ${removed}` : 'Сегодня нечего убирать.');
@@ -448,6 +460,82 @@ async function maybeWeeklyPing() {
   await send(ALLOWED, '🗓 Воскресенье — пора разобрать неделю.\nОткрой агента в health-harness и скажи «разбери неделю»: он сведёт 7 дней → найдёт паттерны → вердикт «лучше ли живётся» и сверит активные эксперименты с данными.');
 }
 
+// --- Дневные пуши: напоминание (день) + вечерняя сводка. Утренняя — у whoop:sync в 9:00. ---
+const QUIET_FILE = join(ROOT, '.bot', 'quiet');
+
+// Рандомные вопросы по всем сферам жизни; модальность (гс/селфи/фото) подсказана эмодзи.
+const REMINDERS = [
+  '🎙 Как настроение и энергия прямо сейчас? Можно голосовым, в двух словах.',
+  '🤳 Скинь селфи для визуального дневника — как ты сегодня.',
+  'С кем сегодня общалась и как тебе после этого?',
+  'Сколько успела поработать и как с фокусом?',
+  'Как тело — где-то зажато, болит, или наоборот лёгкость?',
+  '🍽 Что ела последним? Можешь просто сфоткать.',
+  'Какая мысль или инсайт сегодня зацепил?',
+  'Было сегодня что-то осмысленное — ради чего?',
+  'Что больше всего впечатлило или, наоборот, беспокоило?',
+  'День шёл как ты хотела — или несло?',
+  'Кофе, алкоголь или что-то ещё сегодня было?',
+  '🎙 Двигалась сегодня — прогулка, тренировка? Черкни голосом.',
+  'Бады приняла по плану?',
+  'Что из сегодняшнего хочется повторить, а что — убрать?',
+];
+const LAST_REM_FILE = join(ROOT, '.bot', 'push-last');
+
+function pickReminder() {
+  let last = -1;
+  try { last = Number(readFileSync(LAST_REM_FILE, 'utf8').trim()); } catch { /* первый раз */ }
+  let i = Math.floor(Math.random() * REMINDERS.length);
+  if (i === last) i = (i + 1) % REMINDERS.length; // не повторять подряд
+  mkdirSync(join(ROOT, '.bot'), { recursive: true });
+  writeFileSync(LAST_REM_FILE, String(i));
+  return `${REMINDERS[i]}\n\n(если не до этого — просто пропусти, это не обязаловка 🤍)`;
+}
+
+function plural(n, one, few, many) {
+  const m10 = n % 10, m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+  return many;
+}
+
+function buildEveningSummary() {
+  const file = join(ROOT, '01_raw', 'health', `${todayISO()}.md`);
+  let n = 0, whoop = '';
+  if (existsSync(file)) {
+    const t = readFileSync(file, 'utf8');
+    n = (t.match(/^- \d{2}:\d{2}/gm) || []).length;
+    whoop = (t.match(/^whoop:\s*(.+)$/m) || [])[1] || '';
+  }
+  if (n === 0 && !whoop) {
+    return '🌙 Вечер. Сегодня тут пока пусто — если есть пара слов о дне и самочувствии, я здесь. А нет — тоже хорошо 🤍';
+  }
+  const lines = [`🌙 Вечер. За сегодня — ${n} ${plural(n, 'запись', 'записи', 'записей')}.`];
+  if (whoop) lines.push(`Тело: ${whoop}`);
+  lines.push('', 'Главное за день: ощущаешь, что прожила его так, как хотелось? Черкни словом или голосом — и если хочется, что повторить, а что убрать.');
+  return lines.join('\n');
+}
+
+const PUSH_SLOTS = [
+  { key: 'mid', h: 14, build: pickReminder },
+  { key: 'eve', h: 21, build: buildEveningSummary },
+];
+
+async function maybeDailyPushes() {
+  if (!ALLOWED || existsSync(QUIET_FILE)) return;
+  const now = new Date(), today = todayISO();
+  for (const s of PUSH_SLOTS) {
+    if (now.getHours() < s.h) continue;
+    const f = join(ROOT, '.bot', `push-${s.key}`);
+    let last = '';
+    try { last = readFileSync(f, 'utf8').trim(); } catch { /* первого раза не было */ }
+    if (last === today) continue;
+    mkdirSync(join(ROOT, '.bot'), { recursive: true });
+    writeFileSync(f, today);
+    await send(ALLOWED, s.build());
+  }
+}
+
 async function loop() {
   console.log('[bot] запущен (long-polling). Ctrl+C для остановки.');
   await registerCommands();
@@ -459,6 +547,7 @@ async function loop() {
   while (true) {
     try {
       await maybeWeeklyPing();
+      await maybeDailyPushes();
       const r = await fetch(`${API}/getUpdates?timeout=50&offset=${offset + 1}`);
       const data = await r.json();
       if (!data.ok) {

@@ -101,6 +101,7 @@ async function sendBrief(text) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chat = process.env.TELEGRAM_CHAT_ID;
   if (!token || !chat) return;
+  if (existsSync(join(ROOT, '.bot', 'quiet'))) { console.log('[whoop] тихий режим — бриф не отправлен'); return; }
   try {
     await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
