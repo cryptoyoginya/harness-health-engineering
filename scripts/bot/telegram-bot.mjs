@@ -10,8 +10,9 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from '
 import { join } from 'node:path';
 import { ROOT, loadEnv, requireEnv, todayISO } from '../whoop/lib.mjs';
 import { fetchSnapshot, whoopBaseline, whoopTrend, whoopAdvice } from '../whoop/advice.mjs';
-import { formatExperiments, createExperiment, cancelExperiment, extendExperiment } from '../experiments.mjs';
+import { formatExperiments, createExperiment, cancelExperiment, extendExperiment, activeExperiments, recordSlip, MAX_ACTIVE } from '../experiments.mjs';
 import { getNorthStar, setNorthStar } from '../northstar.mjs';
+import { listHabits, addHabit } from '../habits.mjs';
 
 loadEnv();
 const TOKEN = requireEnv('TELEGRAM_BOT_TOKEN');
@@ -98,6 +99,8 @@ const EXP_HELP = [
   '   срок по умолчанию 3 недели; свой задаётся фразой в конце: «… на 2 недели»',
   '• отменить: /exp stop <номер>',
   '• продлить: /exp extend <номер> [недель] — по умолчанию +2',
+  '• срыв: /exp slip <что нарушила> — фиксируем честно, это уточняет вывод',
+  `Максимум ${MAX_ACTIVE} активных за раз — меньше параллельных, чище атрибуция.`,
 ].join('\n');
 
 function readOffset() {
@@ -215,12 +218,14 @@ function summarizeRange(days) {
 const weekSummary = () => summarizeRange(7);
 
 // Строки-метрики для сводки (общие для /week /month /year).
+// Цифрами — ТОЛЬКО объективные данные Whoop. Субъективное (настроение/энергия/смысл)
+// намеренно не усредняем в балл: «средняя температура по больнице» врёт. Это — у агента качественно.
 function summaryLines(w) {
   const lines = [];
-  if (w.recAvg != null)    lines.push(`• recovery: ср. ${Math.round(w.recAvg)}%`);
-  if (w.sleepAvg != null)  lines.push(`• сон: ср. ${w.sleepAvg.toFixed(1)} ч, ночей ≥7ч: ${w.nights7}/${w.sleepDays}`);
-  if (w.moodAvg != null)   lines.push(`• настроение: ср. ${w.moodAvg.toFixed(1)}/5`);
-  if (w.energyAvg != null) lines.push(`• энергия: ср. ${w.energyAvg.toFixed(1)}/5`);
+  if (w.recAvg != null)   lines.push(`• recovery: ср. ${Math.round(w.recAvg)}%`);
+  if (w.sleepAvg != null) lines.push(`• сон: ср. ${w.sleepAvg.toFixed(1)} ч · ночей ≥7ч: ${w.nights7}/${w.sleepDays}`);
+  if (!lines.length) lines.push('• данных Whoop за период пока нет');
+  lines.push('', 'Настроение, энергия, смысл в цифру не свожу — это не усредняется честно. Качественный разбор и вердикт «лучше ли живётся» — у агента.');
   return lines;
 }
 
@@ -248,6 +253,7 @@ async function registerCommands() {
     { command: 'year',  description: 'разбор за год' },
     { command: 'exp',   description: 'n-of-1 эксперименты' },
     { command: 'north', description: 'north-star — моё направление' },
+    { command: 'habit', description: 'мои базовые привычки' },
     { command: 'today', description: 'сегодняшний лог целиком' },
     { command: 'undo',  description: 'убрать последнюю запись' },
     { command: 'quiet', description: 'тихий режим: вкл/выкл напоминания' },
@@ -381,6 +387,10 @@ async function handle(msg) {
         await send(chatId, `Опиши гипотезу: /exp new <что меняешь и что проверяешь>\n\n${EXP_HELP}`);
         return;
       }
+      if (activeExperiments().length >= MAX_ACTIVE) {
+        await send(chatId, `Уже ${MAX_ACTIVE} активных эксперимента — это потолок. Чем меньше идёт параллельно, тем чище видно, что сработало (одна переменная за раз). Заверши или отмени один: /exp stop <номер>.`);
+        return;
+      }
       // срок: «на N недель» в конце фразы → задаёт длительность, иначе 3 недели
       let weeks = 3, hyp = payload;
       const m = hyp.match(/\bна\s+(\d{1,2})\s*(?:недел[яьи]|нед)\.?\b/i);
@@ -404,6 +414,15 @@ async function handle(msg) {
       await send(chatId, r ? `⏳ Продлила ${r.title} на ${wk} нед — теперь до ${r.endsOn}.` : `Не нашла эксперимент «${num}». Список — /exp`);
       return;
     }
+    if (['slip', 'срыв', 'сорвалась', 'нарушила'].includes(sub)) {
+      if (!payload) { await send(chatId, 'Опиши срыв: /exp slip <что нарушила>\nНапр.: /exp slip выпила кофе в 17:00, хотя отсекаю в 14'); return; }
+      appendInbox(`⚠️ срыв эксперимента: ${payload}`);
+      const r = recordSlip(payload);
+      if (r.count === 1) await send(chatId, `✓ Записала срыв в ${r.title}. Это не провал — честный confounder делает вывод точнее. Эксперимент продолжается.`);
+      else if (r.count === 0) await send(chatId, '✓ Записала в лог. Активных экспериментов нет — учту как обычную заметку дня.');
+      else await send(chatId, `✓ Записала в лог. Активных экспериментов несколько (${r.count}) — агент разнесёт срыв по нужному на разборе.`);
+      return;
+    }
     await send(chatId, `Не поняла команду.\n\n${EXP_HELP}`);
     return;
   }
@@ -416,8 +435,23 @@ async function handle(msg) {
         : 'North-star ещё не задан.\nЭто твоё долгосрочное направление — куда ты хочешь, чтобы шла жизнь (смысл, не цифра). Агент будет сверять с ним недельные и квартальные выводы.\nЗадай: /north <текст>\nНапр.: /north больше энергии и тёплых связей, меньше тревоги и спешки');
       return;
     }
+    const prev = getNorthStar();
     setNorthStar(arg);
-    await send(chatId, `🧭 Записала north-star:\n\n${arg}\n\nТеперь это твой ориентир — агент сверяет с ним, туда ли движется жизнь.`);
+    const head = prev ? `🧭 Обновила north-star (было: «${prev}»):` : '🧭 Записала north-star:';
+    await send(chatId, `${head}\n\n${arg}\n\nТеперь это твой ориентир — агент сверяет с ним, туда ли движется жизнь.`);
+    return;
+  }
+  if (text === '/habit' || text.startsWith('/habit ')) {
+    const arg = text.slice(6).trim();
+    if (!arg) {
+      const h = listHabits();
+      await send(chatId, h.length
+        ? `🌱 Твои привычки/база (агент учитывает как данность):\n${h.map((x) => '• ' + x).join('\n')}\n\nДобавить: /habit <что уже делаешь>`
+        : 'Пока пусто. Сюда вносим то, что у тебя УЖЕ устойчиво — агент не будет это «открывать» заново и учтёт как базу.\nНапр.: /habit 15 000 шагов каждый день · /habit омега-3 ежедневно несколько лет');
+      return;
+    }
+    const list = addHabit(arg);
+    await send(chatId, `🌱 Запомнила как базовую привычку: «${arg}».\nВсего в базе: ${list.length}. Агент учтёт это в разборах.`);
     return;
   }
   if (text === '/quiet') {

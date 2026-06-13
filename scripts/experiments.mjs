@@ -50,6 +50,9 @@ export function activeExperiments() {
   return listExperiments().filter((e) => !FINISHED.has(e.status));
 }
 
+// Потолок параллельных экспериментов: меньше параллельных → чище атрибуция (одна переменная за раз).
+export const MAX_ACTIVE = 3;
+
 const dmy = (d) => `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
 
 // Полный список для /exp в боте.
@@ -166,6 +169,20 @@ export function extendExperiment(arg, addWeeks = 2) {
   body = body.replace(/\n*$/, '\n') + `\n- продлён вручную ${ddmmyyyy()} на ${addWeeks} нед.\n`;
   writeFileSync(p, body);
   return { title, endsOn: dmy(end) };
+}
+
+// Зафиксировать срыв/нарушение протокола (confounder). Если активен ровно один эксперимент —
+// пишем прямо в него; иначе только в дневной лог (агент разнесёт по экспериментам на разборе).
+export function recordSlip(text) {
+  const act = activeExperiments();
+  if (act.length === 1) {
+    const p = join(DIR, act[0].file);
+    let body = readFileSync(p, 'utf8');
+    body = body.replace(/\n*$/, '\n') + `\n- ⚠️ срыв ${ddmmyyyy()}: ${text}\n`;
+    writeFileSync(p, body);
+    return { count: 1, title: act[0].title };
+  }
+  return { count: act.length, title: null };
 }
 
 // Однострочный нудж для утреннего брифа (самый срочный эксперимент).
