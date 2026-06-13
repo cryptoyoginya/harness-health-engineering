@@ -21,10 +21,13 @@
   .wrap{max-width:1120px;margin:0 auto;padding:0 28px}
   .eyebrow{font-family:var(--head);font-size:12px;letter-spacing:.42em;text-transform:uppercase;color:var(--mut)}
   h1,h2,h3{font-family:var(--head);font-weight:700;letter-spacing:-.02em;line-height:1.03;text-transform:uppercase}
-  .mut{color:var(--mut)}
   .kicker{margin-bottom:20px}
   .big{font-size:clamp(28px,5vw,62px);line-height:1.05;max-width:18ch}
-  .lead{font-size:clamp(15px,1.7vw,19px);color:#cfcfcf;max-width:54ch;margin-top:22px}
+  .lead{font-size:clamp(15px,1.7vw,19px);color:#cfcfcf;max-width:56ch;margin-top:22px}
+  .mut{color:var(--mut)}
+  svg{display:block;width:100%;height:auto}
+  .viz{margin-top:48px}
+  .cap{font-family:var(--head);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-top:18px;text-align:center}
 
   nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:16px 28px;backdrop-filter:blur(9px);background:rgba(0,0,0,.4);border-bottom:1px solid var(--line)}
   nav .brand{font-family:var(--head);font-weight:700;letter-spacing:.05em;font-size:15px;text-transform:uppercase}
@@ -41,24 +44,44 @@
   .hero h1{font-size:clamp(40px,9vw,114px)}
   .hero h1 .l2{color:var(--mut)}
   .hero p.sub{max-width:600px;margin:24px auto 0;font-size:clamp(15px,1.6vw,19px);color:#d6d6d6}
+  .hero .btns{margin-top:34px}
   .scrollcue{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:2;font-family:var(--head);font-size:11px;letter-spacing:.3em;color:var(--dim);text-transform:uppercase;animation:bob 2.4s ease-in-out infinite}
   @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
 
-  section{padding:clamp(72px,11vw,150px) 0;border-top:1px solid var(--line)}
+  section{padding:clamp(72px,11vw,148px) 0;border-top:1px solid var(--line)}
   .reveal{opacity:0;transform:translateY(26px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
   .reveal.in{opacity:1;transform:none}
-  svg{display:block;width:100%;height:auto}
-  .viz{margin-top:48px}
-  .cap{font-family:var(--head);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-top:18px;text-align:center}
+
+  .stats{border-top:1px solid var(--line)}
+  .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+  .statgrid .s{background:#000;padding:40px 22px;text-align:center}
+  .statgrid .s .num{font-family:var(--head);font-weight:700;font-size:clamp(38px,6vw,72px);line-height:1;letter-spacing:-.02em}
+  .statgrid .s .lab{font-size:13px;color:var(--mut);margin-top:14px;letter-spacing:.02em}
 
   .northstar .q{display:block;margin-top:12px;font-size:clamp(34px,7vw,90px)}
+  .pull{font-family:var(--head);font-weight:500;font-size:clamp(22px,3.6vw,44px);line-height:1.16;letter-spacing:-.01em;text-transform:none;max-width:20ch}
+  .pull .em{color:#fff}
+
+  .tyr{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;margin-top:54px}
+  .tyr .note{font-size:15px;color:var(--mut)}
+  .tyr .note b{color:#eaeaea;font-weight:500}
+
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:46px}
+  .steps .st{background:#000;padding:34px 26px;min-height:230px}
+  .steps .st .no{font-family:var(--head);font-size:13px;color:var(--dim);letter-spacing:.2em}
+  .steps .st h3{font-size:21px;margin:14px 0 12px}
+  .steps .st p{font-size:14px;color:var(--mut)}
+  .steps .st svg{margin-top:20px;height:74px}
 
   .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:30px}
-  .grid4 .cell{background:#000;padding:26px 22px;min-height:172px}
+  .grid4 .cell{background:#000;padding:26px 22px;min-height:168px}
   .grid4 .n{font-family:var(--head);font-size:13px;color:var(--dim);letter-spacing:.2em}
   .grid4 .cell h3{font-size:20px;margin:14px 0 9px}
   .grid4 .cell p{font-size:13.5px;color:var(--mut)}
-  .quote{margin-top:46px;font-family:var(--head);font-weight:500;font-size:clamp(20px,3.3vw,38px);line-height:1.18;letter-spacing:-.01em;text-transform:none}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:40px}
+  .chip{border:1px solid #2a2a2a;border-radius:999px;padding:9px 16px;font-family:var(--head);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#cfcfcf}
+  .chip b{color:#fff;font-weight:500}
+  .quote{margin-top:44px;font-family:var(--head);font-weight:500;font-size:clamp(20px,3.3vw,38px);line-height:1.18;letter-spacing:-.01em;text-transform:none}
   .quote .by{display:block;margin-top:14px;font-family:var(--body);font-size:13px;letter-spacing:.05em;color:var(--dim);text-transform:uppercase}
 
   .photos{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:46px}
@@ -91,6 +114,14 @@
   .vs .col li::before{content:"";position:absolute;left:0;top:9px;width:7px;height:7px;background:#2a2a2a}
   .vs .col.you li{color:#ececec}.vs .col.you li::before{background:#fff}
 
+  .faq{margin-top:40px;border-top:1px solid var(--line)}
+  .faq details{border-bottom:1px solid var(--line)}
+  .faq summary{list-style:none;cursor:pointer;padding:24px 0;font-family:var(--head);font-size:clamp(16px,2vw,21px);letter-spacing:-.01em;display:flex;justify-content:space-between;gap:16px;text-transform:none}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary .pl{color:var(--dim);font-weight:500;transition:.25s}
+  .faq details[open] summary .pl{transform:rotate(45deg);color:#fff}
+  .faq p{padding:0 0 24px;font-size:15px;color:var(--mut);max-width:64ch}
+
   .cta-s{text-align:center}
   .cta-s .big{margin:0 auto;max-width:20ch}
   .btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:36px}
@@ -111,7 +142,7 @@
   .spin.rev{animation-duration:95s;animation-direction:reverse}
   @keyframes spin{to{transform:rotate(360deg)}}
 
-  @media(max-width:820px){.grid4,.feat,.stack,.vs .cols,.photos{grid-template-columns:1fr}}
+  @media(max-width:860px){.statgrid,.steps,.grid4,.feat,.stack,.vs .cols,.photos,.tyr{grid-template-columns:1fr}}
   @media(prefers-reduced-motion:reduce){.reveal{transition:none;opacity:1;transform:none}.scrollcue,.core,.spin,.pcard::after{animation:none}.chartline{stroke-dashoffset:0}}
 </style>
 </head>
@@ -130,23 +161,39 @@
     <div class="eyebrow">Harness &middot; Health Engineering</div>
     <h1>Body data in.<br /><span class="l2">Life decisions out.</span></h1>
     <p class="sub">A local AI lab that runs experiments on <em>your</em> life &mdash; and tells you, with proof, what actually makes it better.</p>
+    <div class="btns">
+      <a class="btn" href="https://github.com/cryptoyoginya/harness-health-engineering">View the repo &#8599;</a>
+      <a class="btn ghost" href="#purpose">Why it exists</a>
+    </div>
   </div>
   <div class="scrollcue">Scroll</div>
 </header>
+
+<section class="stats">
+  <div class="wrap">
+    <div class="statgrid">
+      <div class="s reveal"><div class="num"><span class="cnt" data-to="100">0</span>%</div><div class="lab">capture runs on-device</div></div>
+      <div class="s reveal"><div class="num"><span class="cnt" data-to="3">0</span></div><div class="lab">local AI models · no uploads</div></div>
+      <div class="s reveal"><div class="num">n=<span class="cnt" data-to="1">0</span></div><div class="lab">the only sample size that matters</div></div>
+      <div class="s reveal"><div class="num">$<span class="cnt" data-to="0">0</span></div><div class="lab">servers &middot; it's your folder</div></div>
+    </div>
+  </div>
+</section>
 
 <section class="manifesto">
   <div class="wrap">
     <div class="eyebrow kicker reveal">The problem</div>
     <h2 class="big reveal">Every tracker optimised a number. Your life fell out of frame.</h2>
-    <p class="lead reveal">Goodhart&rsquo;s law, wearing a fitness band: when a measure becomes the target, it stops measuring anything that matters.</p>
+    <p class="lead reveal">Recovery. HRV. Steps. People grind a score up while the thing it was supposed to stand for &mdash; a life that feels good to be inside &mdash; quietly slips. That's Goodhart's law wearing a fitness band: when a measure becomes the target, it stops measuring anything that matters.</p>
   </div>
 </section>
 
-<section class="northstar">
+<section class="northstar" id="purpose">
   <div class="wrap">
-    <div class="eyebrow kicker reveal">The shift</div>
-    <h2 class="big reveal">One metric. <span class="q reveal">Is my life actually better?</span></h2>
-    <p class="lead reveal">Everything else &mdash; sleep, HRV, supplements &mdash; is demoted to an instrument in service of that answer. And every part of your life orbits it:</p>
+    <div class="eyebrow kicker reveal">Why it exists &middot; the point</div>
+    <h2 class="big reveal">You don't want more data. You want a life that's actually good.</h2>
+    <p class="lead reveal">Longevity, recovery, sleep &mdash; all of it is a <em>means</em>. The end is whether your days are worth having. This system keeps that end in the frame on purpose, because it's the one thing a tracker structurally can't: a wearable doesn't know what your good life looks like. <b style="color:#eee;font-weight:500">You do</b> &mdash; so you name it, and everything else is held accountable to it.</p>
+    <p class="pull reveal" style="margin-top:48px">The top metric isn't a body score.<br /><span class="em q" style="display:block;margin-top:10px;font-size:clamp(30px,6vw,72px)">Is my life actually better?</span></p>
     <div class="viz reveal">
       <svg viewBox="0 0 1000 600" role="img" aria-label="Life domains orbiting the north-star">
         <g stroke="#262626" stroke-width="1" fill="none">
@@ -178,46 +225,117 @@
         <path d="M500 276 L509 295 L530 300 L509 305 L500 324 L491 305 L470 300 L491 295 Z" fill="#fff"/>
       </svg>
     </div>
-    <div class="cap reveal">Body &times; work &times; people &times; mind &mdash; all in service of one question</div>
+    <div class="tyr">
+      <div class="viz reveal" style="margin-top:0">
+        <svg viewBox="0 0 600 240" role="img" aria-label="A body score rising while life stays flat — metric tyranny">
+          <line x1="60" y1="200" x2="560" y2="200" stroke="#222"/>
+          <path d="M60 180 L180 150 L300 110 L440 70 L540 50" fill="none" stroke="#fff" stroke-width="2.5"/>
+          <text x="540" y="40" text-anchor="end" font-family="Space Grotesk, sans-serif" font-size="13" fill="#fff">recovery &#8599;</text>
+          <path d="M60 150 L540 152" fill="none" stroke="#5a5a5a" stroke-width="2" stroke-dasharray="6 6"/>
+          <text x="60" y="138" font-family="Inter, sans-serif" font-size="12" fill="#7c7c7c">your life &mdash; flat</text>
+          <circle cx="500" cy="60" r="5" fill="#fff"/>
+          <text x="300" y="232" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="13" fill="#8d8d8d" letter-spacing="1">PROXY UP, LIFE FLAT = A FAIL</text>
+        </svg>
+      </div>
+      <div class="note reveal">
+        <p>When the body score climbs but life doesn't, that isn't a win to celebrate. It's <b>metric tyranny</b> &mdash; and the system flags it instead of congratulating you.</p>
+        <p style="margin-top:14px">Built for people who've tried enough supplements, trackers, and protocols to know the hard question isn't <em>"what's optimal?"</em> but <b>"what's optimal for me, in the life I actually live?"</b></p>
+      </div>
+    </div>
   </div>
 </section>
 
-<section class="capture">
+<section class="science">
   <div class="wrap">
-    <div class="eyebrow kicker reveal">Capture</div>
-    <h2 class="big reveal">Text, talk, or snap. It flows into one place.</h2>
+    <div class="eyebrow kicker reveal">The science</div>
+    <h2 class="big reveal">Personal science, not correlations.</h2>
+    <p class="lead reveal">Correlations are guesses &mdash; "you sleep worse when you drink" can't tell if the drink did it or a hard day caused both. So the harness borrows the method clinical medicine uses to decide if something works for one specific person: the <b style="color:#eee;font-weight:500">n-of-1 trial</b>, pre-registered, controlled, judged against a line drawn before the data arrives.</p>
     <div class="viz reveal">
-      <svg viewBox="0 0 1000 300" role="img" aria-label="Text, voice and photo flowing into the daily log, then to the agent">
-        <defs>
-          <path id="pT" d="M250 80 C360 80 380 150 470 150" />
-          <path id="pV" d="M250 150 L470 150" />
-          <path id="pP" d="M250 220 C360 220 380 150 470 150" />
-          <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M2 1 L8 5 L2 9" fill="none" stroke="#fff" stroke-width="1.5"/></marker>
-        </defs>
-        <g fill="none" stroke="#2a2a2a" stroke-width="1.2"><use href="#pT"/><use href="#pV"/><use href="#pP"/></g>
-        <g font-family="Space Grotesk, sans-serif" font-size="14" letter-spacing="1.5" fill="#eaeaea" text-transform="uppercase">
-          <g><rect x="70" y="58" width="180" height="44" rx="22" fill="#0a0a0a" stroke="#2e2e2e"/><text x="160" y="85" text-anchor="middle">TEXT</text></g>
-          <g><rect x="70" y="128" width="180" height="44" rx="22" fill="#0a0a0a" stroke="#2e2e2e"/><text x="160" y="155" text-anchor="middle">VOICE</text></g>
-          <g><rect x="70" y="198" width="180" height="44" rx="22" fill="#0a0a0a" stroke="#2e2e2e"/><text x="160" y="225" text-anchor="middle">PHOTO</text></g>
-        </g>
-        <circle cx="470" cy="150" r="60" fill="rgba(255,255,255,.05)"><animate attributeName="r" values="54;64;54" dur="3s" repeatCount="indefinite"/></circle>
-        <circle cx="470" cy="150" r="46" fill="#0c0c0c" stroke="#3a3a3a"/>
-        <text x="470" y="146" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="13" fill="#fff" letter-spacing="1">DAILY</text>
-        <text x="470" y="164" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="13" fill="#fff" letter-spacing="1">LOG</text>
-        <line x1="516" y1="150" x2="690" y2="150" stroke="#2a2a2a" stroke-width="1.2" marker-end="url(#ah)"/>
-        <text x="600" y="138" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#666" letter-spacing="2">WEEKLY</text>
-        <g font-family="Space Grotesk, sans-serif" font-size="14" letter-spacing="1.5"><rect x="700" y="120" width="230" height="60" rx="14" fill="#0a0a0a" stroke="#2e2e2e"/><text x="815" y="146" text-anchor="middle" fill="#fff">AGENT</text><text x="815" y="166" text-anchor="middle" fill="#7c7c7c" font-size="12">finds your real levers</text></g>
-        <g fill="#fff">
-          <circle r="3.4"><animateMotion dur="2.6s" begin="0s" repeatCount="indefinite"><mpath href="#pT"/></animateMotion></circle>
-          <circle r="3.4"><animateMotion dur="2.6s" begin="1.3s" repeatCount="indefinite"><mpath href="#pT"/></animateMotion></circle>
-          <circle r="3.4"><animateMotion dur="2.2s" begin="0.5s" repeatCount="indefinite"><mpath href="#pV"/></animateMotion></circle>
-          <circle r="3.4"><animateMotion dur="2.2s" begin="1.6s" repeatCount="indefinite"><mpath href="#pV"/></animateMotion></circle>
-          <circle r="3.4"><animateMotion dur="2.6s" begin="0.9s" repeatCount="indefinite"><mpath href="#pP"/></animateMotion></circle>
-          <circle r="3.4"><animateMotion dur="2.6s" begin="2.1s" repeatCount="indefinite"><mpath href="#pP"/></animateMotion></circle>
-        </g>
+      <svg viewBox="0 0 1000 300" role="img" aria-label="An experiment crossing its success criterion and becoming a rule">
+        <line x1="70" y1="250" x2="950" y2="250" stroke="#222"/>
+        <line x1="70" y1="250" x2="70" y2="40" stroke="#222"/>
+        <line x1="70" y1="120" x2="950" y2="120" stroke="#4a4a4a" stroke-dasharray="5 6"/>
+        <text x="950" y="112" text-anchor="end" font-family="Inter, sans-serif" font-size="12" fill="#7c7c7c" letter-spacing="1">success criterion (pre-registered)</text>
+        <line x1="430" y1="40" x2="430" y2="250" stroke="#1f1f1f"/>
+        <text x="250" y="70" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#6a6a6a" letter-spacing="1">baseline</text>
+        <text x="690" y="70" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#6a6a6a" letter-spacing="1">change one variable</text>
+        <path d="M70 210 L210 206 L360 214 L430 210" fill="none" stroke="#5a5a5a" stroke-width="2"/>
+        <path class="chartline" d="M430 210 L560 196 L660 150 L780 104 L900 70" fill="none" stroke="#fff" stroke-width="2.5"/>
+        <circle cx="900" cy="70" r="5" fill="#fff"/>
+        <text x="900" y="50" text-anchor="end" font-family="Space Grotesk, sans-serif" font-size="14" fill="#fff" letter-spacing="1">MERGE &rarr; RULE</text>
       </svg>
     </div>
-    <div class="cap reveal">Several a day is better than one &mdash; the shape of the day, not an average</div>
+    <div class="grid4">
+      <div class="cell reveal"><div class="n">01</div><h3>Hypothesis</h3><p>A specific causal claim.</p></div>
+      <div class="cell reveal"><div class="n">02</div><h3>One variable</h3><p>Hold everything else. The rule everyone breaks.</p></div>
+      <div class="cell reveal"><div class="n">03</div><h3>Pre-set criterion</h3><p>Written before the data, so you can't fool yourself.</p></div>
+      <div class="cell reveal"><div class="n">04</div><h3>Verdict &rarr; rule</h3><p>Merge it, or revert and log why. A washout confirms.</p></div>
+    </div>
+    <p class="lead reveal" style="margin-top:48px">And every claim the agent makes carries its epistemic weight &mdash; observation split from interpretation, each line cited to its source:</p>
+    <div class="chips">
+      <span class="chip reveal"><b>FACT</b> &middot; measured</span>
+      <span class="chip reveal"><b>INFERENCE</b> &middot; reasoned</span>
+      <span class="chip reveal"><b>ASSUMPTION</b> &middot; stated</span>
+      <span class="chip reveal"><b>UNKNOWN</b> &middot; admitted</span>
+      <span class="chip reveal"><b>RISK</b> &middot; flagged</span>
+    </div>
+    <p class="quote reveal">&ldquo;Creatine moved nothing for you in three weeks &mdash; stop paying for it.&rdquo;
+      <span class="by">&mdash; the kind of sentence no wearable will ever say</span></p>
+  </div>
+</section>
+
+<section class="how">
+  <div class="wrap">
+    <div class="eyebrow kicker reveal">How it works</div>
+    <h2 class="big reveal">Capture loose. Reason tight. Decide.</h2>
+    <div class="steps">
+      <div class="st reveal">
+        <div class="no">01 &middot; Capture</div>
+        <h3>Live, on the fly</h3>
+        <p>Text, voice, or a photo &mdash; selfie, food, stool auto-sorted on-device. Several a day. Zero forms.</p>
+        <svg viewBox="0 0 300 74" role="img" aria-label="three inputs into a log">
+          <g font-family="Space Grotesk, sans-serif" font-size="11" fill="#cfcfcf" letter-spacing="1">
+            <rect x="6" y="6" width="78" height="20" rx="10" fill="#0a0a0a" stroke="#2e2e2e"/><text x="45" y="20" text-anchor="middle">TEXT</text>
+            <rect x="6" y="28" width="78" height="20" rx="10" fill="#0a0a0a" stroke="#2e2e2e"/><text x="45" y="42" text-anchor="middle">VOICE</text>
+            <rect x="6" y="50" width="78" height="20" rx="10" fill="#0a0a0a" stroke="#2e2e2e"/><text x="45" y="64" text-anchor="middle">PHOTO</text>
+          </g>
+          <path d="M84 16 C150 16 150 37 210 37" fill="none" stroke="#2a2a2a"/>
+          <path d="M84 38 L210 37" fill="none" stroke="#2a2a2a"/>
+          <path d="M84 60 C150 60 150 37 210 37" fill="none" stroke="#2a2a2a"/>
+          <circle cx="210" cy="37" r="26" fill="#0c0c0c" stroke="#3a3a3a"/>
+          <text x="210" y="41" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="10" fill="#fff" letter-spacing="1">LOG</text>
+          <circle r="2.6" fill="#fff"><animateMotion dur="2.4s" repeatCount="indefinite" path="M84 38 L210 37"/></circle>
+        </svg>
+      </div>
+      <div class="st reveal">
+        <div class="no">02 &middot; Synthesise</div>
+        <h3>Cited, on-device memory</h3>
+        <p>Hybrid RAG retrieves your real history; the agent finds patterns you can't see and writes them down with sources.</p>
+        <svg viewBox="0 0 300 74" role="img" aria-label="document with citations">
+          <rect x="96" y="8" width="108" height="58" rx="6" fill="#0a0a0a" stroke="#2e2e2e"/>
+          <line x1="110" y1="24" x2="190" y2="24" stroke="#444" stroke-width="2"/>
+          <line x1="110" y1="34" x2="178" y2="34" stroke="#333" stroke-width="2"/>
+          <line x1="110" y1="44" x2="190" y2="44" stroke="#444" stroke-width="2"/>
+          <line x1="110" y1="54" x2="166" y2="54" stroke="#333" stroke-width="2"/>
+          <circle cx="196" cy="24" r="4" fill="#fff"/><circle cx="184" cy="44" r="4" fill="#fff"/>
+          <text x="150" y="74" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#666">FACT / INFERENCE · [source]</text>
+        </svg>
+      </div>
+      <div class="st reveal">
+        <div class="no">03 &middot; Decide</div>
+        <h3>Experiments become rules</h3>
+        <p>A hypothesis turns into an n-of-1; a verdict turns into a standing rule. Knowledge that compounds.</p>
+        <svg viewBox="0 0 300 74" role="img" aria-label="hypothesis to rule">
+          <g font-family="Space Grotesk, sans-serif" font-size="10" letter-spacing="1">
+            <rect x="20" y="26" width="90" height="22" rx="11" fill="#0a0a0a" stroke="#2e2e2e"/><text x="65" y="41" text-anchor="middle" fill="#cfcfcf">HYPOTHESIS</text>
+            <rect x="190" y="26" width="90" height="22" rx="11" fill="#fff"/><text x="235" y="41" text-anchor="middle" fill="#000">RULE</text>
+          </g>
+          <line x1="112" y1="37" x2="186" y2="37" stroke="#3a3a3a" marker-end="url(#hr)"/>
+          <defs><marker id="hr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M2 1 L8 5 L2 9" fill="none" stroke="#fff" stroke-width="1.5"/></marker></defs>
+          <text x="150" y="22" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#666">merge</text>
+        </svg>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -255,51 +373,20 @@
         <div class="pl">Gut</div><div class="ps">Bristol scale &middot; colour</div>
       </div>
     </div>
-    <div class="cap reveal">CLIP vision routes each photo locally &mdash; no caption, nothing uploaded</div>
-  </div>
-</section>
-
-<section class="science">
-  <div class="wrap">
-    <div class="eyebrow kicker reveal">The science</div>
-    <h2 class="big reveal">Personal science, not correlations.</h2>
-    <p class="lead reveal">A pre-registered n-of-1 trial: change one thing, judge it against a line drawn before the data arrives.</p>
-    <div class="viz reveal">
-      <svg viewBox="0 0 1000 300" role="img" aria-label="An experiment crossing its success criterion and becoming a rule">
-        <line x1="70" y1="250" x2="950" y2="250" stroke="#222"/>
-        <line x1="70" y1="250" x2="70" y2="40" stroke="#222"/>
-        <line x1="70" y1="120" x2="950" y2="120" stroke="#4a4a4a" stroke-dasharray="5 6"/>
-        <text x="950" y="112" text-anchor="end" font-family="Inter, sans-serif" font-size="12" fill="#7c7c7c" letter-spacing="1">success criterion</text>
-        <line x1="430" y1="40" x2="430" y2="250" stroke="#1f1f1f"/>
-        <text x="250" y="70" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#6a6a6a" letter-spacing="1">baseline</text>
-        <text x="690" y="70" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#6a6a6a" letter-spacing="1">change one variable</text>
-        <path d="M70 210 L210 206 L360 214 L430 210" fill="none" stroke="#5a5a5a" stroke-width="2"/>
-        <path class="chartline" d="M430 210 L560 196 L660 150 L780 104 L900 70" fill="none" stroke="#fff" stroke-width="2.5"/>
-        <circle cx="900" cy="70" r="5" fill="#fff"/>
-        <text x="900" y="50" text-anchor="end" font-family="Space Grotesk, sans-serif" font-size="14" fill="#fff" letter-spacing="1">MERGE &rarr; RULE</text>
-      </svg>
-    </div>
-    <div class="grid4">
-      <div class="cell reveal"><div class="n">01</div><h3>Hypothesis</h3><p>A specific causal claim.</p></div>
-      <div class="cell reveal"><div class="n">02</div><h3>One variable</h3><p>The rule everyone breaks.</p></div>
-      <div class="cell reveal"><div class="n">03</div><h3>Pre-set criterion</h3><p>Written before the data.</p></div>
-      <div class="cell reveal"><div class="n">04</div><h3>Verdict &rarr; rule</h3><p>Merge it, or revert and log why.</p></div>
-    </div>
-    <p class="quote reveal">&ldquo;Creatine moved nothing for you in three weeks &mdash; stop paying for it.&rdquo;
-      <span class="by">&mdash; the kind of sentence no wearable will ever say</span></p>
+    <div class="cap reveal">CLIP vision routes each photo locally &mdash; no caption, nothing uploaded, never diagnostic</div>
   </div>
 </section>
 
 <section class="features">
   <div class="wrap">
     <div class="eyebrow kicker reveal">What it does</div>
-    <h2 class="big reveal">Capture loose. Reason tight.</h2>
+    <h2 class="big reveal">A system, not a chatbot.</h2>
     <div class="feat">
       <div class="f reveal"><div class="ix">Capture</div><h3>Text, voice, photo</h3><p>Selfie, food, and stool photos sort themselves &mdash; no captions, no forms.</p></div>
-      <div class="f reveal"><div class="ix">On-device</div><h3>Private intelligence</h3><p>Voice&rarr;text and photo-type run locally. Your raw life isn&rsquo;t uploaded to be processed.</p></div>
+      <div class="f reveal"><div class="ix">Rhythm</div><h3>A gentle daily nudge</h3><p>Morning brief, a question or two across life domains, an evening recap. Mute it anytime.</p></div>
       <div class="f reveal"><div class="ix">Weekly</div><h3>The verdict</h3><p>The agent reads your week and scores it against your north-star.</p></div>
-      <div class="f reveal"><div class="ix">Causal</div><h3>n-of-1 experiments</h3><p>Start, extend, or stop a trial in a tap. It ends in a rule.</p></div>
-      <div class="f reveal"><div class="ix">Direction</div><h3>Your north-star</h3><p>You define a good life. Everything optimises toward it.</p></div>
+      <div class="f reveal"><div class="ix">Causal</div><h3>n-of-1 experiments</h3><p>Run, extend, or log a lapse. Capped to a few at once for clean attribution.</p></div>
+      <div class="f reveal"><div class="ix">Baseline</div><h3>Knows your habits</h3><p>Tell it what's already standing &mdash; 15k steps, omega for years &mdash; and it won't re-discover them.</p></div>
       <div class="f reveal"><div class="ix">Horizons</div><h3>Week &middot; month &middot; year</h3><p>Watch quality of life move over seasons as data compounds.</p></div>
     </div>
   </div>
@@ -326,8 +413,8 @@
     <div class="stack">
       <div class="row reveal"><div class="k">On-device voice</div><div class="v"><b>Whisper</b> (ONNX) transcribes locally &mdash; audio never leaves the device.</div></div>
       <div class="row reveal"><div class="k">On-device vision</div><div class="v"><b>CLIP</b> zero-shot routes every photo into the right diary, in milliseconds.</div></div>
-      <div class="row reveal"><div class="k">Hybrid RAG</div><div class="v"><b>multilingual-e5</b> + <b>sqlite-vec</b> + FTS5, fused with RRF &mdash; your history, cited.</div></div>
-      <div class="row reveal"><div class="k">Agent surface</div><div class="v">An <b>MCP server</b> exposes search &amp; synthesis to any client &mdash; reasoning over the pyramid, not guesses.</div></div>
+      <div class="row reveal"><div class="k">Hybrid RAG</div><div class="v"><b>multilingual-e5</b> + <b>sqlite-vec</b> + FTS5, fused with RRF &mdash; your history, cited, hosted on your laptop.</div></div>
+      <div class="row reveal"><div class="k">Agent surface</div><div class="v">A local <b>MCP server</b> exposes search &amp; synthesis to any client &mdash; reasoning over the pyramid, not guesses.</div></div>
       <div class="row reveal"><div class="k">Evidence labels</div><div class="v">Every claim is <b>fact / inference / assumption</b> with a source &mdash; observation split from interpretation.</div></div>
       <div class="row reveal"><div class="k">Quietly automatic</div><div class="v">Race-safe OAuth, a morning brief via <b>launchd</b>, a <b>kb-doctor</b> health-check.</div></div>
     </div>
@@ -345,8 +432,22 @@
       </div>
       <div class="col you reveal">
         <div class="lab">Harness Health</div>
-        <ul><li>Top metric is your life quality</li><li>Evidence is n-of-1 causation &rarr; rules</li><li>Body &times; work &times; people &times; food</li><li>Output is decisions and experiments</li><li>On-device, cited, asked in plain language</li></ul>
+        <ul><li>Top metric is your life quality</li><li>Evidence is n-of-1 causation &rarr; rules</li><li>Body &times; work &times; people &times; food</li><li>Output is decisions and experiments</li><li>Cited, interrogable in plain language</li></ul>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="faqs">
+  <div class="wrap">
+    <div class="eyebrow kicker reveal">Honest answers</div>
+    <h2 class="big reveal">The questions you'd actually ask.</h2>
+    <div class="faq reveal">
+      <details><summary>Is my data private?<span class="pl">+</span></summary><p>Capture is on-device: voice→text, photo sorting, and search all run locally, and your files live on your disk (photos and sensitive diaries are never pushed to git). Two things do leave, by design: messages transit Telegram, and deep analysis uses Claude when you ask the agent. Nothing is sold or posted.</p></details>
+      <details><summary>What does it cost to run?<span class="pl">+</span></summary><p>The capture loop is free &mdash; bot, on-device models, and storage cost nothing. The only spend is the weekly analysis: included if you run the agent on a Claude subscription, or cents per session on a raw API key. A photo costs well under a cent.</p></details>
+      <details><summary>Is it a medical device?<span class="pl">+</span></summary><p>No. The agent describes and compares; it never diagnoses. Any worrying sign &mdash; from a stool photo or anything else &mdash; resolves to a single recommendation: see a specialist.</p></details>
+      <details><summary>Do I have to journal every day?<span class="pl">+</span></summary><p>No. Body data arrives on its own; the rest is whatever you feel like sharing. Skip days freely &mdash; it's a tool for your life, not another job.</p></details>
+      <details><summary>Who is it for?<span class="pl">+</span></summary><p>People who've tried enough supplements, trackers, and protocols to want what works for <em>them</em>, in the life they actually live. Not for streaks, badges, or a prettier sleep chart.</p></details>
     </div>
   </div>
 </section>
@@ -403,7 +504,10 @@
     ci.appendChild(an);g.appendChild(ci);
   });
 
-  var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);}});},{threshold:0.14});
+  function countUp(el){var to=+el.dataset.to,t0=performance.now(),dur=1100;
+    function step(t){var p=Math.min(1,(t-t0)/dur);el.textContent=Math.round(p*to);if(p<1)requestAnimationFrame(step);}requestAnimationFrame(step);}
+  var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');
+    e.target.querySelectorAll&&e.target.querySelectorAll('.cnt').forEach(countUp);obs.unobserve(e.target);}});},{threshold:0.14});
   document.querySelectorAll('.reveal').forEach(function(el,i){el.style.transitionDelay=((i%4)*70)+'ms';obs.observe(el);});
 })();
 </script>
