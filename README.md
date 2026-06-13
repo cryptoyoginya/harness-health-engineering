@@ -10,6 +10,13 @@ all as plain **Markdown you own**.
 
 <br/>
 
+[![Live demo](https://img.shields.io/badge/%E2%96%B6%20live%20demo-0a0a0a?style=for-the-badge&logo=githubpages&logoColor=white)](https://cryptoyoginya.github.io/harness-health-engineering/)
+
+<sub>↑ a black-and-white product page · [cryptoyoginya.github.io/harness-health-engineering](https://cryptoyoginya.github.io/harness-health-engineering/)</sub>
+
+<br/>
+
+[![demo](https://img.shields.io/badge/demo-live-2ea043)](https://cryptoyoginya.github.io/harness-health-engineering/)
 ![local-first](https://img.shields.io/badge/local--first-on--device-2563eb)
 ![method](https://img.shields.io/badge/method-n--of--1%20trials-16a34a)
 ![north star](https://img.shields.io/badge/north_star-"is_life_better%3F"-eab308)
