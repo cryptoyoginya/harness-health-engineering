@@ -142,7 +142,28 @@
   .spin.rev{animation-duration:95s;animation-direction:reverse}
   @keyframes spin{to{transform:rotate(360deg)}}
 
-  @media(max-width:860px){.statgrid,.steps,.grid4,.feat,.stack,.vs .cols,.photos,.tyr{grid-template-columns:1fr}}
+  .compare .toggle{display:inline-flex;border:1px solid #2a2a2a;border-radius:999px;padding:5px;margin-top:36px;gap:4px}
+  .compare .toggle button{font-family:var(--head);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);background:transparent;border:0;cursor:pointer;padding:11px 22px;border-radius:999px;transition:.2s}
+  .compare .toggle button.on{background:#fff;color:#000}
+  .compare .meta{margin-top:24px;font-family:var(--head);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+  .compare .meta b{color:#fff;font-weight:500}
+  .board{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:22px}
+  .board .tile{border:1px solid #242424;border-radius:12px;padding:18px 10px;text-align:center;font-size:13px;color:#eaeaea;transition:opacity .4s,border-color .4s,color .4s}
+  .board .tile .t{font-family:var(--head);font-size:13px;letter-spacing:.04em}
+  .board .tile .g{font-size:11px;color:var(--dim);margin-top:5px;text-transform:uppercase;letter-spacing:.1em}
+  .compare[data-mode="whoop"] .tile.life{opacity:.18;border-color:#161616}
+  .compare[data-mode="harness"] .tile.life{opacity:1}
+  .compare[data-mode="harness"] .tile{border-color:#333}
+  .verdict{margin-top:30px;border:1px solid #242424;border-left:2px solid #fff;border-radius:0;padding:24px 26px;background:#060606}
+  .verdict .vl{font-family:var(--head);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+  .verdict .vt{font-size:clamp(18px,2.6vw,28px);margin-top:10px;color:#fff;font-family:var(--head);font-weight:500;letter-spacing:-.01em;line-height:1.25}
+  @media(max-width:860px){.statgrid,.steps,.grid4,.feat,.stack,.vs .cols,.photos,.tyr,.board{grid-template-columns:1fr}}
+  @media(max-width:720px){
+    .board{grid-template-columns:repeat(3,1fr)}
+    .viz{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .viz::-webkit-scrollbar{display:none}
+    .viz svg{min-width:560px}
+  }
   @media(prefers-reduced-motion:reduce){.reveal{transition:none;opacity:1;transform:none}.scrollcue,.core,.spin,.pcard::after{animation:none}.chartline{stroke-dashoffset:0}}
 </style>
 </head>
@@ -207,7 +228,7 @@
         <g class="spin" fill="none" stroke="#202020" stroke-dasharray="2 9"><circle cx="500" cy="300" r="150"/></g>
         <g class="spin rev" fill="none" stroke="#1c1c1c" stroke-dasharray="2 11"><circle cx="500" cy="300" r="250"/></g>
         <g id="domDots" fill="#fff"></g>
-        <g font-family="Space Grotesk, sans-serif" font-size="15" fill="#cfcfcf" letter-spacing="1">
+        <g font-family="Space Grotesk, sans-serif" font-size="20" fill="#cfcfcf" letter-spacing="1">
           <text x="672" y="304">Body</text>
           <text x="575" y="452" text-anchor="middle">Movement</text>
           <text x="425" y="452" text-anchor="middle">Food</text>
@@ -251,18 +272,18 @@
     <h2 class="big reveal">Personal science, not correlations.</h2>
     <p class="lead reveal">Correlations are guesses &mdash; "you sleep worse when you drink" can't tell if the drink did it or a hard day caused both. So the harness borrows the method clinical medicine uses to decide if something works for one specific person: the <b style="color:#eee;font-weight:500">n-of-1 trial</b>, pre-registered, controlled, judged against a line drawn before the data arrives.</p>
     <div class="viz reveal">
-      <svg viewBox="0 0 1000 300" role="img" aria-label="An experiment crossing its success criterion and becoming a rule">
-        <line x1="70" y1="250" x2="950" y2="250" stroke="#222"/>
-        <line x1="70" y1="250" x2="70" y2="40" stroke="#222"/>
-        <line x1="70" y1="120" x2="950" y2="120" stroke="#4a4a4a" stroke-dasharray="5 6"/>
-        <text x="950" y="112" text-anchor="end" font-family="Inter, sans-serif" font-size="12" fill="#7c7c7c" letter-spacing="1">success criterion (pre-registered)</text>
-        <line x1="430" y1="40" x2="430" y2="250" stroke="#1f1f1f"/>
-        <text x="250" y="70" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#6a6a6a" letter-spacing="1">baseline</text>
-        <text x="690" y="70" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#6a6a6a" letter-spacing="1">change one variable</text>
-        <path d="M70 210 L210 206 L360 214 L430 210" fill="none" stroke="#5a5a5a" stroke-width="2"/>
-        <path class="chartline" d="M430 210 L560 196 L660 150 L780 104 L900 70" fill="none" stroke="#fff" stroke-width="2.5"/>
-        <circle cx="900" cy="70" r="5" fill="#fff"/>
-        <text x="900" y="50" text-anchor="end" font-family="Space Grotesk, sans-serif" font-size="14" fill="#fff" letter-spacing="1">MERGE &rarr; RULE</text>
+      <svg viewBox="0 0 1000 330" role="img" aria-label="An experiment crossing its pre-registered criterion and becoming a rule">
+        <line x1="70" y1="270" x2="950" y2="270" stroke="#222"/>
+        <line x1="70" y1="270" x2="70" y2="50" stroke="#222"/>
+        <line x1="70" y1="150" x2="950" y2="150" stroke="#4a4a4a" stroke-dasharray="5 6"/>
+        <text x="80" y="138" text-anchor="start" font-family="Inter, sans-serif" font-size="19" fill="#9a9a9a">success criterion &middot; set before the data</text>
+        <line x1="430" y1="60" x2="430" y2="270" stroke="#1f1f1f"/>
+        <text x="250" y="298" text-anchor="middle" font-family="Inter, sans-serif" font-size="18" fill="#7c7c7c">baseline</text>
+        <text x="640" y="298" text-anchor="middle" font-family="Inter, sans-serif" font-size="18" fill="#7c7c7c">change one variable</text>
+        <path d="M70 240 L210 236 L360 244 L430 240" fill="none" stroke="#5a5a5a" stroke-width="2.5"/>
+        <path class="chartline" d="M430 240 L545 230 L660 178 L800 116 L905 84" fill="none" stroke="#fff" stroke-width="3"/>
+        <circle cx="905" cy="84" r="6" fill="#fff"/>
+        <text x="905" y="58" text-anchor="end" font-family="Space Grotesk, sans-serif" font-size="22" fill="#fff" letter-spacing="1">MERGE &rarr; RULE</text>
       </svg>
     </div>
     <div class="grid4">
@@ -399,7 +420,7 @@
     <p class="lead reveal">Your whole life is a folder of plain Markdown you own &mdash; a layered pyramid where evidence flows up and nothing is asserted without a trail.</p>
     <div class="viz reveal">
       <svg viewBox="0 0 1000 330" role="img" aria-label="The knowledge pyramid, raw at the base and decisions at the top">
-        <g font-family="Space Grotesk, sans-serif" font-size="14" letter-spacing="1">
+        <g font-family="Space Grotesk, sans-serif" font-size="17" letter-spacing="1">
           <g><rect x="430" y="36" width="140" height="34" fill="#fff"/><text x="500" y="58" text-anchor="middle" fill="#000">06 outputs</text></g>
           <g><rect x="390" y="78" width="220" height="34" fill="#d8d8d8"/><text x="500" y="100" text-anchor="middle" fill="#000">05 decisions &middot; n-of-1</text></g>
           <g><rect x="345" y="120" width="310" height="34" fill="#9c9c9c"/><text x="500" y="142" text-anchor="middle" fill="#000">04 synthesis</text></g>
@@ -421,18 +442,34 @@
   </div>
 </section>
 
-<section class="vs">
+<section class="compare" data-mode="whoop">
   <div class="wrap">
-    <div class="eyebrow kicker reveal">Where it sits</div>
-    <h2 class="big reveal">Whoop is a brilliant sensor. This is the decision layer above it.</h2>
-    <div class="cols">
-      <div class="col reveal">
-        <div class="lab">Wearable journal</div>
-        <ul><li>Top metric is a body score</li><li>Evidence is correlation</li><li>Sees the body, nothing else</li><li>Output is dashboards</li><li>Reasoning is a black box</li></ul>
+    <div class="eyebrow kicker reveal">See the difference</div>
+    <h2 class="big reveal">Whoop tracks your body. This tracks your life.</h2>
+    <p class="lead reveal">A wearable is a brilliant sensor &mdash; for physiology. But the drivers of how a day actually feels live mostly outside its straps. Flip it:</p>
+    <div class="reveal">
+      <div class="toggle" role="tablist" aria-label="tracking mode">
+        <button id="bWhoop" class="on" role="tab" aria-selected="true">Whoop journal</button>
+        <button id="bHarness" role="tab" aria-selected="false">Harness</button>
       </div>
-      <div class="col you reveal">
-        <div class="lab">Harness Health</div>
-        <ul><li>Top metric is your life quality</li><li>Evidence is n-of-1 causation &rarr; rules</li><li>Body &times; work &times; people &times; food</li><li>Output is decisions and experiments</li><li>Cited, interrogable in plain language</li></ul>
+      <div class="meta"><b id="cmpCount">4</b> of 12 life domains in frame</div>
+      <div class="board" id="board">
+        <div class="tile phys"><div class="t">Recovery</div><div class="g">body</div></div>
+        <div class="tile phys"><div class="t">HRV</div><div class="g">body</div></div>
+        <div class="tile phys"><div class="t">Sleep</div><div class="g">body</div></div>
+        <div class="tile phys"><div class="t">Strain</div><div class="g">body</div></div>
+        <div class="tile life"><div class="t">Mood</div><div class="g">emotion</div></div>
+        <div class="tile life"><div class="t">Energy</div><div class="g">vitality</div></div>
+        <div class="tile life"><div class="t">Work</div><div class="g">focus</div></div>
+        <div class="tile life"><div class="t">People</div><div class="g">connection</div></div>
+        <div class="tile life"><div class="t">Food</div><div class="g">intake</div></div>
+        <div class="tile life"><div class="t">Meaning</div><div class="g">purpose</div></div>
+        <div class="tile life"><div class="t">Autonomy</div><div class="g">agency</div></div>
+        <div class="tile life"><div class="t">Growth</div><div class="g">flow</div></div>
+      </div>
+      <div class="verdict">
+        <div class="vl">Output</div>
+        <div class="vt" id="cmpVerdict">A recovery score. The things that most move how you feel &mdash; work, people, meaning &mdash; stay invisible.</div>
       </div>
     </div>
   </div>
@@ -509,6 +546,21 @@
   var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');
     e.target.querySelectorAll&&e.target.querySelectorAll('.cnt').forEach(countUp);obs.unobserve(e.target);}});},{threshold:0.14});
   document.querySelectorAll('.reveal').forEach(function(el,i){el.style.transitionDelay=((i%4)*70)+'ms';obs.observe(el);});
+
+  var cmp=document.querySelector('.compare'), bW=document.getElementById('bWhoop'), bH=document.getElementById('bHarness'),
+      cCount=document.getElementById('cmpCount'), cVerd=document.getElementById('cmpVerdict');
+  function setMode(m){
+    cmp.dataset.mode=m;
+    var on=m==='harness';
+    bH.classList.toggle('on',on); bW.classList.toggle('on',!on);
+    bH.setAttribute('aria-selected',on); bW.setAttribute('aria-selected',!on);
+    cCount.textContent=on?'12':'4';
+    cVerd.innerHTML=on
+      ? 'Is your life actually better? &mdash; plus the one experiment most likely to move it, proven on your own data.'
+      : 'A recovery score. The things that most move how you feel &mdash; work, people, meaning &mdash; stay invisible.';
+  }
+  bW.addEventListener('click',function(){setMode('whoop');});
+  bH.addEventListener('click',function(){setMode('harness');});
 })();
 </script>
 </body>
