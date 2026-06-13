@@ -168,8 +168,17 @@ caption needed; a caption simply overrides the guess:
 | stool | gut | **Bristol Stool Scale** — type, colour, frequency |
 
 Every message lands as a timestamped line `- 14:30 …` in `01_raw/health/YYYY-MM-DD.md`, so the *shape* of
-the day is preserved — not flattened into one average. Commands set the rest: `/north` for your
-north-star, `/exp` to run an n-of-1, `/week` · `/month` · `/year` for horizons.
+the day is preserved — not flattened into one average.
+
+**A gentle daily rhythm.** A morning body brief, a nudge or two with a question rotating across life
+domains, an evening recap — `/quiet` mutes the lot. **Commands set the rest:** `/north` your direction ·
+`/habit` what's already standing (15k steps, omega for years — so it's treated as baseline, not
+re-discovered) · `/exp` to run, extend, or `/exp slip` to log a lapse on an n-of-1 (capped at 3 active,
+for clean attribution) · `/week` · `/month` · `/year` for horizons.
+
+> Numbers stay where they belong: only Whoop signals are summarised numerically. Mood, energy, and
+> meaning are never averaged into a score — a single honest *"is life better?"* is more valid than an
+> arithmetic of parts.
 
 ## Three photo diaries, one on-device eye 🤳
 
