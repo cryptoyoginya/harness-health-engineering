@@ -164,6 +164,43 @@
     .viz::-webkit-scrollbar{display:none}
     .viz svg{min-width:560px}
   }
+  .pick{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+  .pick button{font-family:var(--head);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#cfcfcf;background:#070707;border:1px solid #2a2a2a;border-radius:999px;padding:11px 18px;cursor:pointer;transition:.2s}
+  .pick button:hover{border-color:#555}
+  .pick button.on{background:#fff;color:#000;border-color:#fff}
+  .simline{stroke:#fff;stroke-width:3;fill:none}
+  .simverdict{margin-top:30px;min-height:30px;font-family:var(--head);font-weight:500;font-size:clamp(17px,2.3vw,26px);letter-spacing:-.01em;display:flex;align-items:center;flex-wrap:wrap;gap:14px}
+  .simverdict .tag{font-size:12px;letter-spacing:.18em;text-transform:uppercase;border:1px solid #333;border-radius:999px;padding:5px 13px}
+  .simverdict .tag.merge{background:#fff;color:#000;border-color:#fff}
+  .simverdict .tag.revert{color:#8d8d8d}
+
+  .levers{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+  .lever{font-family:var(--head);font-size:12.5px;letter-spacing:.06em;color:#bdbdbd;background:#070707;border:1px solid #262626;border-radius:999px;padding:12px 18px;cursor:pointer;transition:.2s;user-select:none}
+  .lever:hover{border-color:#555}
+  .lever.on{background:#fff;color:#000;border-color:#fff}
+  .lever.neg.on{background:#2a2a2a;color:#fff;border-color:#444}
+  .lifebar{margin-top:36px}
+  .lifebar .top{display:flex;justify-content:space-between;align-items:baseline}
+  .lifebar .lab{font-size:13px;color:var(--mut);letter-spacing:.04em}
+  .lifebar .val{font-family:var(--head);font-size:clamp(30px,5vw,52px);font-weight:700;line-height:1}
+  .lifebar .track{height:12px;background:#161616;border-radius:999px;margin-top:14px;overflow:hidden}
+  .lifebar .fill{height:100%;background:#fff;width:30%;border-radius:999px;transition:width .55s cubic-bezier(.2,.7,.2,1)}
+  .leverNote{margin-top:24px;font-size:15px;color:#cfcfcf;min-height:24px}
+  .leverNote b{color:#fff;font-weight:500}
+
+  .calc{margin-top:32px;display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center}
+  .calc .ctrl{display:flex;flex-direction:column;gap:20px}
+  .calc .row{display:flex;align-items:center;gap:14px}
+  .calc label{font-size:13px;color:var(--mut);min-width:118px}
+  .calc input[type=range]{flex:1;accent-color:#fff;height:4px}
+  .calc .seg{display:inline-flex;border:1px solid #2a2a2a;border-radius:999px;padding:4px}
+  .calc .seg button{font-family:var(--head);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);background:transparent;border:0;cursor:pointer;padding:8px 15px;border-radius:999px;transition:.2s}
+  .calc .seg button.on{background:#fff;color:#000}
+  .calc .out{text-align:center;border:1px solid #242424;border-radius:16px;padding:36px 20px;background:#060606}
+  .calc .out .cv{font-family:var(--head);font-weight:700;font-size:clamp(34px,6vw,60px);line-height:1}
+  .calc .out .sub{font-size:13px;color:var(--mut);margin-top:14px}
+  @media(max-width:720px){.calc{grid-template-columns:1fr}}
+
   @media(prefers-reduced-motion:reduce){.reveal{transition:none;opacity:1;transform:none}.scrollcue,.core,.spin,.pcard::after{animation:none}.chartline{stroke-dashoffset:0}}
 </style>
 </head>
@@ -302,6 +339,35 @@
     </div>
     <p class="quote reveal">&ldquo;Creatine moved nothing for you in three weeks &mdash; stop paying for it.&rdquo;
       <span class="by">&mdash; the kind of sentence no wearable will ever say</span></p>
+  </div>
+</section>
+
+<section class="sim">
+  <div class="wrap">
+    <div class="eyebrow kicker reveal">Try it</div>
+    <h2 class="big reveal">Run an experiment. Watch it become a rule.</h2>
+    <p class="lead reveal">Pick a change. The harness holds one variable, measures against a line set in advance, and returns a verdict &mdash; merge, or honestly, revert.</p>
+    <div class="pick reveal" id="simPick">
+      <button data-i="0" class="on">Cut caffeine after 14:00</button>
+      <button data-i="1">Protein at breakfast</button>
+      <button data-i="2">No phone after 22:00</button>
+      <button data-i="3">Magnesium at night</button>
+    </div>
+    <div class="viz reveal">
+      <svg viewBox="0 0 1000 330" role="img" aria-label="Interactive experiment chart">
+        <line x1="70" y1="270" x2="950" y2="270" stroke="#222"/>
+        <line x1="70" y1="270" x2="70" y2="50" stroke="#222"/>
+        <line x1="70" y1="150" x2="950" y2="150" stroke="#4a4a4a" stroke-dasharray="5 6"/>
+        <text x="80" y="138" font-family="Inter, sans-serif" font-size="19" fill="#9a9a9a">success criterion</text>
+        <line x1="430" y1="60" x2="430" y2="270" stroke="#1f1f1f"/>
+        <text x="250" y="298" text-anchor="middle" font-family="Inter, sans-serif" font-size="18" fill="#7c7c7c">baseline</text>
+        <text x="660" y="298" text-anchor="middle" font-family="Inter, sans-serif" font-size="18" fill="#7c7c7c">change one variable</text>
+        <path d="M70 240 L210 236 L360 244 L430 240" fill="none" stroke="#5a5a5a" stroke-width="2.5"/>
+        <path id="simLine" class="simline" d="M430 240 L560 224 L690 168 L800 120 L905 86"/>
+        <circle id="simDot" cx="905" cy="86" r="6" fill="#fff"/>
+      </svg>
+    </div>
+    <div class="simverdict reveal" id="simVerdict"></div>
   </div>
 </section>
 
@@ -475,6 +541,46 @@
   </div>
 </section>
 
+<section class="lev">
+  <div class="wrap">
+    <div class="eyebrow kicker reveal">The killer question</div>
+    <h2 class="big reveal">Find your real lever.</h2>
+    <p class="lead reveal">Toggle what a week held. Watch what actually moves <em>"is life better?"</em> &mdash; and what just looks like progress.</p>
+    <div class="levers reveal" id="levers">
+      <button class="lever on" data-k="friends">Saw friends</button>
+      <button class="lever on" data-k="workout">3 workouts</button>
+      <button class="lever" data-k="meaning">Meaningful work</button>
+      <button class="lever" data-k="sleep">Slept 7h+</button>
+      <button class="lever" data-k="recovery">High recovery score</button>
+      <button class="lever neg" data-k="alcohol">Drank twice</button>
+    </div>
+    <div class="lifebar reveal">
+      <div class="top"><span class="lab">Is life better this week?</span><span class="val" id="lifeVal">&mdash;</span></div>
+      <div class="track"><div class="fill" id="lifeFill"></div></div>
+    </div>
+    <div class="leverNote reveal" id="leverNote"></div>
+  </div>
+</section>
+
+<section class="cost">
+  <div class="wrap">
+    <div class="eyebrow kicker reveal">The honest number</div>
+    <h2 class="big reveal">What it costs to run.</h2>
+    <p class="lead reveal">Capture is free &mdash; everything on-device. The only spend is the agent's analysis. Move the dials:</p>
+    <div class="calc reveal">
+      <div class="ctrl">
+        <div class="row"><label>Photos / week</label><input id="cPhotos" type="range" min="0" max="30" value="7" step="1" /><span id="cPhotosOut" style="font-family:var(--head);min-width:28px;text-align:right">7</span></div>
+        <div class="row"><label>Agent model</label><span class="seg"><button id="cSonnet" class="on">Sonnet</button><button id="cOpus">Opus</button></span></div>
+        <div class="row"><label>How you run it</label><span class="seg"><button id="cModeSub" class="on">Subscription</button><button id="cModeApi">API key</button></span></div>
+      </div>
+      <div class="out">
+        <div class="cv" id="cOut">$0</div>
+        <div class="sub" id="cOutSub">included in your plan &mdash; no per-photo charge</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="faqs">
   <div class="wrap">
     <div class="eyebrow kicker reveal">Honest answers</div>
@@ -561,6 +667,75 @@
   }
   bW.addEventListener('click',function(){setMode('whoop');});
   bH.addEventListener('click',function(){setMode('harness');});
+
+  // --- n-of-1 simulator ---
+  var EXPS=[
+    {d:'M430 240 L560 224 L690 168 L800 116 L905 84',  v:'merge',  t:'+35 min deep sleep &rarr; caffeine before 14:00 is now a standing rule.'},
+    {d:'M430 240 L560 230 L690 182 L800 132 L905 104', v:'merge',  t:'Steadier energy, fewer 4&nbsp;p.m. cravings &rarr; protein breakfast, kept.'},
+    {d:'M430 240 L560 218 L690 156 L800 104 L905 72',  v:'merge',  t:'+8&nbsp;pp recovery &rarr; lights-down by 22:00 sticks.'},
+    {d:'M430 240 L560 238 L690 236 L800 240 L905 237', v:'revert', t:'No measurable change in three weeks &rarr; dropped &mdash; and you stop paying for it.'},
+  ];
+  var simLine=document.getElementById('simLine'), simDot=document.getElementById('simDot'), simV=document.getElementById('simVerdict');
+  function endXY(d){var m=d.match(/L(\d+)\s+(\d+)$/);return m?[+m[1],+m[2]]:[905,86];}
+  function runSim(i){
+    var e=EXPS[i], xy=endXY(e.d);
+    simLine.setAttribute('d',e.d);
+    simDot.setAttribute('cx',xy[0]); simDot.setAttribute('cy',xy[1]);
+    var len=simLine.getTotalLength();
+    simLine.style.transition='none'; simLine.style.strokeDasharray=len; simLine.style.strokeDashoffset=len;
+    simLine.getBoundingClientRect();
+    simLine.style.transition='stroke-dashoffset 1.4s cubic-bezier(.2,.7,.2,1)'; simLine.style.strokeDashoffset='0';
+    simDot.style.opacity='0'; setTimeout(function(){simDot.style.transition='opacity .4s';simDot.style.opacity='1';},900);
+    var tag=e.v==='merge'?'<span class="tag merge">merge &rarr; rule</span>':'<span class="tag revert">revert &rarr; dropped</span>';
+    simV.innerHTML=tag+'<span>'+e.t+'</span>';
+  }
+  document.getElementById('simPick').addEventListener('click',function(ev){
+    var b=ev.target.closest('button'); if(!b)return;
+    this.querySelectorAll('button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on');
+    runSim(+b.dataset.i);
+  });
+  runSim(0);
+
+  // --- real-lever attribution ---
+  var W={friends:1.5,workout:1.3,meaning:1.2,sleep:0.9,recovery:0.3,alcohol:-0.9};
+  var LBL={friends:'connection',workout:'movement',meaning:'meaning',sleep:'sleep',recovery:'a recovery score'};
+  var lifeVal=document.getElementById('lifeVal'), lifeFill=document.getElementById('lifeFill'), lNote=document.getElementById('leverNote');
+  function recalc(){
+    var on=[].slice.call(document.querySelectorAll('#levers .lever.on')).map(function(b){return b.dataset.k;});
+    var v=1; on.forEach(function(k){v+=W[k];}); v=Math.max(1,Math.min(5,v));
+    lifeVal.textContent=v.toFixed(1); lifeFill.style.width=((v-1)/4*100)+'%';
+    var pos=on.filter(function(k){return W[k]>0;}).sort(function(a,b){return W[b]-W[a];});
+    var note;
+    if(!pos.length) note='Nothing that moves life is on &mdash; it sits near baseline.';
+    else if(pos[0]==='recovery') note='Recovery&rsquo;s high &mdash; but life barely moved. That&rsquo;s a <b>vanity metric</b>, not a lever.';
+    else note='Your real lever this week: <b>'+LBL[pos[0]]+'</b>'+(on.indexOf('recovery')>=0?' &mdash; not the recovery score.':'.');
+    if(on.indexOf('alcohol')>=0) note+=' Alcohol pulled it down.';
+    lNote.innerHTML=note;
+  }
+  document.getElementById('levers').addEventListener('click',function(ev){
+    var b=ev.target.closest('.lever'); if(!b)return; b.classList.toggle('on'); recalc();
+  });
+  recalc();
+
+  // --- cost calculator ---
+  var cst={photos:7,model:'sonnet',mode:'sub'};
+  var cOut=document.getElementById('cOut'), cOutSub=document.getElementById('cOutSub'), cPhotosOut=document.getElementById('cPhotosOut');
+  function calcCost(){
+    if(cst.mode==='sub'){ cOut.textContent='$0'; cOutSub.innerHTML='included in your plan &mdash; no per-photo charge'; return; }
+    var tok=cst.model==='sonnet'?1568:1600, price=cst.model==='sonnet'?3:5;
+    var monthly=cst.photos*tok/1e6*price*4.3;
+    cOut.textContent='$'+monthly.toFixed(2);
+    cOutSub.innerHTML='per month, just the photos &mdash; on a raw API key';
+  }
+  var cP=document.getElementById('cPhotos');
+  cP.addEventListener('input',function(){cst.photos=+cP.value;cPhotosOut.textContent=cP.value;calcCost();});
+  function seg(a,b,key,va,vb){
+    document.getElementById(a).addEventListener('click',function(){cst[key]=va;document.getElementById(a).classList.add('on');document.getElementById(b).classList.remove('on');calcCost();});
+    document.getElementById(b).addEventListener('click',function(){cst[key]=vb;document.getElementById(b).classList.add('on');document.getElementById(a).classList.remove('on');calcCost();});
+  }
+  seg('cSonnet','cOpus','model','sonnet','opus');
+  seg('cModeSub','cModeApi','mode','sub','api');
+  calcCost();
 })();
 </script>
 </body>
