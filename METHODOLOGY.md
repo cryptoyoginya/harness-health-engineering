@@ -28,14 +28,46 @@ individual*. Each experiment (`05_decisions/experiments/`) is pre-registered wit
 
 1. **Hypothesis** — a specific causal claim ("caffeine after 14:00 cuts deep sleep → lowers recovery → lowers mood").
 2. **One variable.** Exactly one thing changes; everything else is held steady — otherwise the effect
-   can't be attributed. This is the single most violated rule in casual self-experiments.
-3. **Baseline.** A measured "before", ideally a median over a stabilisation week, not a single day.
+   can't be attributed. This is the single most violated rule in casual self-experiments, so it is
+   enforced at the system level too: **only one experiment runs at a time** (parallel interventions on
+   one body confound each other — `MAX_ACTIVE = 1` in `scripts/experiments.mjs`).
+3. **Baseline.** A measured "before" — a median over a *stabilisation* week, not a single day, and not
+   taken from a low point (see regression to the mean, §2a).
 4. **Intervention period** with a fixed duration (typically 2–3 weeks).
-5. **Pre-defined success criterion.** The threshold is written *before* the data arrives, to prevent
-   post-hoc rationalisation (e.g. "+30 min sleep OR +10 pp recovery").
-6. **Verdict → rule.** At the end: `merge` (it worked → the change becomes a standing rule in
-   `CLAUDE.md`) or `revert` (it didn't → drop it, record why). Where feasible, a **washout** or
-   reversal period strengthens the inference.
+5. **One pre-defined primary metric + criterion.** Pick *one* outcome metric and write its threshold
+   *before* the data arrives. The threshold must clear the metric's ordinary week-to-week variability
+   (a "+10 pp recovery" win is meaningless if recovery already swings ±8 pp week to week). Secondary
+   metrics may be watched, but the **verdict is read off the primary one only** — a criterion that
+   fires on "metric A *OR* metric B *OR* C" is multiple comparisons in disguise and manufactures false
+   positives.
+6. **Verdict → rule, via the rubric below.** At the end: `merge` (it worked → the change becomes a
+   standing rule in `CLAUDE.md`) or `revert` (it didn't → drop it, record why). Where feasible, a
+   **washout / reversal** period (revert the variable, check the effect disappears) is the default — it
+   is what separates a causal claim from a correlation.
+
+### 2a. The three traps a verdict must clear
+
+The n-of-1 method is strong, but a careless verdict re-imports exactly the errors it was meant to kill:
+
+- **Regression to the mean.** Experiments are usually started *because things got bad* (red recovery, a
+  low week). Things then drift back toward your normal *on their own* — and a naive verdict credits the
+  intervention. Guard: baseline from a stable week, not a trough; demand an effect larger than normal
+  variability; prefer a washout that re-creates the effect on demand.
+- **Multiple comparisons.** Many metrics × many concurrent experiments = something will look
+  significant by chance. Guard: one active experiment, one primary metric, one pre-registered threshold.
+- **Unblinded expectation.** You know what you changed, so motivation and placebo move subjective
+  scores. Guard: lean on objective primary metrics where possible, and on the washout/reversal.
+
+### 2b. Verdict rubric — `merge` only if all hold
+
+A result is promoted to a standing rule **only when every box is checked** (otherwise `revert` or
+extend, and say why):
+
+1. The **primary** metric crossed its **pre-registered** threshold (not a secondary picked after the fact).
+2. The effect is **larger than the baseline's ordinary week-to-week noise**.
+3. **Regression to the mean** is ruled out (stable baseline, not a trough).
+4. A **washout/reversal** reproduced the effect — or its absence is logged and the confidence lowered.
+5. **Confounders** (slips, illness, life events, cycle, season) are named; uncontrolled ones → `UNKNOWN`.
 
 This turns "I tried a thing once" into evidence that compounds. The headline output is a sentence no
 wearable will ever produce: *"creatine moved nothing for you over three weeks — stop paying for it."*
