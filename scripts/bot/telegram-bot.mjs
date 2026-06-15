@@ -10,7 +10,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from '
 import { join } from 'node:path';
 import { ROOT, loadEnv, requireEnv, todayISO } from '../whoop/lib.mjs';
 import { fetchSnapshot, whoopBaseline, whoopTrend, whoopAdvice } from '../whoop/advice.mjs';
-import { formatExperiments, createExperiment, cancelExperiment, extendExperiment, activeExperiments, recordSlip, MAX_ACTIVE } from '../experiments.mjs';
+import { formatExperiments, createExperiment, cancelExperiment, extendExperiment, parkExperiment, activeExperiments, recordSlip, MAX_ACTIVE } from '../experiments.mjs';
 import { getNorthStar, setNorthStar } from '../northstar.mjs';
 import { listHabits, addHabit } from '../habits.mjs';
 
@@ -99,9 +99,10 @@ const EXP_HELP = [
   '• завести: /exp new <гипотеза> — напр. «/exp new убрать сахар после 18:00 — проверить сон»',
   '   срок по умолчанию 3 недели; свой задаётся фразой в конце: «… на 2 недели»',
   '• отменить: /exp stop <номер>',
-  '• продлить: /exp extend <номер> [недель] — по умолчанию +2',
+  '• отложить в бэклог: /exp park <номер> — освободить слот, не теряя черновик',
+  '• продлить / поднять из бэклога: /exp extend <номер> [недель] — по умолчанию +2',
   '• срыв: /exp slip <что нарушила> — фиксируем честно, это уточняет вывод',
-  `Максимум ${MAX_ACTIVE} активных за раз — меньше параллельных, чище атрибуция.`,
+  `Только ${MAX_ACTIVE} активный эксперимент за раз — одна переменная, иначе эффект не атрибутировать.`,
 ].join('\n');
 
 function readOffset() {
@@ -388,23 +389,40 @@ async function handle(msg) {
         await send(chatId, `Опиши гипотезу: /exp new <что меняешь и что проверяешь>\n\n${EXP_HELP}`);
         return;
       }
-      if (activeExperiments().length >= MAX_ACTIVE) {
-        await send(chatId, `Уже ${MAX_ACTIVE} активных эксперимента — это потолок. Чем меньше идёт параллельно, тем чище видно, что сработало (одна переменная за раз). Заверши или отмени один: /exp stop <номер>.`);
+      const running = activeExperiments();
+      if (running.length >= MAX_ACTIVE) {
+        const cur = running[0];
+        await send(chatId, `Уже идёт эксперимент (${cur?.title || 'активный'}) — это потолок: только одна переменная за раз, иначе не понять, что сработало. Заверши или отмени текущий: /exp stop <номер>.`);
         return;
       }
       // срок: «на N недель» в конце фразы → задаёт длительность, иначе 3 недели
       let weeks = 3, hyp = payload;
       const m = hyp.match(/\bна\s+(\d{1,2})\s*(?:недел[яьи]|нед)\.?\b/i);
       if (m) { weeks = Math.min(12, Math.max(1, +m[1])); hyp = hyp.replace(m[0], '').replace(/\s{2,}/g, ' ').trim(); }
-      const e = createExperiment(hyp, weeks);
+      let e;
+      try {
+        e = createExperiment(hyp, weeks);
+      } catch (err) {
+        if (err?.code === 'MAX_ACTIVE') {
+          await send(chatId, `Уже идёт эксперимент — только один за раз. Заверши или отмени текущий: /exp stop <номер>.`);
+          return;
+        }
+        throw err;
+      }
       appendInbox(`🧪 завела эксперимент ${e.title}`);
-      await send(chatId, `🧪 Завела ${e.title}\nЧерновик, срок ${weeks} нед (до ${e.endsOn}). Дизайн (baseline, критерий) агент уточнит на ближайшем разборе — так точнее.`);
+      await send(chatId, `🧪 Завела ${e.title}\nЧерновик, срок ${weeks} нед (до ${e.endsOn}). Дизайн (baseline, первичная метрика, критерий) агент уточнит на ближайшем разборе — так точнее.`);
       return;
     }
     if (['stop', 'cancel', 'отмена', 'стоп', '-'].includes(sub)) {
       if (!payload) { await send(chatId, 'Укажи номер: /exp stop 1 (номер виден в /exp)'); return; }
       const r = cancelExperiment(payload);
       await send(chatId, r ? `↩️ Отменила ${r.title} (revert).` : `Не нашла эксперимент «${payload}». Список — /exp`);
+      return;
+    }
+    if (['park', 'отложить', 'отложи', 'бэклог', 'backlog'].includes(sub)) {
+      if (!payload) { await send(chatId, 'Укажи номер: /exp park 1 (отложит в бэклог, слот освободится; поднять — /exp extend)'); return; }
+      const r = parkExperiment(payload);
+      await send(chatId, r ? `⏸️ Отложила ${r.title} в бэклог. Слот свободен — заведи новый или подними его позже: /exp extend <номер>.` : `Не нашла эксперимент «${payload}». Список — /exp`);
       return;
     }
     if (['extend', 'продлить', 'продли', 'prolong'].includes(sub)) {

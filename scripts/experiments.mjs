@@ -7,7 +7,9 @@ import { join } from 'node:path';
 import { ROOT } from './whoop/lib.mjs';
 
 const DIR = join(ROOT, '05_decisions', 'experiments');
-const FINISHED = new Set(['merged', 'reverted', 'done', 'closed', 'abandoned', 'archived', 'template']);
+// Статусы, которые НЕ считаются активными. `parked` — отложен в бэклог: ждёт своей очереди, не
+// нарушает потолок «один активный за раз». Поднять обратно — /exp extend (вернёт в active).
+const FINISHED = new Set(['merged', 'reverted', 'done', 'closed', 'abandoned', 'archived', 'template', 'parked']);
 
 function parseEndDate(body) {
   // «до 03.07.2026» или «до 03.07» (без года — берём ближайший будущий).
@@ -50,8 +52,11 @@ export function activeExperiments() {
   return listExperiments().filter((e) => !FINISHED.has(e.status));
 }
 
-// Потолок параллельных экспериментов: меньше параллельных → чище атрибуция (одна переменная за раз).
-export const MAX_ACTIVE = 3;
+// Потолок параллельных экспериментов: ровно ОДИН активный за раз.
+// Несколько одновременных интервенций на одном теле конфаундят друг друга — атрибутировать эффект
+// тогда невозможно. «Одна переменная за раз» обязана держаться и на уровне системы, не только внутри
+// одного эксперимента (см. METHODOLOGY.md §2).
+export const MAX_ACTIVE = 1;
 
 const dmy = (d) => `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
 
@@ -87,7 +92,16 @@ function nextId() {
 }
 
 // Завести черновик n-of-1 из одной фразы. Агент уточнит дизайн (baseline/метрики/критерий) позже.
+// Инвариант: один активный эксперимент за раз — отказываем, если потолок уже выбран (защита и для
+// вызова агентом напрямую, не только из бота).
 export function createExperiment(hypothesis, weeks = 3) {
+  const active = activeExperiments();
+  if (active.length >= MAX_ACTIVE) {
+    const err = new Error(`MAX_ACTIVE`);
+    err.code = 'MAX_ACTIVE';
+    err.active = active;
+    throw err;
+  }
   const id = nextId();
   const now = new Date();
   const end = new Date(now);
@@ -110,16 +124,26 @@ related:
 DECISION: ${hypothesis}.
 
 - **Гипотеза:** ${hypothesis}
-- **Что меняю:** <ровно одна переменная — уточнить с агентом>
-- **Baseline (до):** <медиана за стартовую неделю — уточнить>
+- **Что меняю:** <ровно ОДНА переменная — уточнить с агентом>. Остальное держу неизменным.
+- **Baseline (до):** <медиана за стабилизационную неделю, НЕ один плохой день — уточнить>.
+  ⚠️ Не стартовать от ямы: если запускаю «на дне», улучшение может быть регрессией к среднему, а не эффектом.
 - **Срок:** ${weeks} недели (до ${dmy(end)})
-- **Метрики:** <уточнить — Whoop и/или субъективно>
-- **Критерий успеха (пред-регистрация):** <порог ДО данных — уточнить>
+- **Первичная метрика (одна!):** <одна метрика-исход, выбранная ДО данных — уточнить>.
+  Вторичные можно смотреть, но вывод выносим по первичной (иначе множественные сравнения раздувают ложные срабатывания).
+- **Критерий успеха (пред-регистрация):** <порог по первичной метрике, записанный ДО данных, выше обычного недельного разброса — уточнить>
+- **Washout / реверс:** <по умолчанию ДА — вернуть переменную в конце и проверить, что эффект уходит; без этого вывод слабее>
 
-## Итог (заполнить по окончании)
+## Итог (заполнить по окончании) — рубрика вердикта
+
+Вердикт \`merge\` только если выполнены ВСЕ пункты, иначе \`revert\` или \`продлить\`:
+- [ ] **Первичная метрика** прошла пред-зарегистрированный порог (не вторичная, подобранная постфактум).
+- [ ] Эффект **больше обычного недельного разброса** baseline (не шум).
+- [ ] **Регрессия к среднему** исключена (baseline был стабильным, не «дном»).
+- [ ] **Washout/реверс** подтвердил, что без переменной эффект уходит (или честно отмечено, что не проверяли → confidence ниже).
+- [ ] **Confounders** названы (срывы, болезнь, события, цикл) — неконтролируемые помечены UNKNOWN.
 
 - **Результат:** <цифры после vs baseline vs критерий>
-- DECISION: merge (→ правило в \`CLAUDE.md\`) / revert / продлить.
+- DECISION: merge (→ правило в \`CLAUDE.md\`) / revert (откат, записать почему) / продлить.
 `;
   if (!existsSync(DIR)) mkdirSync(DIR, { recursive: true });
   writeFileSync(join(DIR, `EXP-${id}.md`), body);
@@ -147,6 +171,22 @@ export function cancelExperiment(arg) {
     ? body.replace(/^status:.*/m, 'status: reverted')
     : body.replace(/^---\n/, '---\nstatus: reverted\n');
   body = body.replace(/\n*$/, '\n') + `\n- DECISION: revert — отменён вручную ${ddmmyyyy()}.\n`;
+  writeFileSync(p, body);
+  return { title };
+}
+
+// Отложить эксперимент в бэклог (status parked) — освобождает единственный активный слот, не теряя
+// черновик. Поднять обратно — extendExperiment (вернёт в active).
+export function parkExperiment(arg) {
+  const file = findExpFile(arg);
+  if (!file) return null;
+  const p = join(DIR, file);
+  let body = readFileSync(p, 'utf8');
+  const title = body.match(/^#\s+(EXP-.+)$/m)?.[1] || file.replace(/\.md$/, '');
+  body = /^status:/m.test(body)
+    ? body.replace(/^status:.*/m, 'status: parked')
+    : body.replace(/^---\n/, '---\nstatus: parked\n');
+  body = body.replace(/\n*$/, '\n') + `\n- ⏸️ отложен в бэклог ${ddmmyyyy()} (ждёт своей очереди — один активный за раз).\n`;
   writeFileSync(p, body);
   return { title };
 }
