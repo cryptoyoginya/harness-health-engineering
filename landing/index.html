@@ -201,10 +201,34 @@
   .calc .out .sub{font-size:13px;color:var(--mut);margin-top:14px}
   @media(max-width:720px){.calc{grid-template-columns:1fr}}
 
-  @media(prefers-reduced-motion:reduce){.reveal{transition:none;opacity:1;transform:none}.scrollcue,.core,.spin,.pcard::after{animation:none}.chartline{stroke-dashoffset:0}}
+  .progress{position:fixed;top:0;left:0;right:0;height:2px;z-index:60;background:transparent;pointer-events:none}
+  .progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#555,#fff)}
+  .feat .f,.grid4 .cell,.steps .st,.pcard,.statgrid .s,.calc .out,.verdict{transition:transform .45s cubic-bezier(.2,.7,.2,1),border-color .4s,background .4s,box-shadow .4s}
+  .feat .f:hover,.grid4 .cell:hover,.steps .st:hover{transform:translateY(-4px);background:#080808}
+  .pcard:hover{transform:translateY(-5px);border-color:#3a3a3a;box-shadow:0 18px 50px -28px rgba(255,255,255,.18)}
+  .statgrid .s:hover{background:#070707}
+  .tilt{will-change:transform}
+  .btn{position:relative;overflow:hidden}
+  .btn::after{content:"";position:absolute;top:0;left:-130%;width:60%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-18deg);transition:left .65s ease}
+  .btn:hover::after{left:150%}
+  .btn.ghost::after{background:linear-gradient(100deg,transparent,rgba(255,255,255,.12),transparent)}
+  .hero .ping{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);border:1px solid rgba(255,255,255,.12);border-radius:50%;animation:ping 4.6s cubic-bezier(.2,.6,.3,1) infinite;pointer-events:none;z-index:1}
+  .hero .ping.p2{animation-delay:1.5s}.hero .ping.p3{animation-delay:3s}
+  @keyframes ping{0%{width:130px;height:130px;opacity:.55}100%{width:780px;height:780px;opacity:0}}
+  .statgrid .s.in .num{animation:statpop .7s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes statpop{0%{transform:scale(.94);opacity:.3}100%{transform:scale(1);opacity:1}}
+  @media(hover:none){.btn::after{display:none}}
+  @media(prefers-reduced-motion:reduce){
+    .reveal{transition:none;opacity:1;transform:none}
+    .scrollcue,.core,.spin,.pcard::after,.hero .ping,.statgrid .s.in .num{animation:none}
+    .chartline{stroke-dashoffset:0}
+    .hero .ping{display:none}.btn::after{display:none}.tilt{transform:none!important}
+  }
 </style>
 </head>
 <body>
+
+<div class="progress" aria-hidden="true"><span id="prog"></span></div>
 
 <nav>
   <div class="brand">Harness <span>/ Health</span></div>
@@ -214,6 +238,9 @@
 <header class="hero">
   <canvas id="dna"></canvas>
   <div class="core"></div>
+  <div class="ping" aria-hidden="true"></div>
+  <div class="ping p2" aria-hidden="true"></div>
+  <div class="ping p3" aria-hidden="true"></div>
   <div class="vignette"></div>
   <div class="inner">
     <div class="eyebrow">Harness &middot; Health Engineering</div>
@@ -736,6 +763,24 @@
   seg('cSonnet','cOpus','model','sonnet','opus');
   seg('cModeSub','cModeApi','mode','sub','api');
   calcCost();
+
+  // --- scroll progress bar ---
+  var prog=document.getElementById('prog');
+  function onScroll(){var h=document.documentElement,max=h.scrollHeight-h.clientHeight;prog.style.width=(max>0?(h.scrollTop/max*100):0)+'%';}
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+  // --- premium pointer tilt on showcase cards ---
+  var rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches, fine=window.matchMedia('(hover:hover)').matches;
+  if(!rm && fine){
+    document.querySelectorAll('.feat .f, .grid4 .cell, .steps .st, .pcard').forEach(function(card){
+      card.classList.add('tilt');
+      card.addEventListener('pointermove',function(e){
+        var r=card.getBoundingClientRect(), px=(e.clientX-r.left)/r.width-0.5, py=(e.clientY-r.top)/r.height-0.5;
+        card.style.transform='perspective(900px) rotateX('+(-py*4.5).toFixed(2)+'deg) rotateY('+(px*4.5).toFixed(2)+'deg) translateY(-4px)';
+      });
+      card.addEventListener('pointerleave',function(){card.style.transform='';});
+    });
+  }
 })();
 </script>
 </body>
