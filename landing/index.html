@@ -230,6 +230,44 @@
   .statgrid .s.in .num{animation:statpop .7s cubic-bezier(.2,.7,.2,1) both}
   @keyframes statpop{0%{transform:scale(.94);opacity:.3}100%{transform:scale(1);opacity:1}}
   @media(hover:none){.btn::after{display:none}}
+  /* ===== Premium glass + ambient light (Apple / visionOS, monochrome) ===== */
+  body{background:#060607}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(38% 30% at 16% 6%, rgba(255,255,255,.06), transparent 72%),
+      radial-gradient(34% 30% at 88% 24%, rgba(255,255,255,.05), transparent 72%),
+      radial-gradient(48% 40% at 50% 106%, rgba(255,255,255,.055), transparent 72%);}
+
+  .bento .b,.steps .st,.pcard,.calc .out,.faq details{
+    background:rgba(255,255,255,.035);
+    -webkit-backdrop-filter:blur(28px) saturate(150%); backdrop-filter:blur(28px) saturate(150%);
+    border:1px solid rgba(255,255,255,.09); border-radius:24px;
+    box-shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 34px 64px -42px rgba(0,0,0,.9);
+  }
+  .bento .b::before,.steps .st::before,.pcard::before{content:"";position:absolute;inset:0;border-radius:inherit;
+    background:linear-gradient(180deg,rgba(255,255,255,.07),transparent 42%);pointer-events:none;z-index:0}
+  .bento .b>*,.steps .st>*,.pcard>*{position:relative;z-index:1}
+  .bento .b:hover,.steps .st:hover,.pcard:hover,.calc .out:hover{
+    background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.2);
+    box-shadow:0 1px 0 rgba(255,255,255,.08) inset, 0 40px 80px -36px rgba(0,0,0,.95);
+  }
+  .verdict{background:rgba(255,255,255,.04);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,.08);border-left:2px solid #fff;border-radius:0 18px 18px 0}
+
+  .steps .st{position:relative;overflow:hidden;min-height:240px}
+  .steps .st .stnum{position:absolute;top:8px;right:22px;font-family:var(--head);font-weight:700;
+    font-size:84px;line-height:1;color:rgba(255,255,255,.06);z-index:0}
+  .steps .st .no{font-family:var(--head);font-size:13px;color:var(--mut);letter-spacing:.2em;text-transform:uppercase}
+  .steps .st h3{font-size:23px;margin:14px 0 12px}
+  .steps .st svg{display:none}
+
+  .faq details{margin-bottom:12px;padding:0 24px;border-bottom:0}
+  .faq{border-top:0}
+  .faq summary{padding:24px 0}
+
+  .pcard{border-radius:22px}
+  .nav a.cta,.btn{border-radius:999px}
+
   @media(prefers-reduced-motion:reduce){
     .reveal{transition:none;opacity:1;transform:none}
     .scrollcue,.core,.spin,.pcard::after,.hero .ping,.statgrid .s.in .num{animation:none}
@@ -416,52 +454,9 @@
     <div class="eyebrow kicker reveal">How it works</div>
     <h2 class="big reveal">Capture loose. Reason tight. Decide.</h2>
     <div class="steps">
-      <div class="st reveal">
-        <div class="no">01 &middot; Capture</div>
-        <h3>Live, on the fly</h3>
-        <p>Text, voice, or a photo &mdash; selfie, food, stool auto-sorted on-device. Several a day. Zero forms.</p>
-        <svg viewBox="0 0 300 74" role="img" aria-label="three inputs into a log">
-          <g font-family="Space Grotesk, sans-serif" font-size="11" fill="#cfcfcf" letter-spacing="1">
-            <rect x="6" y="6" width="78" height="20" rx="10" fill="#0a0a0a" stroke="#2e2e2e"/><text x="45" y="20" text-anchor="middle">TEXT</text>
-            <rect x="6" y="28" width="78" height="20" rx="10" fill="#0a0a0a" stroke="#2e2e2e"/><text x="45" y="42" text-anchor="middle">VOICE</text>
-            <rect x="6" y="50" width="78" height="20" rx="10" fill="#0a0a0a" stroke="#2e2e2e"/><text x="45" y="64" text-anchor="middle">PHOTO</text>
-          </g>
-          <path d="M84 16 C150 16 150 37 210 37" fill="none" stroke="#2a2a2a"/>
-          <path d="M84 38 L210 37" fill="none" stroke="#2a2a2a"/>
-          <path d="M84 60 C150 60 150 37 210 37" fill="none" stroke="#2a2a2a"/>
-          <circle cx="210" cy="37" r="26" fill="#0c0c0c" stroke="#3a3a3a"/>
-          <text x="210" y="41" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="10" fill="#fff" letter-spacing="1">LOG</text>
-          <circle r="2.6" fill="#fff"><animateMotion dur="2.4s" repeatCount="indefinite" path="M84 38 L210 37"/></circle>
-        </svg>
-      </div>
-      <div class="st reveal">
-        <div class="no">02 &middot; Synthesise</div>
-        <h3>Cited, on-device memory</h3>
-        <p>Hybrid RAG retrieves your real history; the agent finds patterns you can't see and writes them down with sources.</p>
-        <svg viewBox="0 0 300 74" role="img" aria-label="document with citations">
-          <rect x="96" y="8" width="108" height="58" rx="6" fill="#0a0a0a" stroke="#2e2e2e"/>
-          <line x1="110" y1="24" x2="190" y2="24" stroke="#444" stroke-width="2"/>
-          <line x1="110" y1="34" x2="178" y2="34" stroke="#333" stroke-width="2"/>
-          <line x1="110" y1="44" x2="190" y2="44" stroke="#444" stroke-width="2"/>
-          <line x1="110" y1="54" x2="166" y2="54" stroke="#333" stroke-width="2"/>
-          <circle cx="196" cy="24" r="4" fill="#fff"/><circle cx="184" cy="44" r="4" fill="#fff"/>
-          <text x="150" y="74" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#666">FACT / INFERENCE · [source]</text>
-        </svg>
-      </div>
-      <div class="st reveal">
-        <div class="no">03 &middot; Decide</div>
-        <h3>Experiments become rules</h3>
-        <p>A hypothesis turns into an n-of-1; a verdict turns into a standing rule. Knowledge that compounds.</p>
-        <svg viewBox="0 0 300 74" role="img" aria-label="hypothesis to rule">
-          <g font-family="Space Grotesk, sans-serif" font-size="10" letter-spacing="1">
-            <rect x="20" y="26" width="90" height="22" rx="11" fill="#0a0a0a" stroke="#2e2e2e"/><text x="65" y="41" text-anchor="middle" fill="#cfcfcf">HYPOTHESIS</text>
-            <rect x="190" y="26" width="90" height="22" rx="11" fill="#fff"/><text x="235" y="41" text-anchor="middle" fill="#000">RULE</text>
-          </g>
-          <line x1="112" y1="37" x2="186" y2="37" stroke="#3a3a3a" marker-end="url(#hr)"/>
-          <defs><marker id="hr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M2 1 L8 5 L2 9" fill="none" stroke="#fff" stroke-width="1.5"/></marker></defs>
-          <text x="150" y="22" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#666">merge</text>
-        </svg>
-      </div>
+      <div class="st reveal"><span class="stnum">01</span><div class="no">Capture</div><h3>Live, on the fly</h3><p>Text, voice, or a photo &mdash; selfie, food, stool auto-sorted on-device. Several a day. Zero forms.</p></div>
+      <div class="st reveal"><span class="stnum">02</span><div class="no">Synthesise</div><h3>Cited, on-device memory</h3><p>Hybrid RAG retrieves your real history; the agent finds patterns you can&rsquo;t see and writes them down with sources.</p></div>
+      <div class="st reveal"><span class="stnum">03</span><div class="no">Decide</div><h3>Experiments become rules</h3><p>A hypothesis turns into an n-of-1; a verdict turns into a standing rule &mdash; knowledge that compounds.</p></div>
     </div>
   </div>
 </section>
