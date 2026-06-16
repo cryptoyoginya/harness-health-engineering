@@ -111,8 +111,9 @@ can't:
 | Guardrail | — | **flags metric-tyranny: proxy up, life flat → that's a fail** |
 
 The discipline is the product. The data is just raw material. The full scientific rationale —
-n-of-1 design, surrogate-endpoint failure, evidence labelling, confounding — is in
-[`METHODOLOGY.md`](./METHODOLOGY.md).
+n-of-1 design, surrogate-endpoint failure, evidence labelling, confounding — plus a
+**[clinician-facing brief with references](./METHODOLOGY.md#8-for-clinicians--the-evidence-pedigree)**
+is in [`METHODOLOGY.md`](./METHODOLOGY.md).
 
 ## How it works
 

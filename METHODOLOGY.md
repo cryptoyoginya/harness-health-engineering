@@ -121,4 +121,58 @@ explicitly (the `UNKNOWN` label exists for this), and the remedy for an unresolv
 - **Not medicine.** The system never diagnoses or treats. Worrying signals resolve to one
   recommendation: see a specialist.
 
+## 8. For clinicians — the evidence pedigree
+
+Plainly: this is **not a medical device, not diagnostic, not regulated clinical decision support.** It is
+a structured **n-of-1 self-experimentation and self-management** instrument that enforces a recognised
+methodology and produces an auditable, cited record a clinician can read. Defend the *method*, not the app.
+
+**Why the method has standing in evidence-based medicine**
+
+- **N-of-1 trials are a recognised design, not a hobby.** In the OCEBM 2011 Levels of Evidence, the
+  n-of-1 RCT is ranked **Level 1 for an individual treatment decision** — when the question is "does this
+  work for *this* person," it outranks population RCTs. Foundational and methodological sources: Guyatt
+  et al. (*NEJM* 1986); the AHRQ *Design and Implementation of N-of-1 Trials: A User's Guide* (Kravitz &
+  Duan, 2014); Nikles & Mitchell, *The Essential Guide to N-of-1 Trials in Health* (Springer, 2015);
+  reporting standard **CENT 2015** (CONSORT extension, Vohra et al., *BMJ* 2015). The validity-bearing
+  design elements — pre-registered hypothesis and threshold, single variable, stable baseline,
+  washout/reversal — are exactly what §2–2b enforce.
+- **Outcome over surrogate is the conservative position.** Recovery/HRV are surrogate endpoints, and
+  medicine itself warns that surrogates don't reliably track real outcomes. Anchoring on a patient-centred
+  outcome aligns with the **patient-reported outcome (PRO)** tradition (FDA PRO guidance, 2009) and
+  validated wellbeing instruments such as the **WHO-5** (Topp et al., 2015).
+- **Momentary capture** of mood/energy/events is a lightweight **ecological momentary assessment**
+  (Shiffman, Stone & Hufford, *Annu Rev Clin Psychol* 2008), reducing recall bias vs retrospective recall.
+- **Evidence grading** (`FACT`/`INFERENCE`/`ASSUMPTION`/`UNKNOWN`) applies evidence-appraisal logic to a
+  personal log and mirrors the cognitive-behavioural separation of event from interpretation.
+
+**How to position it in a clinical conversation**
+
+1. It **augments, not replaces** care — it hands the clinician a clean, pre-registered protocol plus data
+   ("here is the hypothesis, the criterion fixed before the data, and the response"), not "I think it helped."
+2. It **enforces discipline** ordinary self-tracking lacks: one variable, one primary metric, a threshold
+   set in advance, a verdict rubric (§2b).
+3. It is **transparent and auditable** — plain Markdown, every claim cited — unlike black-box wellness apps.
+4. It is **explicitly non-diagnostic**, with a hard escalation rule: any worrying signal → see a specialist.
+
+**Stated limits (see §7) are part of the pitch.** n = 1 (no generalisability), rarely blinded
+(placebo/expectation), consumer-grade sensors (trends, not diagnostics), and LLM synthesis that is
+citation-constrained but not infallible. Naming these is what makes the case evidence-based, not promotional.
+
+### References
+
+- OCEBM Levels of Evidence Working Group. *The Oxford 2011 Levels of Evidence.* Oxford Centre for Evidence-Based Medicine.
+- Guyatt G, Sackett D, Taylor DW, et al. *Determining optimal therapy — randomized trials in individual patients.* N Engl J Med. 1986;314(14):889–892.
+- Kravitz RL, Duan N, eds. *Design and Implementation of N-of-1 Trials: A User's Guide.* AHRQ Publication No. 13(14)-EHC122-EF. 2014.
+- Nikles J, Mitchell G, eds. *The Essential Guide to N-of-1 Trials in Health.* Springer; 2015.
+- Vohra S, Shamseer L, Sampson M, et al. *CONSORT extension for reporting N-of-1 trials (CENT) 2015.* BMJ. 2015;350:h1738.
+- US FDA. *Guidance for Industry: Patient-Reported Outcome Measures.* 2009.
+- Topp CW, Østergaard SD, Søndergaard S, Bech P. *The WHO-5 Well-Being Index: a systematic review.* Psychother Psychosom. 2015;84(3):167–176.
+- Shiffman S, Stone AA, Hufford MR. *Ecological momentary assessment.* Annu Rev Clin Psychol. 2008;4:1–32.
+- Strathern M. *'Improving ratings': audit in the British University system.* European Review. 1997;5(3):305–321. (Goodhart's law.)
+
+> Citations are given as commonly referenced; verify exact pages/edition before any formal presentation.
+
+---
+
 The discipline is the product. The data is just the raw material.
