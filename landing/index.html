@@ -37,6 +37,7 @@
 
   .hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden}
   #dna{position:absolute;inset:0;width:100%;height:100%;opacity:.38;filter:blur(.2px)}
+  #gl{position:absolute;inset:0;width:100%;height:100%;z-index:1}
   .hero .vignette{position:absolute;inset:0;background:radial-gradient(120% 95% at 50% 42%,transparent 22%,rgba(0,0,0,.55) 60%,#000 88%);pointer-events:none}
   .hero .core{position:absolute;left:50%;top:46%;width:620px;height:620px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.10) 0%,transparent 62%);animation:breathe 6s ease-in-out infinite;pointer-events:none}
   @keyframes breathe{0%,100%{opacity:.6;transform:translate(-50%,-50%) scale(.96)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}}
@@ -98,6 +99,17 @@
   .feat .f .ix{font-family:var(--head);font-size:12px;color:var(--dim);letter-spacing:.22em}
   .feat .f h3{font-size:18px;margin:16px 0 9px;text-transform:none;letter-spacing:0}
   .feat .f p{font-size:13.5px;color:var(--mut)}
+
+  .bento{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:minmax(140px,auto);gap:14px;margin-top:30px}
+  .bento .b{position:relative;background:#070707;border:1px solid #1f1f1f;border-radius:20px;padding:30px 26px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;transition:transform .45s cubic-bezier(.2,.7,.2,1),border-color .4s,background .4s}
+  .bento .b:hover{border-color:#3a3a3a;background:#0a0a0a}
+  .bento .b .ix{font-family:var(--head);font-size:12px;color:var(--dim);letter-spacing:.22em;text-transform:uppercase}
+  .bento .b h3{font-size:clamp(18px,2.2vw,26px);margin:14px 0 8px;text-transform:none;letter-spacing:-.01em}
+  .bento .b p{font-size:14px;color:var(--mut);max-width:44ch}
+  .bento .b.hero-b h3{font-size:clamp(24px,3.2vw,40px)}
+  .bento .b .glowdot{position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.07),transparent 65%);pointer-events:none}
+  .w6{grid-column:span 6}.w4{grid-column:span 4}.w3{grid-column:span 3}.w2{grid-column:span 2}.h2{grid-row:span 2}
+  @media(max-width:860px){.bento{grid-template-columns:1fr}.bento .b{grid-column:auto!important;grid-row:auto!important}}
 
   .stack{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:30px}
   .stack .row{background:#000;padding:20px 22px}
@@ -237,6 +249,7 @@
 
 <header class="hero">
   <canvas id="dna"></canvas>
+  <canvas id="gl"></canvas>
   <div class="core"></div>
   <div class="ping" aria-hidden="true"></div>
   <div class="ping p2" aria-hidden="true"></div>
@@ -495,13 +508,13 @@
   <div class="wrap">
     <div class="eyebrow kicker reveal">What it does</div>
     <h2 class="big reveal">A system, not a chatbot.</h2>
-    <div class="feat">
-      <div class="f reveal"><div class="ix">Capture</div><h3>Text, voice, photo</h3><p>Selfie, food, and stool photos sort themselves &mdash; no captions, no forms.</p></div>
-      <div class="f reveal"><div class="ix">Rhythm</div><h3>A gentle daily nudge</h3><p>Morning brief, a question or two across life domains, an evening recap. Mute it anytime.</p></div>
-      <div class="f reveal"><div class="ix">Weekly</div><h3>The verdict</h3><p>The agent reads your week and scores it against your north-star.</p></div>
-      <div class="f reveal"><div class="ix">Causal</div><h3>n-of-1 experiments</h3><p>Run, extend, or log a lapse. One active at a time &mdash; truly one variable, so the effect is attributable.</p></div>
-      <div class="f reveal"><div class="ix">Baseline</div><h3>Knows your habits</h3><p>Tell it what's already standing &mdash; 15k steps, omega for years &mdash; and it won't re-discover them.</p></div>
-      <div class="f reveal"><div class="ix">Horizons</div><h3>Week &middot; month &middot; year</h3><p>Watch quality of life move over seasons as data compounds.</p></div>
+    <div class="bento">
+      <div class="b hero-b w4 h2 reveal"><span class="glowdot"></span><div class="ix">Capture</div><h3>Text, voice, photo &mdash; sorted on-device</h3><p>Talk, type, or snap. Selfie, food, and stool photos route themselves into the right diary with on-device vision &mdash; no captions, no forms, nothing uploaded.</p></div>
+      <div class="b w2 h2 reveal"><span class="glowdot"></span><div class="ix">Rhythm</div><h3>A gentle daily nudge</h3><p>Morning brief, a question or two across life domains, an evening recap. Mute it anytime.</p></div>
+      <div class="b w3 reveal"><div class="ix">Weekly</div><h3>The verdict</h3><p>The agent reads your week and scores it against your north-star.</p></div>
+      <div class="b w3 reveal"><div class="ix">Causal</div><h3>n-of-1 experiments</h3><p>Run, extend, or log a lapse. One active at a time &mdash; truly one variable, so the effect is attributable.</p></div>
+      <div class="b w3 reveal"><div class="ix">Baseline</div><h3>Knows your habits</h3><p>Tell it what&rsquo;s already standing &mdash; 15k steps, omega for years &mdash; and it won&rsquo;t re-discover them.</p></div>
+      <div class="b w3 reveal"><div class="ix">Horizons</div><h3>Week &middot; month &middot; year</h3><p>Watch quality of life move over seasons as data compounds.</p></div>
     </div>
   </div>
 </section>
@@ -640,11 +653,16 @@
   </div>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function(){
-  var c=document.getElementById('dna'), ctx=c.getContext('2d'), W=0,H=0,DPR=1;
+  // 3D hero: тысячи частиц-ДНК на WebGL (Three.js), фолбэк — 2D-канвас #dna.
+  var useGL = (typeof THREE !== 'undefined');
+  if (useGL) { try { initGL(); document.getElementById('dna').style.display='none'; } catch(e){ useGL=false; } }
+
+  var c=document.getElementById('dna'), ctx=useGL?null:c.getContext('2d'), W=0,H=0,DPR=1;
   function resize(){DPR=Math.min(2,window.devicePixelRatio||1);W=c.clientWidth;H=c.clientHeight;c.width=W*DPR;c.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);}
-  window.addEventListener('resize',resize);resize();
+  if(!useGL){ window.addEventListener('resize',resize);resize(); }
   var N=150,turns=4.2,pairs=[];
   for(var i=0;i<N;i++){var f=i/(N-1);pairs.push({ang:f*Math.PI*2*turns,y:(f-0.5)*2});}
   function dot(x,y,d){var r=1.2+2*((d+1)/2),a=0.06+0.20*((d+1)/2);ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,'+a+')';ctx.fill();}
@@ -660,7 +678,7 @@
       dot(n.x0,n.y,n.d0);dot(n.x1,n.y,n.d1);}
     requestAnimationFrame(frame);
   }
-  requestAnimationFrame(frame);
+  if(!useGL) requestAnimationFrame(frame);
 
   var g=document.getElementById('domDots');
   var pos=[[650,300],[575,430],[425,430],[350,300],[425,170],[575,170],[716,425],[500,550],[284,425],[284,175],[500,50],[716,175]];
@@ -772,14 +790,58 @@
   // --- premium pointer tilt on showcase cards ---
   var rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches, fine=window.matchMedia('(hover:hover)').matches;
   if(!rm && fine){
-    document.querySelectorAll('.feat .f, .grid4 .cell, .steps .st, .pcard').forEach(function(card){
+    document.querySelectorAll('.bento .b, .grid4 .cell, .steps .st, .pcard').forEach(function(card){
       card.classList.add('tilt');
       card.addEventListener('pointermove',function(e){
         var r=card.getBoundingClientRect(), px=(e.clientX-r.left)/r.width-0.5, py=(e.clientY-r.top)/r.height-0.5;
-        card.style.transform='perspective(900px) rotateX('+(-py*4.5).toFixed(2)+'deg) rotateY('+(px*4.5).toFixed(2)+'deg) translateY(-4px)';
+        card.style.transform='perspective(900px) rotateX('+(-py*4).toFixed(2)+'deg) rotateY('+(px*4).toFixed(2)+'deg) translateY(-4px)';
       });
       card.addEventListener('pointerleave',function(){card.style.transform='';});
     });
+    // magnetic buttons
+    document.querySelectorAll('.btn, nav a.cta').forEach(function(btn){
+      btn.addEventListener('pointermove',function(e){
+        var r=btn.getBoundingClientRect();
+        btn.style.transform='translate('+((e.clientX-r.left-r.width/2)*0.25).toFixed(1)+'px,'+((e.clientY-r.top-r.height/2)*0.3).toFixed(1)+'px)';
+      });
+      btn.addEventListener('pointerleave',function(){btn.style.transform='';});
+    });
+  }
+
+  // --- WebGL 3D hero (Three.js) ---
+  function initGL(){
+    var cv=document.getElementById('gl');
+    var renderer=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true});
+    renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+    var scene=new THREE.Scene(); scene.fog=new THREE.FogExp2(0x000000,0.09);
+    var cam=new THREE.PerspectiveCamera(55,1,0.1,100); cam.position.set(0,0,15);
+    var grp=new THREE.Group(); scene.add(grp);
+    // double helix
+    var N=2800,R=2.6,turns=7,Hh=12,pos=new Float32Array(N*3);
+    for(var i=0;i<N;i++){var t=i/N,ang=t*Math.PI*2*turns,y=(t-0.5)*Hh,a=ang+(i%2)*Math.PI;
+      pos[i*3]=Math.cos(a)*R; pos[i*3+1]=y; pos[i*3+2]=Math.sin(a)*R;}
+    var g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+    var m=new THREE.PointsMaterial({color:0xffffff,size:0.06,sizeAttenuation:true,transparent:true,opacity:0.92,blending:THREE.AdditiveBlending,depthWrite:false});
+    grp.add(new THREE.Points(g,m));
+    // ambient haze
+    var Mn=1100,hp=new Float32Array(Mn*3);
+    for(var j=0;j<Mn;j++){hp[j*3]=(Math.random()-0.5)*30;hp[j*3+1]=(Math.random()-0.5)*22;hp[j*3+2]=(Math.random()-0.5)*30;}
+    var hg=new THREE.BufferGeometry(); hg.setAttribute('position',new THREE.BufferAttribute(hp,3));
+    var hm=new THREE.PointsMaterial({color:0xffffff,size:0.03,transparent:true,opacity:0.22,blending:THREE.AdditiveBlending,depthWrite:false});
+    grp.add(new THREE.Points(hg,hm));
+    function rs(){var w=cv.clientWidth,h=cv.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+    window.addEventListener('resize',rs); rs();
+    var tx=0,ty=0,mx=0,my=0,reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.addEventListener('pointermove',function(e){tx=e.clientX/window.innerWidth-0.5;ty=e.clientY/window.innerHeight-0.5;});
+    function loop(t){
+      grp.rotation.y += reduce?0:0.0017;
+      mx+=(tx-mx)*0.045; my+=(ty-my)*0.045;
+      grp.rotation.x = my*0.55; cam.position.x = mx*3.2; cam.lookAt(0,0,0);
+      m.opacity = 0.7+0.25*Math.sin(t*0.0011);
+      renderer.render(scene,cam);
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
   }
 })();
 </script>
