@@ -268,6 +268,23 @@
   .pcard{border-radius:22px}
   .nav a.cta,.btn{border-radius:999px}
 
+  .evgrid{display:grid;grid-template-columns:.85fr 1.15fr;gap:40px;align-items:center;margin-top:46px}
+  .evpyr svg{max-width:440px;margin:0 auto}
+  .evpyr .cap{text-transform:none;letter-spacing:0;font-family:var(--body);font-size:13px;color:var(--mut);text-align:center;margin-top:16px;max-width:42ch;margin-left:auto;margin-right:auto}
+  .evpillars{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .evp{background:rgba(255,255,255,.035);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.09);border-radius:18px;padding:22px 20px}
+  .evp .t{font-family:var(--head);font-size:15px;letter-spacing:.01em;margin-bottom:8px}
+  .evp p{font-size:13px;color:var(--mut)}
+  .refs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}
+  .ref{text-decoration:none;display:flex;flex-direction:column;gap:8px;padding:20px 20px;border-radius:16px;
+    background:rgba(255,255,255,.035);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
+    border:1px solid rgba(255,255,255,.09);transition:transform .35s,border-color .35s,background .35s;cursor:pointer}
+  .ref:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.06)}
+  .ref .rt{font-family:var(--head);font-size:15px;letter-spacing:-.01em;color:#fff}
+  .ref .rs{font-size:12.5px;color:var(--mut);line-height:1.5}
+  .ref .rs i{font-style:normal;color:#cfcfcf}
+  @media(max-width:860px){.evgrid{grid-template-columns:1fr}.evpillars{grid-template-columns:1fr}.refs{grid-template-columns:1fr}}
+
   @media(prefers-reduced-motion:reduce){
     .reveal{transition:none;opacity:1;transform:none}
     .scrollcue,.core,.spin,.pcard::after,.hero .ping,.statgrid .s.in .num{animation:none}
@@ -294,7 +311,6 @@
   <div class="ping p3" aria-hidden="true"></div>
   <div class="vignette"></div>
   <div class="inner">
-    <div class="eyebrow">Harness &middot; Health Engineering</div>
     <h1>Body data in.<br /><span class="l2">Life decisions out.</span></h1>
     <p class="sub">A local AI lab that runs experiments on <em>your</em> life &mdash; and tells you, with proof, what actually makes it better.</p>
     <div class="btns">
@@ -417,6 +433,50 @@
     </div>
     <p class="quote reveal">&ldquo;Creatine moved nothing for you in three weeks &mdash; stop paying for it.&rdquo;
       <span class="by">&mdash; the kind of sentence no wearable will ever say</span></p>
+  </div>
+</section>
+
+<section class="evidence">
+  <div class="wrap">
+    <div class="eyebrow kicker reveal">Grounded, not vibes</div>
+    <h2 class="big reveal">Standing in evidence-based medicine.</h2>
+    <p class="lead reveal">Not a medical device &mdash; and not invented. The discipline it enforces is the one clinical science uses to decide whether something works for one specific person.</p>
+
+    <div class="evgrid">
+      <div class="evpyr reveal">
+        <svg viewBox="0 0 460 360" role="img" aria-label="Evidence pyramid — n-of-1 trials at the apex for individual decisions">
+          <polygon points="230,30 300,108 160,108" fill="#fff"/>
+          <text x="230" y="80" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="16" fill="#000">n-of-1</text>
+          <polygon points="150,118 310,118 345,186 115,186" fill="rgba(255,255,255,.16)"/>
+          <text x="230" y="160" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" fill="#dcdcdc">Systematic reviews</text>
+          <polygon points="108,196 352,196 388,264 72,264" fill="rgba(255,255,255,.10)"/>
+          <text x="230" y="238" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" fill="#a9a9a9">Population RCTs</text>
+          <polygon points="64,274 396,274 432,342 28,342" fill="rgba(255,255,255,.05)"/>
+          <text x="230" y="316" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" fill="#8a8a8a">Cohort &middot; case &middot; opinion</text>
+          <line x1="312" y1="69" x2="430" y2="69" stroke="#333"/>
+          <text x="430" y="56" text-anchor="end" font-family="Space Grotesk, sans-serif" font-size="13" fill="#fff" letter-spacing="1">OCEBM Level 1</text>
+          <text x="430" y="84" text-anchor="end" font-family="Inter, sans-serif" font-size="12" fill="#8a8a8a">for the individual</text>
+        </svg>
+        <div class="cap">For a population, RCTs rank higher. For deciding what works for <em>you</em>, the n-of-1 trial is the top tier.</div>
+      </div>
+      <div class="evpillars">
+        <div class="evp reveal"><div class="t">n-of-1 trials</div><p>Single-subject design from personalised medicine: pre-registered, one variable, washout, verdict.</p></div>
+        <div class="evp reveal"><div class="t">Outcome over surrogate</div><p>Anchored on a patient-reported outcome (PRO), not a proxy like HRV. Validated tradition (WHO-5).</p></div>
+        <div class="evp reveal"><div class="t">Evidence grading</div><p>Every claim labelled fact / inference / assumption and cited &mdash; observation split from interpretation.</p></div>
+        <div class="evp reveal"><div class="t">Momentary capture</div><p>Logging in the moment is ecological momentary assessment &mdash; it beats recalled, reconstructed diaries.</p></div>
+      </div>
+    </div>
+
+    <div class="eyebrow kicker reveal" style="margin-top:64px">The receipts</div>
+    <div class="refs">
+      <a class="ref reveal" href="https://www.cebm.ox.ac.uk/resources/levels-of-evidence/ocebm-levels-of-evidence" target="_blank" rel="noopener"><span class="rt">OCEBM 2011 Levels of Evidence</span><span class="rs">Oxford Centre for EBM &middot; n-of-1 = Level 1 (individual) <i>&#8599;</i></span></a>
+      <a class="ref reveal" href="https://doi.org/10.1056/NEJM198604033141406" target="_blank" rel="noopener"><span class="rt">Guyatt et al., 1986</span><span class="rs">N Engl J Med &middot; randomized trials in individual patients <i>&#8599;</i></span></a>
+      <a class="ref reveal" href="https://effectivehealthcare.ahrq.gov/products/n-1-trials/research-2014-5" target="_blank" rel="noopener"><span class="rt">AHRQ N-of-1 User&rsquo;s Guide</span><span class="rs">Kravitz &amp; Duan, 2014 &middot; design &amp; implementation <i>&#8599;</i></span></a>
+      <a class="ref reveal" href="https://doi.org/10.1136/bmj.h1738" target="_blank" rel="noopener"><span class="rt">CENT 2015</span><span class="rs">BMJ &middot; CONSORT extension for n-of-1 reporting <i>&#8599;</i></span></a>
+      <a class="ref reveal" href="https://doi.org/10.1159/000376585" target="_blank" rel="noopener"><span class="rt">WHO-5 Well-Being Index</span><span class="rs">Topp et al., 2015 &middot; validated PRO instrument <i>&#8599;</i></span></a>
+      <a class="ref reveal" href="https://doi.org/10.1146/annurev.clinpsy.3.022806.091415" target="_blank" rel="noopener"><span class="rt">Ecological Momentary Assessment</span><span class="rs">Shiffman, Stone &amp; Hufford, 2008 <i>&#8599;</i></span></a>
+    </div>
+    <p class="lead reveal" style="margin-top:30px">Full clinician brief, limitations, and the rest of the references &mdash; in <a href="https://github.com/cryptoyoginya/harness-health-engineering/blob/main/METHODOLOGY.md#8-for-clinicians--the-evidence-pedigree" target="_blank" rel="noopener" style="border-bottom:1px solid #555;text-decoration:none">METHODOLOGY.md &#8599;</a></p>
   </div>
 </section>
 
