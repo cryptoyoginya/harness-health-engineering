@@ -172,9 +172,10 @@
   @media(max-width:860px){.statgrid,.steps,.grid4,.feat,.stack,.vs .cols,.photos,.tyr,.board{grid-template-columns:1fr}}
   @media(max-width:720px){
     .board{grid-template-columns:repeat(3,1fr)}
-    .viz{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-    .viz::-webkit-scrollbar{display:none}
-    .viz svg{min-width:560px}
+    .viz:not(.viz-fit){overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .viz:not(.viz-fit)::-webkit-scrollbar{display:none}
+    .viz:not(.viz-fit) svg{min-width:620px}
+    .viz-fit svg{min-width:0}
   }
   .pick{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
   .pick button{font-family:var(--head);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#cfcfcf;background:#070707;border:1px solid #2a2a2a;border-radius:999px;padding:11px 18px;cursor:pointer;transition:.2s}
@@ -346,7 +347,7 @@
     <h2 class="big reveal">You don't want more data. You want a life that's actually good.</h2>
     <p class="lead reveal">Longevity, recovery, sleep &mdash; all of it is a <em>means</em>. The end is whether your days are worth having. This system keeps that end in the frame on purpose, because it's the one thing a tracker structurally can't: a wearable doesn't know what your good life looks like. <b style="color:#eee;font-weight:500">You do</b> &mdash; so you name it, and everything else is held accountable to it.</p>
     <p class="pull reveal" style="margin-top:48px">The top metric isn't a body score.<br /><span class="em q" style="display:block;margin-top:10px;font-size:clamp(30px,6vw,72px)">Is my life actually better?</span></p>
-    <div class="viz reveal">
+    <div class="viz viz-fit reveal">
       <svg viewBox="0 0 1000 600" role="img" aria-label="Life domains orbiting the north-star">
         <g stroke="#262626" stroke-width="1" fill="none">
           <line x1="500" y1="300" x2="650" y2="300"/><line x1="500" y1="300" x2="575" y2="430"/>
@@ -359,7 +360,7 @@
         <g class="spin" fill="none" stroke="#202020" stroke-dasharray="2 9"><circle cx="500" cy="300" r="150"/></g>
         <g class="spin rev" fill="none" stroke="#1c1c1c" stroke-dasharray="2 11"><circle cx="500" cy="300" r="250"/></g>
         <g id="domDots" fill="#fff"></g>
-        <g font-family="Space Grotesk, sans-serif" font-size="20" fill="#cfcfcf" letter-spacing="1">
+        <g font-family="Space Grotesk, sans-serif" font-size="30" fill="#cfcfcf" letter-spacing="1">
           <text x="672" y="304">Body</text>
           <text x="575" y="452" text-anchor="middle">Movement</text>
           <text x="425" y="452" text-anchor="middle">Food</text>
@@ -444,18 +445,16 @@
 
     <div class="evgrid">
       <div class="evpyr reveal">
-        <svg viewBox="0 0 460 360" role="img" aria-label="Evidence pyramid — n-of-1 trials at the apex for individual decisions">
-          <polygon points="230,30 300,108 160,108" fill="#fff"/>
-          <text x="230" y="80" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="16" fill="#000">n-of-1</text>
-          <polygon points="150,118 310,118 345,186 115,186" fill="rgba(255,255,255,.16)"/>
-          <text x="230" y="160" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" fill="#dcdcdc">Systematic reviews</text>
-          <polygon points="108,196 352,196 388,264 72,264" fill="rgba(255,255,255,.10)"/>
-          <text x="230" y="238" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" fill="#a9a9a9">Population RCTs</text>
-          <polygon points="64,274 396,274 432,342 28,342" fill="rgba(255,255,255,.05)"/>
-          <text x="230" y="316" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" fill="#8a8a8a">Cohort &middot; case &middot; opinion</text>
-          <line x1="312" y1="69" x2="430" y2="69" stroke="#333"/>
-          <text x="430" y="56" text-anchor="end" font-family="Space Grotesk, sans-serif" font-size="13" fill="#fff" letter-spacing="1">OCEBM Level 1</text>
-          <text x="430" y="84" text-anchor="end" font-family="Inter, sans-serif" font-size="12" fill="#8a8a8a">for the individual</text>
+        <svg viewBox="0 0 460 388" role="img" aria-label="Evidence pyramid — n-of-1 trials at the apex for individual decisions">
+          <text x="230" y="22" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="16" fill="#9a9a9a" letter-spacing="1">OCEBM LEVEL 1 &middot; FOR YOU</text>
+          <polygon points="230,40 314,126 146,126" fill="#fff"/>
+          <text x="230" y="100" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="23" fill="#000">n-of-1</text>
+          <polygon points="136,136 324,136 360,208 100,208" fill="rgba(255,255,255,.16)"/>
+          <text x="230" y="180" text-anchor="middle" font-family="Inter, sans-serif" font-size="20" fill="#e4e4e4">Systematic reviews</text>
+          <polygon points="90,218 370,218 406,290 54,290" fill="rgba(255,255,255,.10)"/>
+          <text x="230" y="262" text-anchor="middle" font-family="Inter, sans-serif" font-size="20" fill="#b2b2b2">Population RCTs</text>
+          <polygon points="44,300 416,300 452,372 8,372" fill="rgba(255,255,255,.05)"/>
+          <text x="230" y="344" text-anchor="middle" font-family="Inter, sans-serif" font-size="20" fill="#909090">Cohort &middot; case &middot; opinion</text>
         </svg>
         <div class="cap">For a population, RCTs rank higher. For deciding what works for <em>you</em>, the n-of-1 trial is the top tier.</div>
       </div>
@@ -581,7 +580,7 @@
     <p class="lead reveal">Your whole life is a folder of plain Markdown you own &mdash; a layered pyramid where evidence flows up and nothing is asserted without a trail.</p>
     <div class="viz reveal">
       <svg viewBox="0 0 1000 330" role="img" aria-label="The knowledge pyramid, raw at the base and decisions at the top">
-        <g font-family="Space Grotesk, sans-serif" font-size="17" letter-spacing="1">
+        <g font-family="Space Grotesk, sans-serif" font-size="21" letter-spacing="1">
           <g><rect x="430" y="36" width="140" height="34" fill="#fff"/><text x="500" y="58" text-anchor="middle" fill="#000">06 outputs</text></g>
           <g><rect x="390" y="78" width="220" height="34" fill="#d8d8d8"/><text x="500" y="100" text-anchor="middle" fill="#000">05 decisions &middot; n-of-1</text></g>
           <g><rect x="345" y="120" width="310" height="34" fill="#9c9c9c"/><text x="500" y="142" text-anchor="middle" fill="#000">04 synthesis</text></g>
