@@ -247,6 +247,9 @@
   }
   .bento .b::before,.steps .st::before,.pcard::before{content:"";position:absolute;inset:0;border-radius:inherit;
     background:linear-gradient(180deg,rgba(255,255,255,.07),transparent 42%);pointer-events:none;z-index:0}
+  .bento .b::before,.steps .st::before{background:
+    radial-gradient(240px circle at var(--mx,50%) var(--my,0%), rgba(255,255,255,.13), transparent 55%),
+    linear-gradient(180deg,rgba(255,255,255,.07),transparent 42%);transition:background .12s}
   .bento .b>*,.steps .st>*,.pcard>*{position:relative;z-index:1}
   .bento .b:hover,.steps .st:hover,.pcard:hover,.calc .out:hover{
     background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.2);
@@ -291,7 +294,17 @@
     .scrollcue,.core,.spin,.pcard::after,.hero .ping,.statgrid .s.in .num{animation:none}
     .chartline{stroke-dashoffset:0}
     .hero .ping{display:none}.btn::after{display:none}.tilt{transform:none!important}
+    .hero h1 .ln>span{animation:none;transform:none}.hero .sub,.hero .btns{animation:none;opacity:1}
   }
+
+  /* kinetic headline reveal */
+  .hero h1 .ln{display:block;overflow:hidden;padding:.02em 0}
+  .hero h1 .ln>span{display:block;transform:translateY(115%);animation:hreveal 1.05s cubic-bezier(.22,1,.36,1) .15s forwards}
+  .hero h1 .ln.l2>span{animation-delay:.28s;color:var(--mut)}
+  @keyframes hreveal{to{transform:none}}
+  .hero .sub{opacity:0;animation:hfade 1s ease .7s forwards}
+  .hero .btns{opacity:0;animation:hfade 1s ease .9s forwards}
+  @keyframes hfade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
@@ -312,7 +325,7 @@
   <div class="ping p3" aria-hidden="true"></div>
   <div class="vignette"></div>
   <div class="inner">
-    <h1>Body data in.<br /><span class="l2">Life decisions out.</span></h1>
+    <h1><span class="ln"><span>Body data in.</span></span><span class="ln l2"><span>Life decisions out.</span></span></h1>
     <p class="sub">A local AI lab that runs experiments on <em>your</em> life &mdash; and tells you, with proof, what actually makes it better.</p>
     <div class="btns">
       <a class="btn" href="https://github.com/cryptoyoginya/harness-health-engineering">View the repo &#8599;</a>
@@ -708,6 +721,12 @@
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
 <script>
 (function(){
   // 3D hero: тысячи частиц-ДНК на WebGL (Three.js), фолбэк — 2D-канвас #dna.
@@ -853,8 +872,9 @@
       card.addEventListener('pointermove',function(e){
         var r=card.getBoundingClientRect(), px=(e.clientX-r.left)/r.width-0.5, py=(e.clientY-r.top)/r.height-0.5;
         card.style.transform='perspective(900px) rotateX('+(-py*4).toFixed(2)+'deg) rotateY('+(px*4).toFixed(2)+'deg) translateY(-4px)';
+        card.style.setProperty('--mx',((px+0.5)*100).toFixed(1)+'%'); card.style.setProperty('--my',((py+0.5)*100).toFixed(1)+'%');
       });
-      card.addEventListener('pointerleave',function(){card.style.transform='';});
+      card.addEventListener('pointerleave',function(){card.style.transform='';card.style.setProperty('--mx','50%');card.style.setProperty('--my','0%');});
     });
     // magnetic buttons
     document.querySelectorAll('.btn, nav a.cta').forEach(function(btn){
@@ -895,10 +915,24 @@
     var hg=new THREE.BufferGeometry(); hg.setAttribute('position',new THREE.BufferAttribute(hp,3));
     grp.add(new THREE.Points(hg,new THREE.PointsMaterial({color:0xffffff,size:0.035,transparent:true,opacity:0.28,blending:THREE.AdditiveBlending,depthWrite:false})));
 
-    function rs(){var w=cv.clientWidth,h=cv.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+    // cinematic bloom (guarded — falls back to plain render if addons didn't load)
+    var composer=null, bloom=null;
+    var useBloom = !!(THREE.EffectComposer && THREE.RenderPass && THREE.ShaderPass && THREE.UnrealBloomPass);
+    if(useBloom){ try{
+      composer=new THREE.EffectComposer(renderer);
+      composer.addPass(new THREE.RenderPass(scene,cam));
+      bloom=new THREE.UnrealBloomPass(new THREE.Vector2(1,1), 0.85, 0.55, 0.0); // strength, radius, threshold
+      composer.addPass(bloom);
+      glow.opacity=0.1; // bloom already glows — tame the fake halo material
+    }catch(e){ useBloom=false; } }
+
+    function rs(){var w=cv.clientWidth,h=cv.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();
+      if(composer)composer.setSize(w,h); if(bloom)bloom.setSize(w,h);}
     window.addEventListener('resize',rs); rs();
-    var tx=0,ty=0,mx=0,my=0,reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var tx=0,ty=0,mx=0,my=0,sY=0,reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.addEventListener('pointermove',function(e){tx=e.clientX/window.innerWidth-0.5;ty=e.clientY/window.innerHeight-0.5;});
+    window.addEventListener('scroll',function(){sY=window.scrollY||0;},{passive:true});
 
     var t0=null, DUR=2400, assembling=true;
     function ease(x){return 1-Math.pow(1-x,3);} // easeOutCubic
@@ -910,12 +944,15 @@
         posAttr.needsUpdate=true;
         if(p>=1) assembling=false;
       }
-      grp.rotation.y += reduce?0:0.0017;
+      var sc=Math.min(sY,1200);
+      grp.rotation.y += reduce?0:(0.0017 + sc*0.0000022); // spin faster as you scroll
       mx+=(tx-mx)*0.045; my+=(ty-my)*0.045;
-      grp.rotation.x = my*0.55; cam.position.x = mx*3.2; cam.lookAt(0,0,0);
+      grp.rotation.x = my*0.55; cam.position.x = mx*3.2;
+      cam.position.z = 15 + Math.min(sY,800)*0.005;      // gentle dolly-out on scroll
+      cam.lookAt(0,0,0);
       sharp.opacity = 0.85+0.15*Math.sin(t*0.0012);
-      glow.opacity  = 0.18+0.10*Math.sin(t*0.0012);
-      renderer.render(scene,cam);
+      if(!useBloom) glow.opacity = 0.18+0.10*Math.sin(t*0.0012);
+      if(useBloom) composer.render(); else renderer.render(scene,cam);
       requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
