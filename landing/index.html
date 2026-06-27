@@ -295,6 +295,7 @@
     .chartline{stroke-dashoffset:0}
     .hero .ping{display:none}.btn::after{display:none}.tilt{transform:none!important}
     .hero h1 .ln>span{animation:none;transform:none}.hero .sub,.hero .btns{animation:none;opacity:1}
+    .swipehint .arw{animation:none}
   }
 
   /* kinetic headline reveal */
@@ -305,6 +306,12 @@
   .hero .sub{opacity:0;animation:hfade 1s ease .7s forwards}
   .hero .btns{opacity:0;animation:hfade 1s ease .9s forwards}
   @keyframes hfade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+  .swipehint{display:none;text-align:center;margin-top:14px;transition:opacity .4s}
+  .swipehint .pill{display:inline-flex;align-items:center;gap:8px;font-family:var(--head);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mut);border:1px solid #2a2a2a;border-radius:999px;padding:8px 15px}
+  .swipehint .arw{display:inline-block;animation:swarrow 1.4s ease-in-out infinite;color:#fff}
+  @keyframes swarrow{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+  @media(max-width:720px){.swipehint{display:block}}
 </style>
 </head>
 <body>
@@ -858,6 +865,25 @@
   seg('cSonnet','cOpus','model','sonnet','opus');
   seg('cModeSub','cModeApi','mode','sub','api');
   calcCost();
+
+  // --- mobile: signal that wide infographics are swipeable ---
+  if(window.matchMedia('(max-width:720px)').matches){
+    var nudged=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.querySelectorAll('.viz:not(.viz-fit)').forEach(function(viz){
+      var hint=document.createElement('div'); hint.className='swipehint';
+      hint.innerHTML='<span class="pill">swipe to explore <span class="arw">&rarr;</span></span>';
+      viz.parentNode.insertBefore(hint, viz.nextSibling);
+      var hide=function(){hint.style.opacity='0';viz.removeEventListener('scroll',hide);};
+      viz.addEventListener('scroll',hide,{passive:true});
+    });
+    var sio=new IntersectionObserver(function(es){es.forEach(function(en){
+      if(!en.isIntersecting)return; var el=en.target; sio.unobserve(el);
+      if(!nudged && el.scrollWidth>el.clientWidth+8){
+        try{ el.scrollTo({left:38,behavior:'smooth'}); setTimeout(function(){el.scrollTo({left:0,behavior:'smooth'});},760);}catch(e){}
+      }
+    });},{threshold:.55});
+    document.querySelectorAll('.viz:not(.viz-fit)').forEach(function(v){sio.observe(v);});
+  }
 
   // --- scroll progress bar ---
   var prog=document.getElementById('prog');
