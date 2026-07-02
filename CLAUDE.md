@@ -29,7 +29,7 @@ HRV, REM, SpO2); аббревиатуры; цифры и единицы (₽, %,
 | **Operational rules** | [`CLAUDE.md`](./CLAUDE.md) (этот файл) | язык, ветки, домен-правила здоровья |
 | **Permissions + Hooks** | [`.claude/settings.json`](./.claude/settings.json) | что разрешено авто, какие хуки проверяют записи |
 | **Working memory** | [`.remember/core.md`](./.remember/core.md) | semantic invariant (коммитится) |
-| **Skills** | [`skills/`](./skills/) | плейбуки: red-recovery, sleep-debt, mood-dip, injury, getting-back, weekly-synthesis |
+| **Skills** | [`skills/`](./skills/) | плейбуки: red-recovery, sleep-debt, mood-dip, injury, getting-back, weekly-synthesis, coach |
 | **Whoop ingest** | [`scripts/whoop/`](./scripts/whoop/) | `auth.mjs` (OAuth разово), `sync.mjs` (утро: физиология → daily-лог) |
 | **Semantic search** | [`scripts/semantic/`](./scripts/semantic/) | on-device hybrid RAG: `search.mjs`, `think.mjs`, `backlinks.mjs` |
 | **MCP-сервер KB** | [`scripts/semantic/mcp-server.mjs`](./scripts/semantic/mcp-server.mjs) | `kb_search`, `kb_think`, `kb_backlinks`. Конфиг: [`.mcp.json`](./.mcp.json) |
