@@ -36,6 +36,11 @@ tools/viewer/.vite/
 04_synthesis/stool-diary.md
 04_synthesis/food-diary.md
 
+# Личные записи-дневники (свободный текст) — приватно, репо публичный.
+# Whoop-логи о здоровье (цифры) остаются публичными; прячем только личный free-text.
+00_context/north-star.md
+01_raw/health/2026-06-13.md
+
 # Кэш моделей transformers.js (~120 MB)
 scripts/semantic/.transformers-cache/
 
