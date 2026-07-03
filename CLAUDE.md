@@ -60,6 +60,8 @@ HRV, REM, SpO2); аббревиатуры; цифры и единицы (₽, %,
 - **Утро:** `pnpm whoop:sync` → recovery определяет цвет дня (зелёный/жёлтый/красный плейбук).
 - **Вечер:** дополнить daily-лог ментальной строкой (~20 сек).
 - **Воскресенье 18:00:** weekly-синтез ([`skills/health-weekly-synthesis.md`](./skills/health-weekly-synthesis.md)).
+- **Конец месяца:** разбор по 5 сферам жизни (достижения/провалы/корректируем) + 6 граней
+  ([`skills/health-life-review.md`](./skills/health-life-review.md)); ведёт приватный `.context/coaching/spheres.md`.
 - **Триггер:** HRV ниже личного бейзлайна 3+ дня → внеплановый разбор.
 
 ## Запуск проекта
