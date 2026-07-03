@@ -47,8 +47,17 @@ export async function fetchSnapshot() {
     try { const d = await whoopGet(p, { limit: 1 }); return d.records?.[0] ?? null; }
     catch { return null; }
   };
+  // strain — у последнего ЗАВЕРШЁННОГО цикла (end!=null): текущий цикл ещё копится,
+  // утром его strain≈0 и подписывать его «за вчера» было бы враньём.
+  const completedCycle = async () => {
+    try {
+      const d = await whoopGet('/v2/cycle', { limit: 5 });
+      const recs = d.records ?? [];
+      return recs.find((c) => c.end != null) ?? recs[0] ?? null;
+    } catch { return null; }
+  };
   const [recovery, cycle, sleep] = await Promise.all([
-    one('/v2/recovery'), one('/v2/cycle'), one('/v2/activity/sleep'),
+    one('/v2/recovery'), completedCycle(), one('/v2/activity/sleep'),
   ]);
   return buildSnapshot(recovery, cycle, sleep);
 }
